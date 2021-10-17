@@ -4,12 +4,13 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 func main() {
 	series := "n6316bn"
 	start := 1
-	end := 2 // 304
+	end := 10 // 304
 
 	generator := func(done <-chan interface{}, start, end int) <-chan string {
 		stream := make(chan string)
@@ -20,6 +21,31 @@ func main() {
 				case <-done:
 					return
 				case stream <- urlFor(series, i):
+				}
+			}
+		}()
+
+		return stream
+	}
+
+	backoff := func(
+		done <-chan interface{},
+		urlStream <-chan string,
+	) <-chan string {
+		stream := make(chan string)
+		counter := 0
+		go func() {
+			defer close(stream)
+			for url := range urlStream {
+				if counter%3 == 0 {
+					time.Sleep(1 * time.Second)
+				}
+				counter++
+
+				select {
+				case <-done:
+					return
+				case stream <- url:
 				}
 			}
 		}()
@@ -50,10 +76,10 @@ func main() {
 	defer close(done)
 
 	urlStream := generator(done, start, end)
-	pipeline := download(done, urlStream)
+	pipeline := download(done, backoff(done, urlStream))
 
 	for v := range pipeline {
-		fmt.Println(v.URL + ": " + v.Body)
+		fmt.Println(v.URL + ": ")
 	}
 }
 
