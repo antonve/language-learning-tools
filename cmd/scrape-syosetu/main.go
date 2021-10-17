@@ -103,7 +103,7 @@ func main() {
 	pipeline := normalize(done, download(done, backoff(done, urlStream, 1*time.Second, 3)))
 
 	for v := range pipeline {
-		fmt.Println(v.URL + ": " + v.Title)
+		fmt.Println(v.URL+": "+v.Title, v.Length())
 	}
 }
 
@@ -118,6 +118,9 @@ func normalizeChapter(raw RawChapter) Chapter {
 	title := htmlquery.FindOne(doc, "//p[@class=\"novel_subtitle\"]")
 	c.Title = htmlquery.InnerText(title)
 
+	body := htmlquery.FindOne(doc, "//div[@id=\"novel_honbun\"]")
+	c.Body = htmlquery.InnerText(body)
+
 	return c
 }
 
@@ -125,6 +128,10 @@ type Chapter struct {
 	URL   string
 	Title string
 	Body  string
+}
+
+func (c Chapter) Length() int {
+	return len(c.Body)
 }
 
 type RawChapter struct {
