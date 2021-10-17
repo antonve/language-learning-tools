@@ -1,12 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/pkg/errors"
@@ -52,6 +54,37 @@ func main() {
 	}
 
 	wg.Wait()
+
+	Search(word, chapters)
+}
+
+func Search(word string, chapters []*Chapter) {
+	maxConcurrentSearches := int64(100)
+	sem := semaphore.NewWeighted(maxConcurrentSearches)
+	mu := sync.RWMutex{}
+
+	results := []Result{}
+
+	wg := &sync.WaitGroup{}
+	for _, c := range chapters {
+		wg.Add(1)
+		sem.Acquire(context.Background(), 1)
+
+		go func(ch *Chapter) {
+			res := ch.Find(word)
+			mu.Lock()
+			results = append(results, res...)
+			mu.Unlock()
+			sem.Release(1)
+			wg.Done()
+		}(c)
+	}
+
+	wg.Wait()
+
+	for _, res := range results {
+		fmt.Println(res.Chapter.Path, res.Line)
+	}
 }
 
 func loadSeries(path string) ([]*Chapter, error) {
@@ -129,4 +162,27 @@ func (c *Chapter) Load() error {
 	}
 	c.body = string(body)
 	return nil
+}
+
+func (c *Chapter) Find(word string) []Result {
+	scanner := bufio.NewScanner(strings.NewReader(c.Body()))
+	results := []Result{}
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.Contains(line, word) {
+			result := Result{
+				Line:    line,
+				Chapter: c,
+			}
+			results = append(results, result)
+		}
+	}
+
+	return results
+}
+
+type Result struct {
+	Line    string
+	Chapter *Chapter
 }
