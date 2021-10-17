@@ -24,6 +24,6 @@ func main() {
 	results := corpus.Search(word)
 
 	for _, res := range results {
-		fmt.Println(res.Chapter.Path, res.Line)
+		fmt.Println(res.Chapter.Series, res.Chapter.Title(), res.Line)
 	}
 }

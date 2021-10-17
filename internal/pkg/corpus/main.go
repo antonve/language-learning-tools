@@ -135,7 +135,8 @@ type Chapter struct {
 	Series string
 	Path   string
 
-	body string
+	body  string
+	title string
 }
 
 func NewChapter(series, path string) *Chapter {
@@ -151,12 +152,21 @@ func (c *Chapter) Body() string {
 	return c.body
 }
 
+func (c *Chapter) Title() string {
+	return c.title
+}
+
 func (c *Chapter) Load() error {
 	body, err := os.ReadFile(c.Path)
 	if err != nil {
 		return errors.Wrap(err, "could not load body for chapter: "+c.Path)
 	}
 	c.body = string(body)
+
+	scanner := bufio.NewScanner(strings.NewReader(c.Body()))
+	scanner.Scan()
+	c.title = scanner.Text()
+
 	return nil
 }
 
