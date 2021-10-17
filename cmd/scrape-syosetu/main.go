@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -13,7 +14,7 @@ import (
 func main() {
 	series := "n6316bn"
 	start := 1
-	end := 10 // 304
+	end := 304
 
 	generator := func(done <-chan interface{}, start, end int) <-chan RawChapter {
 		stream := make(chan RawChapter)
@@ -104,11 +105,20 @@ func main() {
 
 	for v := range pipeline {
 		fmt.Println(v.URL+": "+v.Title, v.Length())
+		save("./out", v)
+	}
+}
+
+func save(path string, chapter Chapter) {
+	filePath := fmt.Sprintf("%s/%05d.txt", path, chapter.Index)
+	err := os.WriteFile(filePath, chapter.Serialize(), 0644)
+	if err != nil {
+		panic(err)
 	}
 }
 
 func normalizeChapter(raw RawChapter) Chapter {
-	c := Chapter{URL: raw.URL}
+	c := Chapter{URL: raw.URL, Index: raw.Index}
 
 	doc, err := htmlquery.Parse(strings.NewReader(raw.Body))
 	if err != nil {
@@ -133,6 +143,10 @@ type Chapter struct {
 
 func (c Chapter) Length() int {
 	return len(c.Body)
+}
+
+func (c Chapter) Serialize() []byte {
+	return []byte(fmt.Sprintf("%s\n\n%s", c.Title, c.Body))
 }
 
 type RawChapter struct {
