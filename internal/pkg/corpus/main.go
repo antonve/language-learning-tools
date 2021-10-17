@@ -29,10 +29,6 @@ func New(path string) (cor Corpus, err error) {
 		return nil, err
 	}
 
-	for _, c := range chapters {
-		fmt.Println(c.Path)
-	}
-
 	maxOpenFiles := int64(25)
 	sem := semaphore.NewWeighted(maxOpenFiles)
 
@@ -124,7 +120,7 @@ func loadChapters(series string, path string) ([]*Chapter, error) {
 			continue
 		}
 
-		c := NewChapter(series, fp)
+		c := NewChapter(series, fp, f.Name())
 		chapters = append(chapters, c)
 	}
 
@@ -132,17 +128,19 @@ func loadChapters(series string, path string) ([]*Chapter, error) {
 }
 
 type Chapter struct {
-	Series string
-	Path   string
+	Series   string
+	Path     string
+	Filename string
 
 	body  string
 	title string
 }
 
-func NewChapter(series, path string) *Chapter {
+func NewChapter(series, path, filename string) *Chapter {
 	c := &Chapter{
-		Series: series,
-		Path:   path,
+		Series:   series,
+		Path:     path,
+		Filename: filename,
 	}
 
 	return c
