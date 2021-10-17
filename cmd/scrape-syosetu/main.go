@@ -31,14 +31,16 @@ func main() {
 	backoff := func(
 		done <-chan interface{},
 		urlStream <-chan string,
+		timeout time.Duration,
+		per int,
 	) <-chan string {
 		stream := make(chan string)
 		counter := 0
 		go func() {
 			defer close(stream)
 			for url := range urlStream {
-				if counter%3 == 0 {
-					time.Sleep(1 * time.Second)
+				if counter%per == 0 {
+					time.Sleep(timeout)
 				}
 				counter++
 
@@ -76,7 +78,7 @@ func main() {
 	defer close(done)
 
 	urlStream := generator(done, start, end)
-	pipeline := download(done, backoff(done, urlStream))
+	pipeline := download(done, backoff(done, urlStream, 1*time.Second, 3))
 
 	for v := range pipeline {
 		fmt.Println(v.URL + ": ")
