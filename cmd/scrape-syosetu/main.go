@@ -4,7 +4,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
+
+	"github.com/antchfx/htmlquery"
 )
 
 func main() {
@@ -74,15 +77,48 @@ func main() {
 		return stream
 	}
 
+	normalize := func(
+		done <-chan interface{},
+		chapterStream <-chan RawChapter,
+	) <-chan Chapter {
+		stream := make(chan Chapter)
+		go func() {
+			defer close(stream)
+			for raw := range chapterStream {
+				select {
+				case <-done:
+					return
+				case stream <- normalizeChapter(raw):
+				}
+			}
+		}()
+
+		return stream
+	}
+
 	done := make(chan interface{})
 	defer close(done)
 
 	urlStream := generator(done, start, end)
-	pipeline := download(done, backoff(done, urlStream, 1*time.Second, 3))
+	pipeline := normalize(done, download(done, backoff(done, urlStream, 1*time.Second, 3)))
 
 	for v := range pipeline {
-		fmt.Println(v.URL + ": ")
+		fmt.Println(v.URL + ": " + v.Title)
 	}
+}
+
+func normalizeChapter(raw RawChapter) Chapter {
+	c := Chapter{URL: raw.URL}
+
+	doc, err := htmlquery.Parse(strings.NewReader(raw.Body))
+	if err != nil {
+		panic(err)
+	}
+
+	title := htmlquery.FindOne(doc, "//p[@class=\"novel_subtitle\"]")
+	c.Title = htmlquery.InnerText(title)
+
+	return c
 }
 
 type Chapter struct {
