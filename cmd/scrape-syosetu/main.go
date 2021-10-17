@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -12,9 +13,15 @@ import (
 )
 
 func main() {
-	series := "n6316bn"
-	start := 1
-	end := 304
+	var series string
+	var start int
+	var end int
+
+	flag.StringVar(&series, "series", "n6316bn", "the code of a series")
+	flag.IntVar(&start, "start", 1, "the starting chapter")
+	flag.IntVar(&end, "end", 10, "the ending chapter")
+
+	flag.Parse()
 
 	generator := func(done <-chan interface{}, start, end int) <-chan RawChapter {
 		stream := make(chan RawChapter)
