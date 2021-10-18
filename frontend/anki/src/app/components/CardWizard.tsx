@@ -7,11 +7,19 @@ import Button from '@app/components/Button'
 import { TextInput, TextArea, Label } from '@app/components/Form'
 import classNames from 'classnames'
 
-const CardWizard = ({ word }: { word: Word | undefined }) => {
+const CardWizard = ({
+  word,
+  id,
+  updateWord,
+}: {
+  word: Word | undefined
+  id: string | undefined
+  updateWord: (newWord: Word, id: string) => void
+}) => {
   const { definition: definitionEn } = useEnglishDefition(word?.value)
   const { sentences } = useSentences(word?.value)
 
-  if (word === undefined) {
+  if (word === undefined || id === undefined) {
     return <div className="px-8 py-6 w-1/2">Select a word to add</div>
   }
 
@@ -22,11 +30,15 @@ const CardWizard = ({ word }: { word: Word | undefined }) => {
         <form>
           <div className="mb-4">
             <Label htmlFor="sentence">Sentence</Label>
-            <TextArea id="sentence" rows={4} />
+            <TextArea
+              id="sentence"
+              rows={4}
+              value={word.meta?.sentence?.line ?? ''}
+            />
           </div>
           <div className="mb-6">
             <Label htmlFor="reading">Reading</Label>
-            <TextInput id="reading" />
+            <TextInput id="reading" value={word.meta?.reading} />
           </div>
           <div className="flex items-center justify-between">
             <Button>Save</Button>
@@ -35,7 +47,22 @@ const CardWizard = ({ word }: { word: Word | undefined }) => {
       </div>
       <div className="bg-gray-200 w-1/2 px-8 py-6">
         <h2 className="text-xl font-bold mb-4">Example sentences</h2>
-        <SentenceList sentences={sentences} />
+        <SentenceList
+          sentences={sentences}
+          onSelect={(sentence: Sentence) => {
+            const newWord: Word = {
+              ...word,
+              meta: {
+                reading: word.meta?.reading,
+                definitionEnglish: word.meta?.definitionEnglish,
+                definitionJapanese: word.meta?.definitionJapanese,
+                vocabCard: word.meta?.vocabCard ?? false,
+                sentence,
+              },
+            }
+            updateWord(newWord, id)
+          }}
+        />
       </div>
     </div>
   )
@@ -43,8 +70,10 @@ const CardWizard = ({ word }: { word: Word | undefined }) => {
 
 const SentenceList = ({
   sentences,
+  onSelect,
 }: {
   sentences: SentencesResult | undefined
+  onSelect: (sentence: Sentence) => void
 }) => {
   if (!sentences || sentences.results.length === 0) {
     return <>no sentences found</>
@@ -53,7 +82,7 @@ const SentenceList = ({
   return (
     <ul>
       {sentences.results.map((s, i) => (
-        <SentenceListItem sentence={s} isActive={i === 0} />
+        <SentenceListItem sentence={s} isActive={i === 0} onSelect={onSelect} />
       ))}
     </ul>
   )
@@ -62,19 +91,24 @@ const SentenceList = ({
 const SentenceListItem = ({
   sentence,
   isActive,
+  onSelect,
 }: {
   sentence: Sentence
   isActive: boolean
+  onSelect: (sentence: Sentence) => void
 }) => {
   return (
-    <li
-      className={classNames(
-        'px-4 pt-3 -mx-3 my-3 rounded bg-white shadow-s transition duration-200 ease-in-out cursor-pointer hover:shadow-md hover:opacity-50 overflow-hidden',
-        { 'bg-purple-600 text-white': isActive },
-      )}
-    >
-      {sentence.line}
-      <span className="block w-100 text-xs -mx-4 px-4 py-2 mt-3 bg-gray-900 text-gray-100">
+    <li className="-mx-3 my-3 rounded shadow-s transition duration-200 ease-in-out hover:shadow-md  overflow-hidden">
+      <a
+        href="#"
+        onClick={() => onSelect(sentence)}
+        className={classNames('hover:opacity-50 block px-4 py-3 bg-white ', {
+          'bg-purple-600 text-white': isActive,
+        })}
+      >
+        {sentence.line}
+      </a>
+      <span className="block w-100 text-xs px-4 py-2 bg-gray-900 text-gray-100">
         <a href="#">
           {sentence.series} - {sentence.chapter}
         </a>

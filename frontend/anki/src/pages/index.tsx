@@ -4,10 +4,10 @@ import type { NextPage } from 'next'
 import Layout from '@app/components/Layout'
 import Sidebar from '@app/components/Sidebar'
 import CardWizard from '@app/components/CardWizard'
-import { WordCollection } from '@app/domain'
+import { Word, WordCollection } from '@app/domain'
 
 const Home: NextPage = () => {
-  const words: WordCollection = {
+  const [words, setWords] = useState({
     '33935dba-b20f-4fd6-9d9e-80c7f2309aea': {
       value: '手が回らない',
       done: true,
@@ -48,11 +48,19 @@ const Home: NextPage = () => {
       done: false,
       meta: undefined,
     },
-  }
+  } as WordCollection)
 
   const [selectedWordId, setSelectedWordId] = useState(
     Object.keys(words)[0] as string,
   )
+
+  const updateWord = (newWord: Word, id: string) => {
+    if (words[id] === undefined) {
+      return
+    }
+
+    setWords({ ...words, [id]: newWord })
+  }
 
   return (
     <Layout>
@@ -65,7 +73,11 @@ const Home: NextPage = () => {
           />
         </div>
         <div className="bg-gray-50 w-full rounded-sm">
-          <CardWizard word={words?.[selectedWordId]} />
+          <CardWizard
+            word={words?.[selectedWordId]}
+            id={selectedWordId}
+            updateWord={updateWord}
+          />
         </div>
       </div>
     </Layout>
