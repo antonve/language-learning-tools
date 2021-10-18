@@ -117,5 +117,23 @@ func (api *api) JishoProxy(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	return c.JSON(http.StatusOK, res)
+	response := JishoProxyResponse{
+		Word:        token,
+		Definitions: make([]JishoProxyDefinition, len(res.Definitions)),
+	}
+
+	for i, d := range res.Definitions {
+		response.Definitions[i] = JishoProxyDefinition{Meaning: d.Meaning}
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+type JishoProxyResponse struct {
+	Word        string                 `json:"word"`
+	Definitions []JishoProxyDefinition `json:"definitions"`
+}
+
+type JishoProxyDefinition struct {
+	Meaning string `json:"meaning"`
 }
