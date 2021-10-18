@@ -4,6 +4,7 @@ import classNames from 'classnames'
 
 import Layout from '@app/components/Layout'
 import Sidebar from '@app/components/Sidebar'
+import CardWizard from '@app/components/CardWizard'
 
 const Home: NextPage = () => {
   const words = [
@@ -29,7 +30,7 @@ const Home: NextPage = () => {
             words={words}
           />
         </div>
-        <div className="bg-gray-50 h-12 w-full md:w-3/4 rounded-sm">
+        <div className="bg-gray-50 w-full md:w-3/4 rounded-sm">
           <CardWizard />
         </div>
       </div>
@@ -38,5 +39,3 @@ const Home: NextPage = () => {
 }
 
 export default Home
-
-const CardWizard = () => null
