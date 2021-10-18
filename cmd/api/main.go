@@ -59,7 +59,7 @@ func (api *api) SearchCorpus(c echo.Context) error {
 }
 
 type SearchCorpusResponse struct {
-	Results []SearchResult
+	Results []SearchResult `json:"results"`
 }
 
 type SearchResult struct {
