@@ -1,4 +1,4 @@
-import { Sentence } from '@app/domain'
+import { SentencesResult } from '@app/domain'
 
 interface JishoResult {
   word: string
@@ -11,7 +11,9 @@ interface Definition {
 
 const root = 'http://localhost:5555'
 
-export const getJishoDefinition = async (word: string): JishoResult => {
+export const getJishoDefinition = async (
+  word: string,
+): Promise<JishoResult> => {
   const url = `${root}/jisho/${encodeURI(word)}`
   const response = await fetch(url)
   const body = await response.json()
@@ -19,11 +21,7 @@ export const getJishoDefinition = async (word: string): JishoResult => {
   return body
 }
 
-interface SentencesResult {
-  results: Sentence[]
-}
-
-export const getSentences = async (word: string): SentencesResult => {
+export const getSentences = async (word: string): Promise<SentencesResult> => {
   const url = `${root}/corpus/${encodeURI(word)}`
   const response = await fetch(url)
   const body = await response.json()

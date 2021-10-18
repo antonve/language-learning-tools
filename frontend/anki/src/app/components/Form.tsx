@@ -12,7 +12,7 @@ export const RadioButton: FC<{
   />
 )
 
-export const Input: FC<{
+export const TextInput: FC<{
   value: string | undefined
   onChange: (value: string) => void
   id: string | undefined
@@ -46,7 +46,6 @@ export const TextArea: FC<{
   rows: number | undefined
 }> = ({ value, onChange, id, rows }) => (
   <textarea
-    type="text"
     className={
       'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50'
     }

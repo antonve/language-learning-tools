@@ -1,10 +1,10 @@
 import classNameNames from 'classnames'
 import { useState, useEffect } from 'react'
 
-import { Word, formatDefinitions } from '@app/domain'
+import { Word, formatDefinitions, SentencesResult } from '@app/domain'
 import { getJishoDefinition, getSentences } from '@app/api'
 import Button from '@app/components/Button'
-import { Input, TextArea, Label } from '@app/components/Form'
+import { TextInput, TextArea, Label } from '@app/components/Form'
 
 const CardWizard = ({ word }: { word: Word | undefined }) => {
   const { definition: definitionEn } = useEnglishDefition(word?.value)
