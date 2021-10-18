@@ -32,3 +32,6 @@ export interface SentencesResult {
 export const formatDefinitions = (defs: Definition[]): string => {
   return defs.map((d, i) => `${i + 1}. ${d.meaning}`).join('\n\n')
 }
+
+export const compareSentences = (s1: Sentence, s2: Sentence): boolean =>
+  s1.line === s2.line && s1.series == s2.series && s1.filename === s2.filename
