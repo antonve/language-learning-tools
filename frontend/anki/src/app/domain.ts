@@ -23,6 +23,7 @@ export interface Sentence {
   filename: string | undefined
   chapter: string | undefined
   line: string
+  original: string | undefined
 }
 
 export interface SentencesResult {
@@ -34,4 +35,6 @@ export const formatDefinitions = (defs: Definition[]): string => {
 }
 
 export const compareSentences = (s1: Sentence, s2: Sentence): boolean =>
-  s1.line == s2.line && s1.series == s2.series && s1.filename === s2.filename
+  s1.original == s2.original &&
+  s1.series == s2.series &&
+  s1.filename === s2.filename

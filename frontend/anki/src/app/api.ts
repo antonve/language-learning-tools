@@ -29,6 +29,7 @@ export const getSentences = async (word: string): Promise<SentencesResult> => {
   const sentences = body.results.map((s: Sentence) => ({
     ...s,
     line: s.line.trim(),
+    original: s.line.trim(),
   }))
 
   sentences.sort((a: Sentence, b: Sentence) => {

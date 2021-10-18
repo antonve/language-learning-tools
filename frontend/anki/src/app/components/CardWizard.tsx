@@ -42,6 +42,7 @@ const CardWizard = ({
                     filename: undefined,
                     series: undefined,
                     chapter: undefined,
+                    original: undefined,
                   }
                 }
 
