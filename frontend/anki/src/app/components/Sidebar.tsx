@@ -57,7 +57,13 @@ const SidebarItem = ({
           'opacity-0': !isActive,
         })}
       ></span>
-      <span className="relative">{word.value}</span>
+      <span
+        className={classNames('relative', {
+          'line-through opacity-40': word.done,
+        })}
+      >
+        {word.value}
+      </span>
     </a>
   </li>
 )
