@@ -6,9 +6,13 @@ import { getJishoDefinition, getSentences } from '@app/api'
 import Button from '@app/components/Button'
 import { Input, TextArea, Label } from '@app/components/Form'
 
-const CardWizard = ({ word }: { word: Word }) => {
-  const { definition: definitionEn } = useEnglishDefition(word.value)
-  const { sentences } = useSentences(word.value)
+const CardWizard = ({ word }: { word: Word | undefined }) => {
+  const { definition: definitionEn } = useEnglishDefition(word?.value)
+  const { sentences } = useSentences(word?.value)
+
+  if (word === undefined) {
+    return <div className="px-8 py-6 w-1/2">Select a word to add</div>
+  }
 
   return (
     <div className="flex rounded overflow-hidden items-stretch">
@@ -33,12 +37,15 @@ const CardWizard = ({ word }: { word: Word }) => {
   )
 }
 
-const useSentences = (word: string) => {
+const useSentences = (word: string | undefined) => {
   const [sentences, setSentences] = useState(
     undefined as SentencesResult | undefined,
   )
 
   useEffect(() => {
+    if (word === undefined) {
+      return
+    }
     const update = async () => {
       const sentences = await getSentences(word)
       setSentences(sentences)
@@ -51,10 +58,13 @@ const useSentences = (word: string) => {
   }
 }
 
-const useEnglishDefition = (word: string) => {
+const useEnglishDefition = (word: string | undefined) => {
   const [definition, setDefinition] = useState(undefined as string | undefined)
 
   useEffect(() => {
+    if (word === undefined) {
+      return
+    }
     const update = async () => {
       const req = await getJishoDefinition(word)
       const def = formatDefinitions(req.definitions)

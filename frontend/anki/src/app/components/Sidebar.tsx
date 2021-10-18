@@ -1,22 +1,23 @@
 import classNames from 'classnames'
-import { Word } from '@app/domain'
+import { Word, WordCollection } from '@app/domain'
 
 const Sidebar = ({
   activeId,
   words,
   updateActiveId,
 }: {
-  activeId: number
-  words: Word[]
-  updateActiveId: (v: number) => void
+  activeId: string
+  words: WordCollection
+  updateActiveId: (v: string) => void
 }) => {
   return (
     <ul className="pr-6">
-      {words.map(w => (
+      {Object.entries(words).map(([id, w]) => (
         <SidebarItem
-          key={w.id}
+          key={id}
+          id={id}
           word={w}
-          isActive={activeId === w.id}
+          isActive={activeId === id}
           updateActiveId={updateActiveId}
         />
       ))}
@@ -25,13 +26,15 @@ const Sidebar = ({
 }
 
 const SidebarItem = ({
+  id,
   word,
   isActive,
   updateActiveId,
 }: {
+  id: string
   word: Word
   isActive: boolean
-  updateActiveId: (v: number) => void
+  updateActiveId: (v: string) => void
 }) => (
   <li className="mb-1">
     <a
@@ -44,7 +47,7 @@ const SidebarItem = ({
       )}
       onClick={e => {
         e.preventDefault()
-        updateActiveId(word.id)
+        updateActiveId(id)
       }}
       href="#"
     >

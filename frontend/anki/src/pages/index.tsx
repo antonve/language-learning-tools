@@ -1,24 +1,58 @@
 import { useState } from 'react'
 import type { NextPage } from 'next'
-import classNames from 'classnames'
 
 import Layout from '@app/components/Layout'
 import Sidebar from '@app/components/Sidebar'
 import CardWizard from '@app/components/CardWizard'
+import { WordCollection } from '@app/domain'
 
 const Home: NextPage = () => {
-  const words = [
-    { id: 1, value: '手が回らない', done: true },
-    { id: 2, value: '足を運んで', done: true },
-    { id: 3, value: '不甲斐ない', done: true },
-    { id: 4, value: 'おろおろ', done: true },
-    { id: 5, value: '旅の恥はかき捨て', done: false },
-    { id: 6, value: '憤懣', done: false },
-    { id: 7, value: '溜飲', done: false },
-    { id: 8, value: '翻弄', done: false },
-  ]
+  const words: WordCollection = {
+    '33935dba-b20f-4fd6-9d9e-80c7f2309aea': {
+      value: '手が回らない',
+      done: true,
+      meta: undefined,
+    },
+    '5ef77e40-1a26-43fc-a58b-7c9012d710ef': {
+      value: '足を運んで',
+      done: true,
+      meta: undefined,
+    },
+    'b5b16715-7bdc-4093-8215-4ccba33d48c4': {
+      value: '不甲斐ない',
+      done: true,
+      meta: undefined,
+    },
+    'ccf31c8e-3df9-4f2f-9221-f6a753961c6b': {
+      value: 'おろおろ',
+      done: true,
+      meta: undefined,
+    },
+    '4a433e60-dcbb-4549-aec0-6d9102199957': {
+      value: '旅の恥はかき捨て',
+      done: false,
+      meta: undefined,
+    },
+    '5a4305c0-8491-433c-af2e-bef517c2b6a7': {
+      value: '憤懣',
+      done: false,
+      meta: undefined,
+    },
+    'abe45caa-3f87-4b7d-b5df-7f3e09c90032': {
+      value: '溜飲',
+      done: false,
+      meta: undefined,
+    },
+    '724c1b68-2971-4a78-a755-b829de022ef5': {
+      value: '翻弄',
+      done: false,
+      meta: undefined,
+    },
+  }
 
-  const [selectedWordId, setSelectedWordId] = useState(3)
+  const [selectedWordId, setSelectedWordId] = useState(
+    Object.keys(words)[0] as string,
+  )
 
   return (
     <Layout>
@@ -31,7 +65,7 @@ const Home: NextPage = () => {
           />
         </div>
         <div className="bg-gray-50 w-full rounded-sm">
-          <CardWizard word={words[selectedWordId]} />
+          <CardWizard word={words?.[selectedWordId]} />
         </div>
       </div>
     </Layout>

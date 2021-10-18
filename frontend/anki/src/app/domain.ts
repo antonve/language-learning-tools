@@ -1,5 +1,6 @@
+export type WordCollection = { [key: string]: Word }
+
 export interface Word {
-  id: number
   value: string
   done: boolean
   meta: WordMeta | undefined
