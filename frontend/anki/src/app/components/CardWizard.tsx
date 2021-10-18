@@ -1,9 +1,13 @@
 import classNameNames from 'classnames'
+import { useState, useEffect } from 'react'
+
 import { Word } from '@app/domain'
 import Button from '@app/components/Button'
 import { Input, TextArea, Label } from '@app/components/Form'
 
 const CardWizard = ({ word }: { word: Word }) => {
+  const { definition, reading } = useDefJp(word.value)
+
   return (
     <div className="flex rounded overflow-hidden items-stretch">
       <div className="px-8 py-6 w-1/2">

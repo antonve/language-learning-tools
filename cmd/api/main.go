@@ -7,6 +7,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/antonve/jp-mining-tools/internal/pkg/corpus"
+	"github.com/antonve/jp-mining-tools/internal/pkg/jisho"
 )
 
 func main() {
@@ -20,6 +21,7 @@ func main() {
 
 	e.GET("/corpus/:token", api.SearchCorpus)
 	e.GET("/series/:series/:filename", api.GetChapter)
+	e.GET("/jisho/:token", api.JishoProxy)
 
 	e.Logger.Fatal(e.Start(":5555"))
 }
@@ -27,10 +29,12 @@ func main() {
 type API interface {
 	SearchCorpus(c echo.Context) error
 	GetChapter(c echo.Context) error
+	JishoProxy(c echo.Context) error
 }
 
 type api struct {
 	corpus corpus.Corpus
+	jisho  jisho.Jisho
 }
 
 func NewAPI() API {
@@ -39,7 +43,7 @@ func NewAPI() API {
 		panic(err)
 	}
 
-	return &api{corpus: c}
+	return &api{corpus: c, jisho: jisho.New()}
 }
 
 func (api *api) SearchCorpus(c echo.Context) error {
@@ -101,4 +105,15 @@ type GetChapterResponse struct {
 	Series   string `json:"series"`
 	Title    string `json:"title"`
 	Body     string `json:"body"`
+}
+
+func (api *api) JishoProxy(c echo.Context) error {
+	token := c.Param("token")
+	res, err := api.jisho.Search(token)
+
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	return c.JSON(http.StatusOK, res)
 }
