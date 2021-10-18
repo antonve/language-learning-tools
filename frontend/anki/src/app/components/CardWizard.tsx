@@ -1,4 +1,3 @@
-import classNames from 'classnames'
 import { useState, useEffect } from 'react'
 
 import { Word, formatDefinitions, SentencesResult, Sentence } from '@app/domain'
@@ -18,6 +17,19 @@ const CardWizard = ({
 }) => {
   const { definition: definitionEn } = useEnglishDefition(word?.value)
   const { sentences } = useSentences(word?.value)
+
+  useEffect(() => {
+    if (
+      word?.meta.definitionEnglish === undefined &&
+      id !== undefined &&
+      word !== undefined &&
+      word
+    ) {
+      const newWord: Word = { ...word }
+      newWord.meta.definitionEnglish = definitionEn
+      updateWord(newWord, id)
+    }
+  }, [definitionEn, id])
 
   if (word === undefined || id === undefined) {
     return <div className="px-8 py-6 w-1/2">Select a word to add</div>
@@ -55,6 +67,33 @@ const CardWizard = ({
             <Label htmlFor="reading">Reading</Label>
             <TextInput id="reading" value={word.meta.reading} />
           </div>
+          <div className="mb-6">
+            <Label htmlFor="def_en">Definition English</Label>
+            <TextArea
+              id="def_en"
+              value={word.meta.definitionEnglish}
+              rows={6}
+              onChange={(newDefinition: string) => {
+                const newWord: Word = { ...word }
+                newWord.meta.definitionEnglish = newDefinition
+                updateWord(newWord, id)
+              }}
+            />
+          </div>
+          <div className="mb-6">
+            <Label htmlFor="def_jp">Definition Japanese</Label>
+            <TextArea
+              id="def_jp"
+              value={word.meta.definitionJapanese}
+              rows={6}
+              onChange={(newDefinition: string) => {
+                const newWord: Word = { ...word }
+                newWord.meta.definitionJapanese = newDefinition
+                updateWord(newWord, id)
+              }}
+            />
+          </div>
+
           <div className="flex items-center justify-between">
             <Button>Save</Button>
           </div>
@@ -112,6 +151,7 @@ const useEnglishDefition = (word: string | undefined) => {
     if (word === undefined) {
       return
     }
+    setDefinition(undefined)
     const update = async () => {
       const req = await getJishoDefinition(word)
       const def = formatDefinitions(req.definitions)
