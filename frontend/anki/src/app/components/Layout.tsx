@@ -1,4 +1,5 @@
 import {FC} from 'react'
+import Button from '@app/components/Button'
 
 const Layout: FC<{}> = ({children}) => (
   <div>
@@ -8,6 +9,7 @@ const Layout: FC<{}> = ({children}) => (
       <h1 className="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl">
         Anki Miner
       </h1>
+      <Button>Add Words</Button>
     </header>
     <div className="px-10">{children}</div>
   </div>
