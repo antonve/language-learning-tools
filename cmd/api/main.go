@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
 
 	"github.com/antonve/jp-mining-tools/internal/pkg/corpus"
@@ -14,6 +15,7 @@ func main() {
 	api := NewAPI()
 
 	e := echo.New()
+	e.Use(middleware.CORS())
 
 	e.GET("/health", func(c echo.Context) error {
 		return c.NoContent(http.StatusOK)
