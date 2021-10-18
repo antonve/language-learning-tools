@@ -3,7 +3,7 @@ export type WordCollection = { [key: string]: Word }
 export interface Word {
   value: string
   done: boolean
-  meta: WordMeta | undefined
+  meta: WordMeta
 }
 
 export interface WordMeta {
@@ -19,9 +19,9 @@ interface Definition {
 }
 
 export interface Sentence {
-  series: string
-  filename: string
-  chapter: string
+  series: string | undefined
+  filename: string | undefined
+  chapter: string | undefined
   line: string
 }
 

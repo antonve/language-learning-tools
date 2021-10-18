@@ -1,17 +1,11 @@
-import classNameNames from 'classnames'
+import classNames from 'classnames'
 import { useState, useEffect } from 'react'
 
-import {
-  Word,
-  formatDefinitions,
-  SentencesResult,
-  Sentence,
-  compareSentences,
-} from '@app/domain'
+import { Word, formatDefinitions, SentencesResult, Sentence } from '@app/domain'
 import { getJishoDefinition, getSentences } from '@app/api'
 import Button from '@app/components/Button'
 import { TextInput, TextArea, Label } from '@app/components/Form'
-import classNames from 'classnames'
+import SentenceList from '@app/components/SentenceList'
 
 const CardWizard = ({
   word,
@@ -40,11 +34,25 @@ const CardWizard = ({
               id="sentence"
               rows={4}
               value={word.meta?.sentence?.line ?? ''}
+              onChange={(newLine: string) => {
+                const newWord: Word = { ...word }
+                if (newWord.meta.sentence === undefined) {
+                  newWord.meta.sentence = {
+                    line: '',
+                    filename: undefined,
+                    series: undefined,
+                    chapter: undefined,
+                  }
+                }
+
+                newWord.meta.sentence.line = newLine
+                updateWord(newWord, id)
+              }}
             />
           </div>
           <div className="mb-6">
             <Label htmlFor="reading">Reading</Label>
-            <TextInput id="reading" value={word.meta?.reading} />
+            <TextInput id="reading" value={word.meta.reading} />
           </div>
           <div className="flex items-center justify-between">
             <Button>Save</Button>
@@ -55,16 +63,16 @@ const CardWizard = ({
         <h2 className="text-xl font-bold mb-4">Example sentences</h2>
         <SentenceList
           sentences={sentences}
-          activeSentence={word.meta?.sentence}
+          activeSentence={word.meta.sentence}
           onSelect={(sentence: Sentence) => {
             const newWord: Word = {
               ...word,
               meta: {
-                reading: word.meta?.reading,
-                definitionEnglish: word.meta?.definitionEnglish,
-                definitionJapanese: word.meta?.definitionJapanese,
-                vocabCard: word.meta?.vocabCard ?? false,
-                sentence,
+                reading: word.meta.reading,
+                definitionEnglish: word.meta.definitionEnglish,
+                definitionJapanese: word.meta.definitionJapanese,
+                vocabCard: word.meta.vocabCard ?? false,
+                sentence: { ...sentence },
               },
             }
             updateWord(newWord, id)
@@ -72,65 +80,6 @@ const CardWizard = ({
         />
       </div>
     </div>
-  )
-}
-
-const SentenceList = ({
-  sentences,
-  onSelect,
-  activeSentence,
-}: {
-  sentences: SentencesResult | undefined
-  activeSentence: Sentence | undefined
-  onSelect: (sentence: Sentence) => void
-}) => {
-  if (!sentences || sentences.results.length === 0) {
-    return <>no sentences found</>
-  }
-
-  return (
-    <ul>
-      {sentences.results.map((s, i) => (
-        <SentenceListItem
-          sentence={s}
-          isActive={
-            activeSentence === undefined
-              ? false
-              : compareSentences(activeSentence, s)
-          }
-          onSelect={onSelect}
-        />
-      ))}
-    </ul>
-  )
-}
-
-const SentenceListItem = ({
-  sentence,
-  isActive,
-  onSelect,
-}: {
-  sentence: Sentence
-  isActive: boolean
-  onSelect: (sentence: Sentence) => void
-}) => {
-  return (
-    <li className="-mx-3 my-3 rounded shadow-s transition duration-200 ease-in-out hover:shadow-md  overflow-hidden">
-      <a
-        href="#"
-        onClick={() => onSelect(sentence)}
-        className={classNames('hover:opacity-50 block px-4 py-3 bg-white ', {
-          'bg-purple-600 text-white': isActive,
-        })}
-      >
-        {sentence.line}
-      </a>
-      <span className="block w-100 text-xs px-4 py-2 bg-gray-900 text-gray-100">
-        <a href="#">
-          {sentence.series} - {sentence.chapter}
-        </a>
-      </span>
-    </li>
   )
 }
 
