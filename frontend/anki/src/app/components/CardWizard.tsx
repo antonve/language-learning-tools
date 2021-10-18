@@ -1,7 +1,13 @@
 import classNameNames from 'classnames'
 import { useState, useEffect } from 'react'
 
-import { Word, formatDefinitions, SentencesResult, Sentence } from '@app/domain'
+import {
+  Word,
+  formatDefinitions,
+  SentencesResult,
+  Sentence,
+  compareSentences,
+} from '@app/domain'
 import { getJishoDefinition, getSentences } from '@app/api'
 import Button from '@app/components/Button'
 import { TextInput, TextArea, Label } from '@app/components/Form'
@@ -49,6 +55,7 @@ const CardWizard = ({
         <h2 className="text-xl font-bold mb-4">Example sentences</h2>
         <SentenceList
           sentences={sentences}
+          activeSentence={word.meta?.sentence}
           onSelect={(sentence: Sentence) => {
             const newWord: Word = {
               ...word,
@@ -71,8 +78,10 @@ const CardWizard = ({
 const SentenceList = ({
   sentences,
   onSelect,
+  activeSentence,
 }: {
   sentences: SentencesResult | undefined
+  activeSentence: Sentence | undefined
   onSelect: (sentence: Sentence) => void
 }) => {
   if (!sentences || sentences.results.length === 0) {
@@ -82,7 +91,15 @@ const SentenceList = ({
   return (
     <ul>
       {sentences.results.map((s, i) => (
-        <SentenceListItem sentence={s} isActive={i === 0} onSelect={onSelect} />
+        <SentenceListItem
+          sentence={s}
+          isActive={
+            activeSentence === undefined
+              ? false
+              : compareSentences(activeSentence, s)
+          }
+          onSelect={onSelect}
+        />
       ))}
     </ul>
   )

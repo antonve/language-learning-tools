@@ -34,4 +34,4 @@ export const formatDefinitions = (defs: Definition[]): string => {
 }
 
 export const compareSentences = (s1: Sentence, s2: Sentence): boolean =>
-  s1.line === s2.line && s1.series == s2.series && s1.filename === s2.filename
+  s1.line == s2.line && s1.series == s2.series && s1.filename === s2.filename
