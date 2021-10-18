@@ -23,15 +23,15 @@ const Home: NextPage = () => {
   return (
     <Layout>
       <div className="flex">
-        <div className="h-12 w-full md:w-1/4">
+        <div className="h-12 w-1/6">
           <Sidebar
             activeId={selectedWordId}
             updateActiveId={setSelectedWordId}
             words={words}
           />
         </div>
-        <div className="bg-gray-50 w-full md:w-3/4 rounded-sm">
-          <CardWizard />
+        <div className="bg-gray-50 w-full rounded-sm">
+          <CardWizard word={words[selectedWordId]} />
         </div>
       </div>
     </Layout>
