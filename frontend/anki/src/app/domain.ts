@@ -17,6 +17,13 @@ interface Definition {
   meaning: string
 }
 
+export interface Sentence {
+  series: string
+  filename: string
+  chapter: string
+  line: string
+}
+
 export const formatDefinitions = (defs: Definition[]): string => {
   return defs.map((d, i) => `${i + 1}. ${d.meaning}`).join('\n\n')
 }
