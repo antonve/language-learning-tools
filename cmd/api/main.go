@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 
 	"github.com/antonve/jp-mining-tools/internal/pkg/corpus"
 )
@@ -18,12 +19,14 @@ func main() {
 	})
 
 	e.GET("/corpus/:token", api.SearchCorpus)
+	e.GET("/series/:series/:filename", api.GetChapter)
 
 	e.Logger.Fatal(e.Start(":5555"))
 }
 
 type API interface {
 	SearchCorpus(c echo.Context) error
+	GetChapter(c echo.Context) error
 }
 
 type api struct {
@@ -67,4 +70,35 @@ type SearchResult struct {
 	Series   string `json:"series"`
 	Chapter  string `json:"chapter"`
 	Line     string `json:"line"`
+}
+
+func (api *api) GetChapter(c echo.Context) error {
+	series := c.Param("series")
+	filename := c.Param("filename")
+	chapter, err := api.corpus.FindOriginal(series, filename)
+
+	if err != nil {
+		switch errors.Cause(err) {
+		case corpus.ErrChapterNotFound:
+			return c.NoContent(http.StatusNotFound)
+		default:
+			return c.NoContent(http.StatusInternalServerError)
+		}
+	}
+
+	response := GetChapterResponse{
+		Filename: chapter.Filename,
+		Series:   chapter.Series,
+		Title:    chapter.Title(),
+		Body:     chapter.BodyWithoutTitle(),
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+type GetChapterResponse struct {
+	Filename string `json:"filename"`
+	Series   string `json:"series"`
+	Title    string `json:"title"`
+	Body     string `json:"body"`
 }

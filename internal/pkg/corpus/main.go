@@ -16,11 +16,14 @@ import (
 
 type Corpus interface {
 	Search(word string) []*Result
+	FindOriginal(series, filename string) (*Chapter, error)
 }
 
 type corpus struct {
 	chapters []*Chapter
 }
+
+var ErrChapterNotFound = errors.New("could not find chapter")
 
 func New(path string) (cor Corpus, err error) {
 	chapters, err := loadSeries(path)
@@ -50,6 +53,16 @@ func New(path string) (cor Corpus, err error) {
 	wg.Wait()
 
 	return &corpus{chapters: chapters}, err
+}
+
+func (c *corpus) FindOriginal(series, filename string) (*Chapter, error) {
+	for _, ch := range c.chapters {
+		if ch.Series == series && ch.Filename == filename {
+			return ch, nil
+		}
+	}
+
+	return nil, ErrChapterNotFound
 }
 
 func (c *corpus) Search(word string) []*Result {
@@ -148,6 +161,11 @@ func NewChapter(series, path, filename string) *Chapter {
 
 func (c *Chapter) Body() string {
 	return c.body
+}
+
+func (c *Chapter) BodyWithoutTitle() string {
+	arr := strings.Split(c.body, "\n")[1:]
+	return strings.Join(arr, "\n")
 }
 
 func (c *Chapter) Title() string {
