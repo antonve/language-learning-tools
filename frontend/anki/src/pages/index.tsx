@@ -1,8 +1,8 @@
 import type { NextPage } from 'next'
-import Head from 'next/head'
+import Layout from '@app/components/Layout'
 
 const Home: NextPage = () => {
-  return <div className="bg-gray-100">test</div>
+  return <Layout>test</Layout>
 }
 
 export default Home
