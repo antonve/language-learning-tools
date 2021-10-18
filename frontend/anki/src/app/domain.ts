@@ -12,3 +12,11 @@ export interface WordMeta {
   definitionJapanese: string | undefined
   vocabCard: boolean
 }
+
+interface Definition {
+  meaning: string
+}
+
+export const formatDefinitions = (defs: Definition[]): string => {
+  return defs.map((d, i) => `${i + 1}. ${d.meaning}`).join('\n\n')
+}

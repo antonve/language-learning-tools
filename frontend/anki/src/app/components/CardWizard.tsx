@@ -1,12 +1,13 @@
 import classNameNames from 'classnames'
 import { useState, useEffect } from 'react'
 
-import { Word } from '@app/domain'
+import { Word, formatDefinitions } from '@app/domain'
+import { getJishoDefinition } from '@app/api'
 import Button from '@app/components/Button'
 import { Input, TextArea, Label } from '@app/components/Form'
 
 const CardWizard = ({ word }: { word: Word }) => {
-  const { definition, reading } = useDefJp(word.value)
+  const { definition: definitionEn } = useEnglishDefition(word.value)
 
   return (
     <div className="flex rounded overflow-hidden items-stretch">
@@ -15,7 +16,7 @@ const CardWizard = ({ word }: { word: Word }) => {
         <form>
           <div className="mb-4">
             <Label htmlFor="sentence">Sentence</Label>
-            <TextArea id="sentence" type="text" rows={4} />
+            <TextArea id="sentence" type="text" rows={4} value={definitionEn} />
           </div>
           <div className="mb-6">
             <Label htmlFor="reading">Reading</Label>
@@ -29,6 +30,24 @@ const CardWizard = ({ word }: { word: Word }) => {
       <div className="bg-gray-400 w-1/2"></div>
     </div>
   )
+}
+
+const useEnglishDefition = (word: string) => {
+  const [definition, setDefinition] = useState(undefined as string | undefined)
+  const [reading, setreading] = useState(undefined as string | undefined)
+
+  useEffect(() => {
+    const update = async () => {
+      const req = await getJishoDefinition(word)
+      const def = formatDefinitions(req.definitions)
+      setDefinition(def)
+    }
+    update()
+  }, [word])
+
+  return {
+    definition,
+  }
 }
 
 export default CardWizard
