@@ -58,16 +58,12 @@ const SentenceListItem = ({
         },
       )}
     >
-      <a
-        href="#"
-        onClick={() => onSelect(sentence)}
-        className={'block px-4 py-3'}
-      >
-        {sentence.line}
+      <a href="#" onClick={() => onSelect(sentence)}>
+        <span className={'block px-4 py-3'}>{sentence.line}</span>
+        <span className="block w-100 text-xs px-4 pb-2 text-gray-500">
+          <a href="#">{sourceForSentence(sentence)}</a>
+        </span>
       </a>
-      <span className="block w-100 text-xs px-4 pb-2 text-gray-500">
-        <a href="#">{sourceForSentence(sentence)}</a>
-      </span>
     </li>
   )
 }
