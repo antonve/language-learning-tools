@@ -95,7 +95,8 @@ const CardWizard = ({
           </div>
 
           <div className="flex items-center justify-between">
-            <Button>Save</Button>
+            <Button primary>Export</Button>
+            <Button>Mark as Done</Button>
           </div>
         </form>
       </div>
