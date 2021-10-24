@@ -124,7 +124,15 @@ const CardWizard = ({
 
           <div className="flex items-center justify-between">
             <Button primary>Export</Button>
-            <Button>Mark as Done</Button>
+            <Button
+              onClick={() => {
+                const newWord: Word = { ...word }
+                newWord.done = !word.done
+                updateWord(newWord, id)
+              }}
+            >
+              Mark as {word.done ? 'WIP' : 'Done'}
+            </Button>
           </div>
         </form>
       </div>
