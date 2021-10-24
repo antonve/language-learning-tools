@@ -147,7 +147,12 @@ func (api *api) GooProxy(c echo.Context) error {
 	res, err := api.goo.Search(token)
 
 	if err != nil {
-		return c.NoContent(http.StatusInternalServerError)
+		switch errors.Cause(err) {
+		case goo.ErrNotFound:
+			return c.NoContent(http.StatusNotFound)
+		default:
+			return c.NoContent(http.StatusInternalServerError)
+		}
 	}
 
 	response := GooProxyResponse{

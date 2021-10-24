@@ -8,6 +8,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+var ErrNotFound = errors.New("could not find definition or reading")
+
 type Goo interface {
 	Search(word string) (*Result, error)
 }
@@ -26,10 +28,15 @@ func (j *goo) Search(word string) (*Result, error) {
 	}
 
 	defElement := htmlquery.FindOne(doc, "//div[contains(@class, \"meaning_area\")]")
+	readingElement := htmlquery.FindOne(doc, "//span[@class=\"yomi\"]")
+
+	if defElement == nil || readingElement == nil {
+		return nil, ErrNotFound
+	}
+
 	def := htmlquery.InnerText(defElement)
 	def = strings.TrimSpace(def)
 
-	readingElement := htmlquery.FindOne(doc, "//span[@class=\"yomi\"]")
 	reading := htmlquery.InnerText(readingElement)
 	reading = strings.TrimSuffix(reading, "）")
 	reading = strings.TrimPrefix(reading, "（")
