@@ -93,7 +93,15 @@ const CardWizard = ({
           </div>
           <div className="mb-6">
             <Label htmlFor="reading">Reading</Label>
-            <TextInput id="reading" value={word.meta.reading} />
+            <TextInput
+              id="reading"
+              value={word.meta.reading}
+              onChange={(newReading: string) => {
+                const newWord: Word = { ...word }
+                newWord.meta.reading = newReading
+                updateWord(newWord, id)
+              }}
+            />
           </div>
           <div className="mb-6">
             <Label htmlFor="def_jp">Definition Japanese</Label>
