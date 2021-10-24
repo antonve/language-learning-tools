@@ -36,6 +36,7 @@ func (j *goo) Search(word string) (*Result, error) {
 
 	def := htmlquery.InnerText(defElement)
 	def = strings.TrimSpace(def)
+	def = strings.ReplaceAll(def, "\n\n", "\n")
 
 	reading := htmlquery.InnerText(readingElement)
 	reading = strings.TrimSuffix(reading, "）")
