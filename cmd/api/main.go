@@ -41,6 +41,8 @@ type api struct {
 	corpus corpus.Corpus
 	jisho  jisho.Jisho
 	goo    goo.Goo
+
+	jishoCache map[string]*JishoProxyResponse
 }
 
 func NewAPI() API {
@@ -49,7 +51,9 @@ func NewAPI() API {
 		panic(err)
 	}
 
-	return &api{corpus: c, jisho: jisho.New(), goo: goo.New()}
+	jishoCache := map[string]*JishoProxyResponse{}
+
+	return &api{corpus: c, jisho: jisho.New(), goo: goo.New(), jishoCache: jishoCache}
 }
 
 func (api *api) SearchCorpus(c echo.Context) error {
@@ -115,6 +119,11 @@ type GetChapterResponse struct {
 
 func (api *api) JishoProxy(c echo.Context) error {
 	token := c.Param("token")
+
+	if response, ok := api.jishoCache[token]; ok {
+		return c.JSON(http.StatusOK, response)
+	}
+
 	res, err := api.jisho.Search(token)
 
 	if err != nil {
@@ -129,6 +138,8 @@ func (api *api) JishoProxy(c echo.Context) error {
 	for i, d := range res.Definitions {
 		response.Definitions[i] = JishoProxyDefinition{Meaning: d.Meaning}
 	}
+
+	api.jishoCache[token] = &response
 
 	return c.JSON(http.StatusOK, response)
 }
