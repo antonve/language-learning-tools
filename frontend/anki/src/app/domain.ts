@@ -1,3 +1,8 @@
+export interface Collection {
+  words: WordCollection
+  selectedId: string | undefined
+}
+
 export type WordCollection = { [key: string]: Word }
 
 export interface Word {

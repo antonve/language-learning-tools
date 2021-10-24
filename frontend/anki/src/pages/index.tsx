@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import type { NextPage } from 'next'
 
 import Layout from '@app/components/Layout'
@@ -7,13 +6,18 @@ import CardWizard from '@app/components/CardWizard'
 import { useWordCollection } from '@app/hooks'
 
 const Home: NextPage = () => {
-  const { words, updateWord } = useWordCollection()
+  const {
+    words,
+    updateWord,
+    selectedWordId,
+    setSelectedWordId,
+  } = useWordCollection()
 
-  const [selectedWordId, setSelectedWordId] = useState(
-    Object.keys(words)[0] as string,
-  )
-
-  if (words === undefined || Object.keys(words).length === 0) {
+  if (
+    words === undefined ||
+    Object.keys(words).length === 0 ||
+    selectedWordId === undefined
+  ) {
     return <>Add some words first.</>
   }
 
