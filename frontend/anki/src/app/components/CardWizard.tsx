@@ -133,7 +133,7 @@ const CardWizard = ({
         <div>
           <ul className="flex -mx-2">
             {dictionaries.map(d => (
-              <li className="mx-2">
+              <li className="mx-2" key={d.name}>
                 <a
                   href={d.url(word.value)}
                   target="_blank"

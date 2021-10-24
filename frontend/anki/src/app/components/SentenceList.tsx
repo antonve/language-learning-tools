@@ -26,6 +26,7 @@ const SentenceList = ({
               : compareSentences(activeSentence, s)
           }
           onSelect={onSelect}
+          key={JSON.stringify(s)}
         />
       ))}
     </ul>
