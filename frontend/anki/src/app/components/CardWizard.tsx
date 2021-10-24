@@ -7,7 +7,7 @@ import {
   useJapaneseDefition,
 } from '@app/hooks'
 import Button from '@app/components/Button'
-import { TextInput, TextArea, Label } from '@app/components/Form'
+import { TextInput, TextArea, Label, Checkbox } from '@app/components/Form'
 import SentenceList from '@app/components/SentenceList'
 import { addAnkiNote } from '@app/api'
 
@@ -158,7 +158,20 @@ const CardWizard = ({
               }}
             />
           </div>
-
+          <div className="mb-6">
+            <Label htmlFor="vocab_only">
+              <Checkbox
+                id="vocab_only"
+                value={word.meta.vocabCard}
+                onChange={(newValue: boolean) => {
+                  const newWord: Word = { ...word }
+                  newWord.meta.vocabCard = newValue
+                  updateWord(newWord, id)
+                }}
+              />
+              <span className="ml-2">Vocabulary card</span>
+            </Label>
+          </div>
           <div className="flex justify-end gap-x-4">
             <Button
               onClick={() => {

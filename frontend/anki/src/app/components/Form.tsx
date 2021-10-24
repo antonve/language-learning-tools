@@ -58,3 +58,21 @@ export const TextArea: FC<{
     rows={rows ?? 3}
   />
 )
+
+export const Checkbox: FC<{
+  value: boolean
+  onChange: (value: boolean) => void
+  id: string | undefined
+}> = ({ value, onChange, id }) => (
+  <input
+    type="checkbox"
+    className={
+      'rounded text-purple-500 border-gray-300 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50'
+    }
+    id={id}
+    checked={value}
+    onChange={() => {
+      onChange(!value)
+    }}
+  />
+)
