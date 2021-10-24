@@ -21,7 +21,8 @@ A frontend for creating Anki cards given a list of words.
 2. Add `http://localhost:3000` to AnkiConnect `webCorsOriginList`
 3. Make sure the Note type `ankiminer_jp` exists, check `frontend/anki/src/app/api.ts` for the format
 4. Update the deck name in `frontend/anki/src/app/api.ts` if using a different deck name
-5. Run the frontend and API
+5. Make sure to use `Syosetu scraper` to build a corpus to find example sentences
+6. Run the frontend and API
   ```sh
   # Frontend
   cd frontend/anki
