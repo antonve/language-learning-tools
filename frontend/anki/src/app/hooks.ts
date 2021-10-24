@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react'
 
-import { formatDefinitions, SentencesResult } from '@app/domain'
+import {
+  Collection,
+  formatDefinitions,
+  SentencesResult,
+  Word,
+  WordCollection,
+  WordMeta,
+} from '@app/domain'
 import { getGooDefinition, getJishoDefinition, getSentences } from '@app/api'
 
 export const useSentences = (word: string | undefined) => {
@@ -112,5 +119,47 @@ export const useJapaneseDefition = (word: string | undefined) => {
 
   return {
     definition,
+  }
+}
+
+export const useWordCollection = () => {
+  const [collection, setCollection] = useState({
+    words: {},
+    selectedId: undefined,
+  } as Collection)
+
+  useEffect(() => {
+    const cachedCollection = localStorage.getItem('collection')
+    if (cachedCollection !== null) {
+      const newCollection: Collection = JSON.parse(cachedCollection)
+      if (newCollection.selectedId === undefined) {
+        newCollection.selectedId =
+          Object.keys(newCollection.words)[0] ?? undefined
+      }
+
+      setCollection(newCollection)
+    }
+  }, [])
+
+  const updateWord = (newWord: Word, id: string) => {
+    if (collection.words[id] === undefined) {
+      return
+    }
+
+    const words = { ...collection.words, [id]: newWord }
+    const newCollection = { words, selectedId: collection.selectedId }
+    localStorage.setItem('collection', JSON.stringify(newCollection))
+    setCollection(newCollection)
+  }
+
+  const setSelectedWordId = (id: string | undefined) => {
+    setCollection({ words: collection.words, selectedId: id })
+  }
+
+  return {
+    words: collection.words,
+    updateWord,
+    selectedWordId: collection.selectedId,
+    setSelectedWordId,
   }
 }
