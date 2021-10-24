@@ -8,6 +8,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/antonve/jp-mining-tools/internal/pkg/corpus"
+	"github.com/antonve/jp-mining-tools/internal/pkg/goo"
 	"github.com/antonve/jp-mining-tools/internal/pkg/jisho"
 )
 
@@ -24,6 +25,7 @@ func main() {
 	e.GET("/corpus/:token", api.SearchCorpus)
 	e.GET("/series/:series/:filename", api.GetChapter)
 	e.GET("/jisho/:token", api.JishoProxy)
+	e.GET("/goo/:token", api.GooProxy)
 
 	e.Logger.Fatal(e.Start(":5555"))
 }
@@ -32,11 +34,13 @@ type API interface {
 	SearchCorpus(c echo.Context) error
 	GetChapter(c echo.Context) error
 	JishoProxy(c echo.Context) error
+	GooProxy(c echo.Context) error
 }
 
 type api struct {
 	corpus corpus.Corpus
 	jisho  jisho.Jisho
+	goo    goo.Goo
 }
 
 func NewAPI() API {
@@ -45,7 +49,7 @@ func NewAPI() API {
 		panic(err)
 	}
 
-	return &api{corpus: c, jisho: jisho.New()}
+	return &api{corpus: c, jisho: jisho.New(), goo: goo.New()}
 }
 
 func (api *api) SearchCorpus(c echo.Context) error {
@@ -136,4 +140,27 @@ type JishoProxyResponse struct {
 
 type JishoProxyDefinition struct {
 	Meaning string `json:"meaning"`
+}
+
+func (api *api) GooProxy(c echo.Context) error {
+	token := c.Param("token")
+	res, err := api.goo.Search(token)
+
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	response := GooProxyResponse{
+		Word:       token,
+		Reading:    res.Reading,
+		Definition: res.Definition,
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
+type GooProxyResponse struct {
+	Word       string `json:"word"`
+	Reading    string `json:"reading"`
+	Definition string `json:"definition"`
 }
