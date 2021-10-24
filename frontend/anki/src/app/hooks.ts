@@ -197,15 +197,10 @@ export const useWordCollection = () => {
     const newCollection = { ...collection.words }
     delete newCollection[id]
 
-    const ids = Object.keys(newCollection)
-    const defaultSelectedId = ids.length > 0 ? ids[ids.length - 1] : undefined
-
     setPersistedCollection({
       words: newCollection,
       selectedId:
-        collection.selectedId === id
-          ? defaultSelectedId
-          : collection.selectedId,
+        collection.selectedId === id ? undefined : collection.selectedId,
     })
   }
 

@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import { Word, Sentence, dictionaries } from '@app/domain'
+import { Word, Sentence, WordCollection, dictionaries } from '@app/domain'
 import {
   useSentences,
   useEnglishDefition,
@@ -11,16 +11,18 @@ import { TextInput, TextArea, Label } from '@app/components/Form'
 import SentenceList from '@app/components/SentenceList'
 
 const CardWizard = ({
-  word,
+  words,
   id,
   updateWord,
   deleteWord,
 }: {
-  word: Word | undefined
+  words: WordCollection
   id: string | undefined
   updateWord: (newWord: Word, id: string) => void
   deleteWord: (id: string) => void
 }) => {
+  const word = words?.[id ?? 'none']
+
   const { definition: english } = useEnglishDefition(word?.value)
   const { definition: japanese } = useJapaneseDefition(word?.value)
   const { sentences } = useSentences(word?.value)

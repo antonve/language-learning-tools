@@ -6,7 +6,7 @@ const Sidebar = ({
   words,
   updateActiveId,
 }: {
-  activeId: string
+  activeId: string | undefined
   words: WordCollection
   updateActiveId: (v: string) => void
 }) => {

@@ -15,14 +15,6 @@ const Home: NextPage = () => {
     setSelectedWordId,
   } = useWordCollection()
 
-  if (
-    words === undefined ||
-    Object.keys(words).length === 0 ||
-    selectedWordId === undefined
-  ) {
-    return <>Add some words first.</>
-  }
-
   return (
     <Layout addWords={addWords}>
       <div className="flex">
@@ -35,7 +27,7 @@ const Home: NextPage = () => {
         </div>
         <div className="bg-gray-50 w-full rounded-sm">
           <CardWizard
-            word={words?.[selectedWordId]}
+            words={words}
             id={selectedWordId}
             updateWord={updateWord}
             deleteWord={deleteWord}
