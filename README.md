@@ -1,12 +1,29 @@
 # jp-mining-tools
 
-Tools to help with Japanese sentence mining.
+Tools to help with Japanese sentence mining. 
 
 ## Disclaimer
 
 This is not meant to be hosted for public users because it fetches data directly from dictionary websites. It's built to create Anki cards for personal usage.
 
 ## Tools
+
+### Anki Miner
+
+A frontend for creating Anki cards given a list of words.
+
+```sh
+# Frontend
+cd frontend/anki
+yarn dev
+
+# API
+go run cmd/api/main.go
+```
+
+### Preview
+
+![Anki Miner preview](docs/assets/anki_miner_preview.png)
 
 ### Syosetu scraper
 
