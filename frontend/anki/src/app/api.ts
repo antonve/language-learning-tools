@@ -5,6 +5,12 @@ interface JishoResult {
   definitions: Definition[]
 }
 
+interface GooResult {
+  word: string
+  definition: string
+  reading: string
+}
+
 interface Definition {
   meaning: string
 }
@@ -45,4 +51,12 @@ export const getSentences = async (word: string): Promise<SentencesResult> => {
   return {
     results: sentences,
   }
+}
+
+export const getGooDefinition = async (word: string): Promise<GooResult> => {
+  const url = `${root}/goo/${encodeURI(word)}`
+  const response = await fetch(url)
+  const body = await response.json()
+
+  return body
 }

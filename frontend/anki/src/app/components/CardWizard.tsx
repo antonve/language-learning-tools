@@ -1,7 +1,11 @@
 import { useEffect } from 'react'
 
 import { Word, Sentence } from '@app/domain'
-import { useSentences, useEnglishDefition } from '@app/hooks'
+import {
+  useSentences,
+  useEnglishDefition,
+  useJapaneseDefition,
+} from '@app/hooks'
 import Button from '@app/components/Button'
 import { TextInput, TextArea, Label } from '@app/components/Form'
 import SentenceList from '@app/components/SentenceList'
@@ -16,6 +20,7 @@ const CardWizard = ({
   updateWord: (newWord: Word, id: string) => void
 }) => {
   const { definition: english } = useEnglishDefition(word?.value)
+  const { definition: japanese } = useJapaneseDefition(word?.value)
   const { sentences } = useSentences(word?.value)
 
   useEffect(() => {
@@ -34,6 +39,25 @@ const CardWizard = ({
     newWord.meta.definitionEnglish = english.definition
     updateWord(newWord, id)
   }, [english, id])
+
+  useEffect(() => {
+    if (
+      japanese === undefined ||
+      id === undefined ||
+      word === undefined ||
+      word.meta.definitionJapanese !== undefined ||
+      word.meta.reading !== undefined ||
+      word.value !== japanese?.word ||
+      japanese.finished === false
+    ) {
+      return
+    }
+
+    const newWord: Word = { ...word }
+    newWord.meta.definitionJapanese = japanese.definition
+    newWord.meta.reading = japanese.reading
+    updateWord(newWord, id)
+  }, [japanese, id])
 
   if (word === undefined || id === undefined) {
     return <div className="px-8 py-6 w-1/2">Select a word to add</div>
