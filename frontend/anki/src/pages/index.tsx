@@ -19,7 +19,7 @@ const Home: NextPage = () => {
   return (
     <Layout addWords={addWords}>
       <div className="flex">
-        <div className="h-12 w-1/6">
+        <div className="w-1/6">
           <Sidebar
             activeId={selectedWordId}
             updateActiveId={setSelectedWordId}

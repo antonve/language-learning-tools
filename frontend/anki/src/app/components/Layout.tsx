@@ -6,7 +6,7 @@ interface Props {
 }
 
 const Layout: FC<Props> = ({ children, addWords }) => (
-  <div>
+  <div className="mb-8">
     <header
       className={`bg-grey-lightest border-t-4 border-purple-400 hero-background p-10 flex justify-between`}
     >
@@ -15,7 +15,7 @@ const Layout: FC<Props> = ({ children, addWords }) => (
       </h1>
       <AddWordsButton addWords={addWords} />
     </header>
-    <div className="px-10 mb-10">{children}</div>
+    <div className="px-10">{children}</div>
   </div>
 )
 
