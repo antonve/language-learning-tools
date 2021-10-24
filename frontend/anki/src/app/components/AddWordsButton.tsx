@@ -14,6 +14,7 @@ const AddWordsButton = ({ addWords }: Props) => {
   const saveWords = () => {
     const newWords = words.split('\n')
     addWords(newWords)
+    setWords('')
     setIsOpen(false)
   }
 
