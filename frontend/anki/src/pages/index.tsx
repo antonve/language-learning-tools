@@ -72,6 +72,10 @@ const Home: NextPage = () => {
     setWords({ ...words, [id]: newWord })
   }
 
+  if (words === undefined || Object.keys(words).length === 0) {
+    return <>Add some words first.</>
+  }
+
   return (
     <Layout>
       <div className="flex">
