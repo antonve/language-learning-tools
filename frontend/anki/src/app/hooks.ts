@@ -48,7 +48,9 @@ export const useEnglishDefition = (word: string | undefined) => {
     })
 
     const update = async () => {
-      const req = await getJishoDefinition(word)
+      const req = await getJishoDefinition(word).catch(() => ({
+        definitions: [],
+      }))
       const def = formatDefinitions(req.definitions)
 
       setDefinition({
@@ -92,7 +94,10 @@ export const useJapaneseDefition = (word: string | undefined) => {
     })
 
     const update = async () => {
-      const req = await getGooDefinition(word)
+      const req = await getGooDefinition(word).catch(() => ({
+        definition: undefined,
+        reading: undefined,
+      }))
 
       setDefinition({
         word,
