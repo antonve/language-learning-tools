@@ -68,19 +68,6 @@ const CardWizard = ({
             <TextInput id="reading" value={word.meta.reading} />
           </div>
           <div className="mb-6">
-            <Label htmlFor="def_en">Definition English</Label>
-            <TextArea
-              id="def_en"
-              value={word.meta.definitionEnglish}
-              rows={6}
-              onChange={(newDefinition: string) => {
-                const newWord: Word = { ...word }
-                newWord.meta.definitionEnglish = newDefinition
-                updateWord(newWord, id)
-              }}
-            />
-          </div>
-          <div className="mb-6">
             <Label htmlFor="def_jp">Definition Japanese</Label>
             <TextArea
               id="def_jp"
@@ -89,6 +76,19 @@ const CardWizard = ({
               onChange={(newDefinition: string) => {
                 const newWord: Word = { ...word }
                 newWord.meta.definitionJapanese = newDefinition
+                updateWord(newWord, id)
+              }}
+            />
+          </div>
+          <div className="mb-6">
+            <Label htmlFor="def_en">Definition English</Label>
+            <TextArea
+              id="def_en"
+              value={word.meta.definitionEnglish}
+              rows={6}
+              onChange={(newDefinition: string) => {
+                const newWord: Word = { ...word }
+                newWord.meta.definitionEnglish = newDefinition
                 updateWord(newWord, id)
               }}
             />
