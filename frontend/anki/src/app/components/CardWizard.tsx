@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 
-import { Word, formatDefinitions, SentencesResult, Sentence } from '@app/domain'
-import { getJishoDefinition, getSentences } from '@app/api'
+import { Word, Sentence } from '@app/domain'
+import { useSentences, useEnglishDefition } from '@app/hooks'
 import Button from '@app/components/Button'
 import { TextInput, TextArea, Label } from '@app/components/Form'
 import SentenceList from '@app/components/SentenceList'
@@ -122,48 +122,6 @@ const CardWizard = ({
       </div>
     </div>
   )
-}
-
-const useSentences = (word: string | undefined) => {
-  const [sentences, setSentences] = useState(
-    undefined as SentencesResult | undefined,
-  )
-
-  useEffect(() => {
-    if (word === undefined) {
-      return
-    }
-    const update = async () => {
-      const sentences = await getSentences(word)
-      setSentences(sentences)
-    }
-    update()
-  }, [word])
-
-  return {
-    sentences,
-  }
-}
-
-const useEnglishDefition = (word: string | undefined) => {
-  const [definition, setDefinition] = useState(undefined as string | undefined)
-
-  useEffect(() => {
-    if (word === undefined) {
-      return
-    }
-    setDefinition(undefined)
-    const update = async () => {
-      const req = await getJishoDefinition(word)
-      const def = formatDefinitions(req.definitions)
-      setDefinition(def)
-    }
-    update()
-  }, [word])
-
-  return {
-    definition,
-  }
 }
 
 export default CardWizard
