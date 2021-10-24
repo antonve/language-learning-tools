@@ -2,11 +2,12 @@ import React, { FC } from 'react'
 import classNames from 'classnames'
 
 interface Props {
+  title?: string
   isOpen: boolean
   closeModal: () => void
 }
 
-const Modal: FC<Props> = ({ children, isOpen, closeModal }) =>
+const Modal: FC<Props> = ({ children, isOpen, closeModal, title }) =>
   isOpen ? (
     <div
       className={classNames(
@@ -24,16 +25,16 @@ const Modal: FC<Props> = ({ children, isOpen, closeModal }) =>
       <div className="relative w-auto my-6 mx-auto max-w-3xl cursor-default">
         <div className="border-0 rounded shadow-lg relative flex flex-col w-full bg-white outline-none focus:outline-none">
           {/*header*/}
-          <div className="flex justify-between px-8 pt-6 items-stretch">
-            <h3 className="text-2xl font-semibold h-full flex-1">
-              Modal Title
-            </h3>
-            <button className="ml-10" onClick={closeModal}>
-              <span className="text-gray-400 text-xl w-7 h-7 block outline-none focus:outline-none hover:opacity-50">
-                ×
-              </span>
-            </button>
-          </div>
+          {title && (
+            <div className="flex justify-between px-8 pt-6 items-stretch">
+              <h3 className="text-2xl font-semibold h-full flex-1">{title}</h3>
+              <button className="ml-10" onClick={closeModal}>
+                <span className="text-gray-400 text-xl w-7 h-7 block outline-none focus:outline-none hover:opacity-50">
+                  ×
+                </span>
+              </button>
+            </div>
+          )}
           {/*body*/}
           <div className="relative flex-auto">
             <p className="px-8 py-6 text-blueGray-500 text-lg leading-relaxed">
