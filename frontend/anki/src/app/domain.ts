@@ -73,3 +73,26 @@ export const dictionaries: { name: string; url: (word: string) => string }[] = [
       )}%22`,
   },
 ]
+
+export const sourceForSentence = (
+  sentence: Sentence | undefined,
+): string | undefined => {
+  const { series, chapter } = sentence ?? {
+    sentence: undefined,
+    chapter: undefined,
+  }
+
+  if (series === undefined || chapter === undefined) {
+    return undefined
+  }
+
+  return `${series} - ${chapter}`
+}
+
+export const sentenceWithFocusWord = (word: Word): string => {
+  if (word.meta.sentence === undefined) {
+    return ''
+  }
+
+  return word.meta.sentence.line.replaceAll(word.value, `<b>${word.value}</b>`)
+}

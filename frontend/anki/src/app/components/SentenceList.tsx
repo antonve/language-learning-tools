@@ -1,6 +1,11 @@
 import classNames from 'classnames'
 
-import { SentencesResult, Sentence, compareSentences } from '@app/domain'
+import {
+  SentencesResult,
+  Sentence,
+  compareSentences,
+  sourceForSentence,
+} from '@app/domain'
 
 const SentenceList = ({
   sentences,
@@ -61,9 +66,7 @@ const SentenceListItem = ({
         {sentence.line}
       </a>
       <span className="block w-100 text-xs px-4 pb-2 text-gray-500">
-        <a href="#">
-          {sentence.series} - {sentence.chapter}
-        </a>
+        <a href="#">{sourceForSentence(sentence)}</a>
       </span>
     </li>
   )
