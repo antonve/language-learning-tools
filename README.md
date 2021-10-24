@@ -1,8 +1,14 @@
 # jp-mining-tools
 
-Tools to help with Japanese sentence mining
+Tools to help with Japanese sentence mining.
 
-## Syosetu scraper
+## Disclaimer
+
+This is not meant to be hosted for public users because it fetches data directly from dictionary websites. It's built to create Anki cards for personal usage.
+
+## Tools
+
+### Syosetu scraper
 
 ```sh
 go run cmd/scrape_syosetu/main.go --help
@@ -15,14 +21,14 @@ Usage of /var/folders/fw/0wq08yqd3fgd69t86wv72l040000gn/T/go-build4010932054/b00
         the starting chapter (default 1)
 ```
 
-### Example
+#### Example
 
 ```sh
 # Download the first 50 chapters of Mushoku Tensei
 go run cmd/scrape_syosetu/main.go -series n9669bk -end 50
 ```
 
-## Search for word in corpus
+### Search for word in corpus
 
 ```sh
 go run cmd/find_sentence/main.go -word これから
