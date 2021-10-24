@@ -60,4 +60,11 @@ export const dictionaries: { name: string; url: (word: string) => string }[] = [
     name: 'Weblio',
     url: word => `https://www.weblio.jp/content/${encodeURI(word)}`,
   },
+  {
+    name: 'Syosetu',
+    url: word =>
+      `https://www.google.com/search?q=site%3Ancode.syosetu.com%2F+%22${encodeURI(
+        word,
+      )}%22`,
+  },
 ]
