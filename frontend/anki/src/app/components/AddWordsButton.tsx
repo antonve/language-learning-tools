@@ -8,7 +8,7 @@ interface Props {
 }
 
 const AddWordsButton = ({ addWords }: Props) => {
-  const [isOpen, setIsOpen] = useState(true)
+  const [isOpen, setIsOpen] = useState(false)
   const [words, setWords] = useState('')
 
   const saveWords = () => {
