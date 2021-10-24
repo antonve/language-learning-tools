@@ -6,6 +6,8 @@ Tools to help with Japanese sentence mining.
 
 This is not meant to be hosted for public users because it fetches data directly from dictionary websites. It's built to create Anki cards for personal usage.
 
+The code is also of prototype quality because it's not meant to be ran in production.
+
 ## Tools
 
 ### Anki Miner
