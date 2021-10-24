@@ -9,6 +9,7 @@ import {
 import Button from '@app/components/Button'
 import { TextInput, TextArea, Label } from '@app/components/Form'
 import SentenceList from '@app/components/SentenceList'
+import { addAnkiNote } from '@app/api'
 
 const CardWizard = ({
   words,
@@ -65,6 +66,18 @@ const CardWizard = ({
 
   if (word === undefined || id === undefined) {
     return <div className="px-8 py-6 w-1/2">Select a word to add</div>
+  }
+
+  const exportNote = async () => {
+    try {
+      await addAnkiNote(word)
+
+      const newWord: Word = { ...word }
+      newWord.done = true
+      updateWord(newWord, id)
+    } catch (e) {
+      window.alert(e)
+    }
   }
 
   return (
@@ -156,7 +169,9 @@ const CardWizard = ({
             >
               Mark as {word.done ? 'WIP' : 'Done'}
             </Button>
-            <Button primary>Export</Button>
+            <Button primary onClick={exportNote}>
+              Export
+            </Button>
           </div>
         </form>
       </div>
