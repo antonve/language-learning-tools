@@ -5,11 +5,15 @@ const Sidebar = ({
   activeId,
   words,
   updateActiveId,
+  cleanWords,
 }: {
   activeId: string | undefined
   words: WordCollection
   updateActiveId: (v: string) => void
+  cleanWords: () => void
 }) => {
+  const showDelete = Object.keys(words).length > 0
+
   return (
     <ul className="pr-6">
       {Object.entries(words).map(([id, w]) => (
@@ -21,6 +25,7 @@ const Sidebar = ({
           updateActiveId={updateActiveId}
         />
       ))}
+      {showDelete && <CleanWordsLink onClick={cleanWords} />}
     </ul>
   )
 }
@@ -64,6 +69,20 @@ const SidebarItem = ({
       >
         {word.value}
       </span>
+    </a>
+  </li>
+)
+
+const CleanWordsLink = ({ onClick }: { onClick: () => void }) => (
+  <li className="mt-4 pt-3 border-t-2">
+    <a
+      className={classNames(
+        'px-2 -mx-2 transition duration-200 ease-in-out relative block font-medium hover:translate-x-2px hover:opacity-70 text-red-700 uppercase text-xs',
+      )}
+      onClick={onClick}
+      href="#"
+    >
+      <span className="relative">Clean up</span>
     </a>
   </li>
 )

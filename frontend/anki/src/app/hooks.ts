@@ -204,10 +204,31 @@ export const useWordCollection = () => {
     })
   }
 
+  const cleanWords = () => {
+    const newCollection = { ...collection.words }
+
+    for (const id of Object.keys(collection.words)) {
+      const word = collection.words[id]
+
+      if (word.done) {
+        delete newCollection[id]
+      }
+    }
+
+    setPersistedCollection({
+      words: newCollection,
+      selectedId:
+        collection.words[collection.selectedId ?? 'none'] === undefined
+          ? undefined
+          : collection.selectedId,
+    })
+  }
+
   return {
     words: collection.words,
     updateWord,
     addWords,
+    cleanWords,
     deleteWord,
     selectedWordId: collection.selectedId,
     setSelectedWordId,

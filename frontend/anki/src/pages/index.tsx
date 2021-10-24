@@ -11,6 +11,7 @@ const Home: NextPage = () => {
     updateWord,
     deleteWord,
     addWords,
+    cleanWords,
     selectedWordId,
     setSelectedWordId,
   } = useWordCollection()
@@ -23,6 +24,7 @@ const Home: NextPage = () => {
             activeId={selectedWordId}
             updateActiveId={setSelectedWordId}
             words={words}
+            cleanWords={cleanWords}
           />
         </div>
         <div className="w-full rounded-sm">
