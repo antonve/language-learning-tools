@@ -15,21 +15,25 @@ const CardWizard = ({
   id: string | undefined
   updateWord: (newWord: Word, id: string) => void
 }) => {
-  const { definition: definitionEn } = useEnglishDefition(word?.value)
+  const { definition: english } = useEnglishDefition(word?.value)
   const { sentences } = useSentences(word?.value)
 
   useEffect(() => {
     if (
-      word?.meta.definitionEnglish === undefined &&
-      id !== undefined &&
-      word !== undefined &&
-      word
+      english === undefined ||
+      id === undefined ||
+      word === undefined ||
+      word.meta.definitionEnglish !== undefined ||
+      word.value !== english?.word ||
+      english.finished === false
     ) {
-      const newWord: Word = { ...word }
-      newWord.meta.definitionEnglish = definitionEn
-      updateWord(newWord, id)
+      return
     }
-  }, [definitionEn, id])
+
+    const newWord: Word = { ...word }
+    newWord.meta.definitionEnglish = english.definition
+    updateWord(newWord, id)
+  }, [english, id])
 
   if (word === undefined || id === undefined) {
     return <div className="px-8 py-6 w-1/2">Select a word to add</div>

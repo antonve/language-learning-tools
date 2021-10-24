@@ -24,19 +24,40 @@ export const useSentences = (word: string | undefined) => {
   }
 }
 
+interface DefinitionResult {
+  word: string
+  definition: string | undefined
+  finished: boolean
+}
+
 export const useEnglishDefition = (word: string | undefined) => {
-  const [definition, setDefinition] = useState(undefined as string | undefined)
+  const [definition, setDefinition] = useState(
+    undefined as DefinitionResult | undefined,
+  )
 
   useEffect(() => {
     if (word === undefined) {
+      setDefinition(undefined)
       return
     }
-    setDefinition(undefined)
+
+    setDefinition({
+      word,
+      definition: undefined,
+      finished: false,
+    })
+
     const update = async () => {
       const req = await getJishoDefinition(word)
       const def = formatDefinitions(req.definitions)
-      setDefinition(def)
+
+      setDefinition({
+        word,
+        definition: def,
+        finished: true,
+      })
     }
+
     update()
   }, [word])
 
