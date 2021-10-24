@@ -128,6 +128,11 @@ export const useWordCollection = () => {
     selectedId: undefined,
   } as Collection)
 
+  const setPersistedCollection = (newCollection: Collection) => {
+    localStorage.setItem('collection', JSON.stringify(newCollection))
+    setCollection(newCollection)
+  }
+
   useEffect(() => {
     const cachedCollection = localStorage.getItem('collection')
     if (cachedCollection !== null) {
@@ -148,12 +153,18 @@ export const useWordCollection = () => {
 
     const words = { ...collection.words, [id]: newWord }
     const newCollection = { words, selectedId: collection.selectedId }
-    localStorage.setItem('collection', JSON.stringify(newCollection))
-    setCollection(newCollection)
+    setPersistedCollection(newCollection)
   }
 
   const setSelectedWordId = (id: string | undefined) => {
     setCollection({ words: collection.words, selectedId: id })
+  }
+
+  const setWords = (words: WordCollection) => {
+    setPersistedCollection({
+      words,
+      selectedId: collection.selectedId,
+    })
   }
 
   const addWords = (rawWords: string[]) => {
@@ -179,9 +190,22 @@ export const useWordCollection = () => {
       {} as WordCollection,
     )
 
-    setCollection({
-      words: { ...collection.words, ...newCollection },
-      selectedId: collection.selectedId,
+    setWords({ ...collection.words, ...newCollection })
+  }
+
+  const deleteWord = (id: string) => {
+    const newCollection = { ...collection.words }
+    delete newCollection[id]
+
+    const ids = Object.keys(newCollection)
+    const defaultSelectedId = ids.length > 0 ? ids[ids.length - 1] : undefined
+
+    setPersistedCollection({
+      words: newCollection,
+      selectedId:
+        collection.selectedId === id
+          ? defaultSelectedId
+          : collection.selectedId,
     })
   }
 
@@ -189,6 +213,7 @@ export const useWordCollection = () => {
     words: collection.words,
     updateWord,
     addWords,
+    deleteWord,
     selectedWordId: collection.selectedId,
     setSelectedWordId,
   }

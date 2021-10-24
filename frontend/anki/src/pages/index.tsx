@@ -9,6 +9,7 @@ const Home: NextPage = () => {
   const {
     words,
     updateWord,
+    deleteWord,
     addWords,
     selectedWordId,
     setSelectedWordId,
@@ -37,6 +38,7 @@ const Home: NextPage = () => {
             word={words?.[selectedWordId]}
             id={selectedWordId}
             updateWord={updateWord}
+            deleteWord={deleteWord}
           />
         </div>
       </div>

@@ -14,10 +14,12 @@ const CardWizard = ({
   word,
   id,
   updateWord,
+  deleteWord,
 }: {
   word: Word | undefined
   id: string | undefined
   updateWord: (newWord: Word, id: string) => void
+  deleteWord: (id: string) => void
 }) => {
   const { definition: english } = useEnglishDefition(word?.value)
   const { definition: japanese } = useJapaneseDefition(word?.value)
@@ -66,7 +68,19 @@ const CardWizard = ({
   return (
     <div className="flex rounded overflow-hidden items-stretch">
       <div className="px-8 py-6 w-1/2">
-        <h2 className="text-2xl font-bold mb-4">{word.value}</h2>
+        <div className="flex justify-between items-start">
+          <h2 className="text-2xl font-bold mb-4">{word.value}</h2>
+          <button
+            onClick={() => {
+              if (window.confirm('Are you sure?')) {
+                deleteWord(id)
+              }
+            }}
+            className="text-sm text-red-700 font-bold uppercase py-1 hover:opacity-70"
+          >
+            Delete
+          </button>
+        </div>
         <form>
           <div className="mb-4">
             <Label htmlFor="sentence">Sentence</Label>
