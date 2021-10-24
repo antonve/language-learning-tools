@@ -15,7 +15,7 @@ const Layout: FC<Props> = ({ children, addWords }) => (
       </h1>
       <AddWordsButton addWords={addWords} />
     </header>
-    <div className="px-10">{children}</div>
+    <div className="px-10 mb-10">{children}</div>
   </div>
 )
 

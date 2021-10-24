@@ -17,7 +17,7 @@ const SentenceList = ({
 
   return (
     <ul>
-      {sentences.results.map((s, i) => (
+      {sentences.results.map(s => (
         <SentenceListItem
           sentence={s}
           isActive={
@@ -45,17 +45,22 @@ const SentenceListItem = ({
   onSelect: (sentence: Sentence) => void
 }) => {
   return (
-    <li className="-mx-3 my-3 rounded shadow-s transition duration-200 ease-in-out hover:shadow-md  overflow-hidden">
+    <li
+      className={classNames(
+        '-mx-3 my-3 rounded shadow-s transition duration-200 ease-in-out bg-white hover:ring ring-purple-300 ring-opacity-100',
+        {
+          'ring ring-purple-500 ring-opacity-100': isActive,
+        },
+      )}
+    >
       <a
         href="#"
         onClick={() => onSelect(sentence)}
-        className={classNames('hover:opacity-50 block px-4 py-3 bg-white ', {
-          'bg-purple-600 text-white': isActive,
-        })}
+        className={'block px-4 py-3'}
       >
         {sentence.line}
       </a>
-      <span className="block w-100 text-xs px-4 py-2 bg-gray-900 text-gray-100">
+      <span className="block w-100 text-xs px-4 pb-2 text-gray-500">
         <a href="#">
           {sentence.series} - {sentence.chapter}
         </a>
