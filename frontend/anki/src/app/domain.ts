@@ -38,3 +38,26 @@ export const compareSentences = (s1: Sentence, s2: Sentence): boolean =>
   s1.original == s2.original &&
   s1.series == s2.series &&
   s1.filename === s2.filename
+
+export const dictionaries: { name: string; url: (word: string) => string }[] = [
+  {
+    name: 'ALC',
+    url: word => `http://eow.alc.co.jp/search?q=${encodeURI(word)}`,
+  },
+  {
+    name: 'Goo',
+    url: word => `http://dictionary.goo.ne.jp/srch/all/${encodeURI(word)}/m0u/`,
+  },
+  {
+    name: 'Google',
+    url: word => `https://www.google.com/search?q=${encodeURI(word)}`,
+  },
+  {
+    name: 'Kotobank',
+    url: word => `https://kotobank.jp/gs/?q=${encodeURI(word)}`,
+  },
+  {
+    name: 'Weblio',
+    url: word => `https://www.weblio.jp/content/${encodeURI(word)}`,
+  },
+]

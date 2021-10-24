@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import { Word, Sentence } from '@app/domain'
+import { Word, Sentence, dictionaries } from '@app/domain'
 import {
   useSentences,
   useEnglishDefition,
@@ -129,7 +129,23 @@ const CardWizard = ({
         </form>
       </div>
       <div className="bg-gray-200 w-1/2 px-8 py-6">
-        <h2 className="text-xl font-bold mb-4">Example sentences</h2>
+        <h2 className="text-xl font-bold mb-4">Dictionaries</h2>
+        <div>
+          <ul className="flex -mx-2">
+            {dictionaries.map(d => (
+              <li className="mx-2">
+                <a
+                  href={d.url(word.value)}
+                  target="_blank"
+                  className="font-bold py-1 px-4 rounded border-2 block border-gray-800 text-gray-800 hover:opacity-50 transition duration-200 ease-in-out"
+                >
+                  {d.name}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <h2 className="text-xl font-bold my-4">Example sentences</h2>
         <SentenceList
           sentences={sentences}
           activeSentence={word.meta.sentence}
