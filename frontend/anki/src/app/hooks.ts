@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { v4 as uuidv4 } from 'uuid'
 
 import {
   Collection,
@@ -6,7 +7,6 @@ import {
   SentencesResult,
   Word,
   WordCollection,
-  WordMeta,
 } from '@app/domain'
 import { getGooDefinition, getJishoDefinition, getSentences } from '@app/api'
 
@@ -156,9 +156,39 @@ export const useWordCollection = () => {
     setCollection({ words: collection.words, selectedId: id })
   }
 
+  const addWords = (rawWords: string[]) => {
+    const newWords: Word[] = rawWords.map(
+      value =>
+        ({
+          value,
+          done: false,
+          meta: {
+            sentence: undefined,
+            reading: undefined,
+            definitionEnglish: undefined,
+            definitionJapanese: undefined,
+            vocabCard: false,
+          },
+        } as Word),
+    )
+    const newCollection: WordCollection = newWords.reduce(
+      (collection, word) => {
+        collection[uuidv4()] = word
+        return collection
+      },
+      {} as WordCollection,
+    )
+
+    setCollection({
+      words: { ...collection.words, ...newCollection },
+      selectedId: collection.selectedId,
+    })
+  }
+
   return {
     words: collection.words,
     updateWord,
+    addWords,
     selectedWordId: collection.selectedId,
     setSelectedWordId,
   }

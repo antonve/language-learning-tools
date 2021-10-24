@@ -3,8 +3,19 @@ import Button from '@app/components/Button'
 import Modal from '@app/components/Modal'
 import { TextArea, Label } from '@app/components/Form'
 
-const AddWordsButton = () => {
+interface Props {
+  addWords: (words: string[]) => void
+}
+
+const AddWordsButton = ({ addWords }: Props) => {
   const [isOpen, setIsOpen] = useState(true)
+  const [words, setWords] = useState('')
+
+  const saveWords = () => {
+    const newWords = words.split('\n')
+    addWords(newWords)
+    setIsOpen(false)
+  }
 
   return (
     <>
@@ -14,16 +25,25 @@ const AddWordsButton = () => {
         isOpen={isOpen}
         closeModal={() => setIsOpen(false)}
       >
-        <form>
+        <form onSubmit={saveWords}>
           <div className="mb-4 w-96">
             <Label htmlFor="words">Words (one per line)</Label>
-            <TextArea id="words" rows={20} />
+            <TextArea id="words" rows={20} value={words} onChange={setWords} />
           </div>
 
           <div className="flex justify-end">
-            <Button>Cancel</Button>
+            <Button
+              onClick={() => {
+                setWords('')
+                setIsOpen(false)
+              }}
+            >
+              Cancel
+            </Button>
             <span className="ml-5">
-              <Button primary>Save</Button>
+              <Button primary type="submit">
+                Save
+              </Button>
             </span>
           </div>
         </form>

@@ -9,6 +9,7 @@ const Home: NextPage = () => {
   const {
     words,
     updateWord,
+    addWords,
     selectedWordId,
     setSelectedWordId,
   } = useWordCollection()
@@ -22,7 +23,7 @@ const Home: NextPage = () => {
   }
 
   return (
-    <Layout>
+    <Layout addWords={addWords}>
       <div className="flex">
         <div className="h-12 w-1/6">
           <Sidebar
