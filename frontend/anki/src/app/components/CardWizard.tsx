@@ -101,7 +101,7 @@ const CardWizard = ({
             <Label htmlFor="sentence">Sentence</Label>
             <TextArea
               id="sentence"
-              rows={4}
+              rows={2}
               value={word.meta?.sentence?.line ?? ''}
               onChange={(newLine: string) => {
                 const newWord: Word = { ...word }
@@ -137,7 +137,7 @@ const CardWizard = ({
             <TextArea
               id="def_jp"
               value={word.meta.definitionJapanese}
-              rows={6}
+              rows={5}
               onChange={(newDefinition: string) => {
                 const newWord: Word = { ...word }
                 newWord.meta.definitionJapanese = newDefinition
@@ -150,7 +150,7 @@ const CardWizard = ({
             <TextArea
               id="def_en"
               value={word.meta.definitionEnglish}
-              rows={6}
+              rows={5}
               onChange={(newDefinition: string) => {
                 const newWord: Word = { ...word }
                 newWord.meta.definitionEnglish = newDefinition
