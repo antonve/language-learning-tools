@@ -43,6 +43,7 @@ type api struct {
 	goo    goo.Goo
 
 	jishoCache map[string]*JishoProxyResponse
+	gooCache   map[string]*GooProxyResponse
 }
 
 func NewAPI() API {
@@ -52,8 +53,15 @@ func NewAPI() API {
 	}
 
 	jishoCache := map[string]*JishoProxyResponse{}
+	gooCache := map[string]*GooProxyResponse{}
 
-	return &api{corpus: c, jisho: jisho.New(), goo: goo.New(), jishoCache: jishoCache}
+	return &api{
+		corpus:     c,
+		jisho:      jisho.New(),
+		goo:        goo.New(),
+		jishoCache: jishoCache,
+		gooCache:   gooCache,
+	}
 }
 
 func (api *api) SearchCorpus(c echo.Context) error {
@@ -155,6 +163,11 @@ type JishoProxyDefinition struct {
 
 func (api *api) GooProxy(c echo.Context) error {
 	token := c.Param("token")
+
+	if response, ok := api.gooCache[token]; ok {
+		return c.JSON(http.StatusOK, response)
+	}
+
 	res, err := api.goo.Search(token)
 
 	if err != nil {
@@ -171,6 +184,8 @@ func (api *api) GooProxy(c echo.Context) error {
 		Reading:    res.Reading,
 		Definition: res.Definition,
 	}
+
+	api.gooCache[token] = &response
 
 	return c.JSON(http.StatusOK, response)
 }
