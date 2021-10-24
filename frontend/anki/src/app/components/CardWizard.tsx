@@ -68,8 +68,8 @@ const CardWizard = ({
   }
 
   return (
-    <div className="flex rounded overflow-hidden items-stretch">
-      <div className="px-8 py-6 w-1/2">
+    <div className="flex rounded overflow-hidden items-stretch divide-x-2 divide-black divide-opacity-10">
+      <div className="bg-gray-100 px-8 py-6 w-1/2">
         <div className="flex justify-between items-start">
           <h2 className="text-2xl font-bold mb-4">{word.value}</h2>
           <button
@@ -146,8 +146,7 @@ const CardWizard = ({
             />
           </div>
 
-          <div className="flex items-center justify-between">
-            <Button primary>Export</Button>
+          <div className="flex justify-end gap-x-4">
             <Button
               onClick={() => {
                 const newWord: Word = { ...word }
@@ -157,15 +156,16 @@ const CardWizard = ({
             >
               Mark as {word.done ? 'WIP' : 'Done'}
             </Button>
+            <Button primary>Export</Button>
           </div>
         </form>
       </div>
-      <div className="bg-gray-200 w-1/2 px-8 py-6">
+      <div className="bg-gray-50 w-1/2 px-8 py-6">
         <h2 className="text-xl font-bold mb-4">Dictionaries</h2>
         <div>
-          <ul className="flex -mx-2">
+          <ul className="flex gap-4">
             {dictionaries.map(d => (
-              <li className="mx-2" key={d.name}>
+              <li key={d.name}>
                 <a
                   href={d.url(word.value)}
                   target="_blank"

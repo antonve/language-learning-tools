@@ -25,7 +25,7 @@ const Home: NextPage = () => {
             words={words}
           />
         </div>
-        <div className="bg-gray-50 w-full rounded-sm">
+        <div className="w-full rounded-sm">
           <CardWizard
             words={words}
             id={selectedWordId}

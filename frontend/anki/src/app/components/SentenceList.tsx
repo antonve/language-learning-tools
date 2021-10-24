@@ -47,7 +47,7 @@ const SentenceListItem = ({
   return (
     <li
       className={classNames(
-        '-mx-3 my-3 rounded shadow-s transition duration-200 ease-in-out bg-white hover:ring ring-purple-300 ring-opacity-100',
+        'my-3 rounded shadow-s transition duration-200 ease-in-out bg-white hover:ring ring-purple-300 ring-opacity-100',
         {
           'ring ring-purple-500 ring-opacity-100': isActive,
         },

@@ -31,7 +31,7 @@ const AddWordsButton = ({ addWords }: Props) => {
             <TextArea id="words" rows={20} value={words} onChange={setWords} />
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-x-4">
             <Button
               onClick={() => {
                 setWords('')
@@ -40,11 +40,9 @@ const AddWordsButton = ({ addWords }: Props) => {
             >
               Cancel
             </Button>
-            <span className="ml-5">
-              <Button primary type="submit">
-                Save
-              </Button>
-            </span>
+            <Button primary type="submit">
+              Save
+            </Button>
           </div>
         </form>
       </Modal>
