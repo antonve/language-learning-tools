@@ -99,5 +99,6 @@ export const sentenceWithFocusWord = (word: Word): string => {
     return ''
   }
 
-  return word.meta.sentence.line.replaceAll(word.value, `<b>${word.value}</b>`)
+  const target = word.meta.highlight ?? word.value
+  return word.meta.sentence.line.replaceAll(target, `<b>${target}</b>`)
 }
