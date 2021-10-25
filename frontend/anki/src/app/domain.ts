@@ -50,6 +50,10 @@ export const dictionaries: { name: string; url: (word: string) => string }[] = [
     url: word => `http://eow.alc.co.jp/search?q=${encodeURI(word)}`,
   },
   {
+    name: 'Jisho',
+    url: word => `https://jisho.org/search/${encodeURI(word)}`,
+  },
+  {
     name: 'Goo',
     url: word => `http://dictionary.goo.ne.jp/srch/all/${encodeURI(word)}/m0u/`,
   },
