@@ -20,7 +20,7 @@ export const TextInput: FC<{
   <input
     type="text"
     className={
-      'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50'
+      'mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50'
     }
     id={id}
     value={value ?? ''}
@@ -47,7 +47,7 @@ export const TextArea: FC<{
 }> = ({ value, onChange, id, rows }) => (
   <textarea
     className={
-      'mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50'
+      'mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50'
     }
     id={id}
     value={value ?? ''}

@@ -97,7 +97,7 @@ const CardWizard = ({
           </button>
         </div>
         <form>
-          <div className="mb-4">
+          <div className="mb-2">
             <Label htmlFor="sentence">Sentence</Label>
             <TextArea
               id="sentence"
@@ -120,7 +120,7 @@ const CardWizard = ({
               }}
             />
           </div>
-          <div className="mb-6">
+          <div className="mb-2">
             <Label htmlFor="reading">Reading</Label>
             <TextInput
               id="reading"
@@ -132,7 +132,7 @@ const CardWizard = ({
               }}
             />
           </div>
-          <div className="mb-6">
+          <div className="mb-2">
             <Label htmlFor="highlight">Highlight</Label>
             <TextInput
               id="highlight"
@@ -144,8 +144,7 @@ const CardWizard = ({
               }}
             />
           </div>
-
-          <div className="mb-6">
+          <div className="mb-2">
             <Label htmlFor="def_jp">Definition Japanese</Label>
             <TextArea
               id="def_jp"
@@ -158,7 +157,7 @@ const CardWizard = ({
               }}
             />
           </div>
-          <div className="mb-6">
+          <div className="mb-2">
             <Label htmlFor="def_en">Definition English</Label>
             <TextArea
               id="def_en"
@@ -171,7 +170,7 @@ const CardWizard = ({
               }}
             />
           </div>
-          <div className="mb-6">
+          <div className="mb-2">
             <Label htmlFor="vocab_only">
               <Checkbox
                 id="vocab_only"
