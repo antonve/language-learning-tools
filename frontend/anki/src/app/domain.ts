@@ -17,6 +17,7 @@ export interface WordMeta {
   definitionEnglish: string | undefined
   definitionJapanese: string | undefined
   vocabCard: boolean
+  highlight: string | undefined
 }
 
 interface Definition {

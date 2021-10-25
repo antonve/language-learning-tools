@@ -26,7 +26,7 @@ const CardWizard = ({
 
   const { definition: english } = useEnglishDefition(word?.value)
   const { definition: japanese } = useJapaneseDefition(word?.value)
-  const { sentences } = useSentences(word?.value)
+  const { sentences } = useSentences(word)
 
   useEffect(() => {
     if (
@@ -133,6 +133,19 @@ const CardWizard = ({
             />
           </div>
           <div className="mb-6">
+            <Label htmlFor="highlight">Highlight</Label>
+            <TextInput
+              id="highlight"
+              value={word.meta.highlight}
+              onChange={(value: string) => {
+                const newWord: Word = { ...word }
+                newWord.meta.highlight = value
+                updateWord(newWord, id)
+              }}
+            />
+          </div>
+
+          <div className="mb-6">
             <Label htmlFor="def_jp">Definition Japanese</Label>
             <TextArea
               id="def_jp"
@@ -217,6 +230,7 @@ const CardWizard = ({
                 definitionEnglish: word.meta.definitionEnglish,
                 definitionJapanese: word.meta.definitionJapanese,
                 vocabCard: word.meta.vocabCard ?? false,
+                highlight: word.meta.highlight,
                 sentence: { ...sentence },
               },
             }

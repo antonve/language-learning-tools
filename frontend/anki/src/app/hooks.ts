@@ -10,21 +10,21 @@ import {
 } from '@app/domain'
 import { getGooDefinition, getJishoDefinition, getSentences } from '@app/api'
 
-export const useSentences = (word: string | undefined) => {
+export const useSentences = (word: Word | undefined) => {
   const [sentences, setSentences] = useState(
     undefined as SentencesResult | undefined,
   )
 
   useEffect(() => {
-    if (word === undefined) {
+    if (word === undefined || word.meta.highlight === undefined) {
       return
     }
     const update = async () => {
-      const sentences = await getSentences(word)
+      const sentences = await getSentences(word.meta.highlight)
       setSentences(sentences)
     }
     update()
-  }, [word])
+  }, [word?.meta.highlight])
 
   return {
     sentences,
@@ -179,6 +179,7 @@ export const useWordCollection = () => {
             definitionEnglish: undefined,
             definitionJapanese: undefined,
             vocabCard: false,
+            highlight: value,
           },
         } as Word),
     )
