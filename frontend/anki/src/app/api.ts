@@ -67,6 +67,8 @@ export const getGooDefinition = async (word: string): Promise<GooResult> => {
   return body
 }
 
+const nl2br = (str: string | undefined) => str?.replaceAll('\n', '<br />')
+
 export const addAnkiNote = async (word: Word): Promise<any> => {
   const deckName = '3. Japanese::3. Vocab'
   const request = {
@@ -80,8 +82,8 @@ export const addAnkiNote = async (word: Word): Promise<any> => {
           Expression: sentenceWithFocusWord(word),
           Focus: word.value,
           Reading: word.meta.reading,
-          EnglishDefinition: word.meta.definitionEnglish,
-          JapaneseDefinition: word.meta.definitionJapanese,
+          EnglishDefinition: nl2br(word.meta.definitionEnglish),
+          JapaneseDefinition: nl2br(word.meta.definitionJapanese),
           VocabOnlyCard: word.meta.vocabCard ? '1' : '',
           Source: sourceForSentence(word.meta.sentence),
         },
