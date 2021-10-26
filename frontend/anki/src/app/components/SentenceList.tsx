@@ -52,16 +52,22 @@ const SentenceListItem = ({
   return (
     <li
       className={classNames(
-        'my-3 rounded shadow-s transition duration-200 ease-in-out bg-white hover:ring ring-purple-300 ring-opacity-100',
+        'my-3 rounded shadow-s transition duration-200 ease-in-out bg-white hover:ring ring-purple-300 ring-opacity-100 relative',
         {
           'ring ring-purple-500 ring-opacity-100': isActive,
         },
       )}
     >
+      <a
+        href="#"
+        className="absolute bottom-0 right-0 uppercase text-white bg-black bg-opacity-40 px-3 py-1 rounded-br text-xs hover:bg-purple-500"
+      >
+        Preview
+      </a>
       <a href="#" onClick={() => onSelect(sentence)}>
         <span className={'block px-4 py-3'}>{sentence.line}</span>
         <span className="block w-100 text-xs px-4 pb-2 text-gray-500">
-          <a href="#">{sourceForSentence(sentence)}</a>
+          {sourceForSentence(sentence)}
         </span>
       </a>
     </li>
