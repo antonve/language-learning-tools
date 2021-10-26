@@ -79,15 +79,27 @@ func (c *corpus) Search(word string) []*Result {
 	wg := &sync.WaitGroup{}
 	for _, c := range c.chapters {
 		wg.Add(1)
-		sem.Acquire(context.Background(), 1)
+
+		err := sem.Acquire(context.Background(), 1)
+		if err != nil {
+			wg.Done()
+			continue
+		}
 
 		go func(ch *Chapter) {
+			defer sem.Release(1)
+			defer wg.Done()
+
 			res := ch.Find(word)
 			mu.Lock()
+
 			results = append(results, res...)
+
+			if len(results) > 100 {
+				results = results[:100]
+			}
+
 			mu.Unlock()
-			sem.Release(1)
-			wg.Done()
 		}(c)
 	}
 
