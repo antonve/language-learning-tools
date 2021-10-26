@@ -60,7 +60,7 @@ const SentenceListItem = ({
     >
       <a
         href="#"
-        className="absolute bottom-0 right-0 uppercase text-white bg-black bg-opacity-40 px-3 py-1 rounded-br text-xs hover:bg-purple-500"
+        className="absolute bottom-0 right-0 uppercase text-white bg-black bg-opacity-text px-3 py-1 rounded-br text-xs hover:bg-purple-500"
       >
         Preview
       </a>

@@ -46,35 +46,37 @@ interface ChapterResult {
   finished: boolean
 }
 
-export const useChapter = (sentence: Sentence | undefined) => {
-  const [chapter, setChapter] = useState(undefined as ChapterResult | undefined)
+export const useChapter = (
+  series: string | undefined,
+  filename: string | undefined,
+) => {
+  const empty: ChapterResult = {
+    chapter: undefined,
+    finished: false,
+  }
+  const [chapter, setChapter] = useState(empty)
 
   useEffect(() => {
-    if (sentence === undefined) {
-      setChapter(undefined)
+    if (series === undefined || filename === undefined) {
+      setChapter(empty)
       return
     }
 
-    setChapter({
-      chapter: undefined,
-      finished: false,
-    })
+    setChapter(empty)
 
     const update = async () => {
-      if (sentence.series === undefined || sentence.filename === undefined) {
+      if (series === undefined || filename === undefined) {
         return
       }
 
       const fallback: Chapter = {
-        series: sentence.series,
-        filename: sentence.filename,
+        series: series,
+        filename: filename,
         title: 'Not found',
         body: 'Something went wrong here.',
       }
 
-      const req = await getChapter(sentence.series, sentence.filename).catch(
-        () => fallback,
-      )
+      const req = await getChapter(series, filename).catch(() => fallback)
 
       setChapter({
         chapter: req,
@@ -83,7 +85,7 @@ export const useChapter = (sentence: Sentence | undefined) => {
     }
 
     update()
-  }, [sentence?.series, sentence?.filename])
+  }, [series, filename])
 
   return chapter
 }

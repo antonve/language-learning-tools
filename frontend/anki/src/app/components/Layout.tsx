@@ -2,7 +2,7 @@ import { FC } from 'react'
 import AddWordsButton from '@app/components/AddWordsButton'
 
 interface Props {
-  addWords: (words: string[]) => void
+  addWords?: (words: string[]) => void
 }
 
 const Layout: FC<Props> = ({ children, addWords }) => (
@@ -13,7 +13,7 @@ const Layout: FC<Props> = ({ children, addWords }) => (
       <h1 className="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl">
         Anki Miner
       </h1>
-      <AddWordsButton addWords={addWords} />
+      {addWords && <AddWordsButton addWords={addWords} />}
     </header>
     <div className="px-10">{children}</div>
   </div>
