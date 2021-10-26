@@ -28,6 +28,14 @@ export const getJishoDefinition = async (
 ): Promise<JishoResult> => {
   const url = `${root}/jisho/${encodeURI(word)}`
   const response = await fetch(url)
+
+  if (response.status !== 200) {
+    return {
+      word,
+      definitions: [],
+    }
+  }
+
   const body = await response.json()
 
   return body
@@ -36,6 +44,13 @@ export const getJishoDefinition = async (
 export const getSentences = async (word: string): Promise<SentencesResult> => {
   const url = `${root}/corpus/${encodeURI(word)}`
   const response = await fetch(url)
+
+  if (response.status !== 200) {
+    return {
+      results: [],
+    }
+  }
+
   const body = await response.json()
 
   const sentences = body.results.map((s: Sentence) => ({
@@ -62,6 +77,15 @@ export const getSentences = async (word: string): Promise<SentencesResult> => {
 export const getGooDefinition = async (word: string): Promise<GooResult> => {
   const url = `${root}/goo/${encodeURI(word)}`
   const response = await fetch(url)
+
+  if (response.status !== 200) {
+    return {
+      word,
+      definition: '',
+      reading: '',
+    }
+  }
+
   const body = await response.json()
 
   return body
