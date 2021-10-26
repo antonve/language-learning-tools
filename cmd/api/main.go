@@ -23,7 +23,7 @@ func main() {
 	})
 
 	e.GET("/corpus/:token", api.SearchCorpus)
-	e.GET("/series/:series/:filename", api.GetChapter)
+	e.GET("/chapter/:series/:filename", api.GetChapter)
 	e.GET("/jisho/:token", api.JishoProxy)
 	e.GET("/goo/:token", api.GooProxy)
 

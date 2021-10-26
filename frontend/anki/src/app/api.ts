@@ -21,7 +21,30 @@ interface Definition {
   meaning: string
 }
 
+interface Chapter {
+  filename: string
+  series: string
+  title: string
+  body: string
+}
+
 const root = 'http://localhost:5555'
+
+export const getChapter = async (
+  series: string,
+  filename: string,
+): Promise<Chapter> => {
+  const url = `${root}/chapter/${encodeURI(series)}/${filename}`
+  const response = await fetch(url)
+
+  if (response.status !== 200) {
+    throw new Error('not found')
+  }
+
+  const body = await response.json()
+
+  return body
+}
 
 export const getJishoDefinition = async (
   word: string,
