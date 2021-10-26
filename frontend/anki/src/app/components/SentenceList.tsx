@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import classNames from 'classnames'
 
 import {
@@ -58,12 +59,14 @@ const SentenceListItem = ({
         },
       )}
     >
-      <a
-        href="#"
-        className="absolute bottom-0 right-0 uppercase text-white bg-black bg-opacity-text px-3 py-1 rounded-br text-xs hover:bg-purple-500"
-      >
-        Preview
-      </a>
+      <Link href={`/chapter/${sentence.series}/${sentence.filename}`}>
+        <a
+          href="#"
+          className="absolute bottom-0 right-0 uppercase text-white bg-black bg-opacity-text px-3 py-1 rounded-br text-xs hover:bg-purple-500"
+        >
+          Preview
+        </a>
+      </Link>
       <a href="#" onClick={() => onSelect(sentence)}>
         <span className={'block px-4 py-3'}>{sentence.line}</span>
         <span className="block w-100 text-xs px-4 pb-2 text-gray-500">
