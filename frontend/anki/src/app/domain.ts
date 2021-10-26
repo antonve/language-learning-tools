@@ -32,6 +32,13 @@ export interface Sentence {
   original: string | undefined
 }
 
+export interface Chapter {
+  filename: string
+  series: string
+  title: string
+  body: string
+}
+
 export interface SentencesResult {
   results: Sentence[]
 }

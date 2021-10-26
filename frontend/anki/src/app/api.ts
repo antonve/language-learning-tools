@@ -4,6 +4,7 @@ import {
   SentencesResult,
   sourceForSentence,
   sentenceWithFocusWord,
+  Chapter,
 } from '@app/domain'
 
 interface JishoResult {
@@ -19,13 +20,6 @@ interface GooResult {
 
 interface Definition {
   meaning: string
-}
-
-interface Chapter {
-  filename: string
-  series: string
-  title: string
-  body: string
 }
 
 const root = 'http://localhost:5555'

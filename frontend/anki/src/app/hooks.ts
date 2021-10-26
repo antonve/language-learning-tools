@@ -2,13 +2,20 @@ import { useState, useEffect } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 
 import {
+  Chapter,
   Collection,
   formatDefinitions,
+  Sentence,
   SentencesResult,
   Word,
   WordCollection,
 } from '@app/domain'
-import { getGooDefinition, getJishoDefinition, getSentences } from '@app/api'
+import {
+  getChapter,
+  getGooDefinition,
+  getJishoDefinition,
+  getSentences,
+} from '@app/api'
 
 export const useSentences = (word: Word | undefined) => {
   const [sentences, setSentences] = useState(
@@ -20,6 +27,9 @@ export const useSentences = (word: Word | undefined) => {
       return
     }
     const update = async () => {
+      if (word.meta.highlight === undefined) {
+        return
+      }
       const sentences = await getSentences(word.meta.highlight)
       setSentences(sentences)
     }
@@ -29,6 +39,53 @@ export const useSentences = (word: Word | undefined) => {
   return {
     sentences,
   }
+}
+
+interface ChapterResult {
+  chapter: Chapter | undefined
+  finished: boolean
+}
+
+export const useChapter = (sentence: Sentence | undefined) => {
+  const [chapter, setChapter] = useState(undefined as ChapterResult | undefined)
+
+  useEffect(() => {
+    if (sentence === undefined) {
+      setChapter(undefined)
+      return
+    }
+
+    setChapter({
+      chapter: undefined,
+      finished: false,
+    })
+
+    const update = async () => {
+      if (sentence.series === undefined || sentence.filename === undefined) {
+        return
+      }
+
+      const fallback: Chapter = {
+        series: sentence.series,
+        filename: sentence.filename,
+        title: 'Not found',
+        body: 'Something went wrong here.',
+      }
+
+      const req = await getChapter(sentence.series, sentence.filename).catch(
+        () => fallback,
+      )
+
+      setChapter({
+        chapter: req,
+        finished: true,
+      })
+    }
+
+    update()
+  }, [sentence?.series, sentence?.filename])
+
+  return chapter
 }
 
 interface EnglishDefinitionResult {
