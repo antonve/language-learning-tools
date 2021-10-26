@@ -12,6 +12,25 @@ export const RadioButton: FC<{
   />
 )
 
+export const TitleInput: FC<{
+  value: string | undefined
+  onChange: (value: string) => void
+  id: string | undefined
+}> = ({ value, onChange, id }) => (
+  <input
+    type="text"
+    className={
+      'bg-transparent border-none p-0 text-2xl font-bold mb-4 focus:border-purple-300 focus:border-none focus:ring focus:ring-purple-200 focus:ring-opacity-50'
+    }
+    id={id}
+    value={value ?? ''}
+    onChange={event => {
+      const updatedValue = event.target.value
+      onChange(updatedValue)
+    }}
+  />
+)
+
 export const TextInput: FC<{
   value: string | undefined
   onChange: (value: string) => void

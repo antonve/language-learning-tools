@@ -7,7 +7,13 @@ import {
   useJapaneseDefition,
 } from '@app/hooks'
 import Button from '@app/components/Button'
-import { TextInput, TextArea, Label, Checkbox } from '@app/components/Form'
+import {
+  TextInput,
+  TextArea,
+  Label,
+  Checkbox,
+  TitleInput,
+} from '@app/components/Form'
 import SentenceList from '@app/components/SentenceList'
 import { addAnkiNote } from '@app/api'
 
@@ -84,7 +90,16 @@ const CardWizard = ({
     <div className="flex rounded overflow-hidden items-stretch divide-x-2 divide-black divide-opacity-10">
       <div className="bg-gray-100 px-8 py-6 w-1/2">
         <div className="flex justify-between items-start">
-          <h2 className="text-2xl font-bold mb-4">{word.value}</h2>
+          <TitleInput
+            value={word.value}
+            id="title"
+            onChange={(value: string) => {
+              const newWord: Word = { ...word }
+              newWord.value = value
+              newWord.meta.highlight = value
+              updateWord(newWord, id)
+            }}
+          />
           <button
             onClick={() => {
               if (window.confirm('Are you sure?')) {
