@@ -38,15 +38,19 @@ func New(path string) (cor Corpus, err error) {
 	wg := &sync.WaitGroup{}
 	for _, c := range chapters {
 		wg.Add(1)
-		sem.Acquire(context.Background(), 1)
+		err = sem.Acquire(context.Background(), 1)
+		if err != nil {
+			return
+		}
 
 		go func(ch *Chapter) {
+			defer sem.Release(1)
+			defer wg.Done()
+
 			err = ch.Load()
 			if err != nil {
 				return
 			}
-			sem.Release(1)
-			wg.Done()
 		}(c)
 	}
 
