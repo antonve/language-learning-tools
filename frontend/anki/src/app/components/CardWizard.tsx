@@ -111,7 +111,7 @@ const CardWizard = ({
             Delete
           </button>
         </div>
-        <form>
+        <form onSubmit={exportNote}>
           <div className="mb-2">
             <Label htmlFor="sentence">Sentence</Label>
             <TextArea
@@ -209,7 +209,7 @@ const CardWizard = ({
             >
               Mark as {word.done ? 'WIP' : 'Done'}
             </Button>
-            <Button primary onClick={exportNote}>
+            <Button type="submit" primary>
               Export
             </Button>
           </div>
