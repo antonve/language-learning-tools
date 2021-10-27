@@ -223,13 +223,13 @@ const CardWizard = ({
       <div className="bg-gray-50 w-1/2 px-8 py-6">
         <h2 className="text-xl font-bold mb-4">Dictionaries</h2>
         <div>
-          <ul className="flex gap-4">
+          <ul className="flex gap-2">
             {dictionaries.map(d => (
               <li key={d.name}>
                 <a
                   href={d.url(word.value)}
                   target="_blank"
-                  className="font-bold py-1 px-4 rounded border-2 block border-gray-800 text-gray-800 hover:opacity-50 transition duration-200 ease-in-out"
+                  className="font-bold py-1 px-3 rounded border-2 block border-gray-800 text-gray-800 hover:opacity-50 transition duration-200 ease-in-out"
                 >
                   {d.name}
                 </a>
