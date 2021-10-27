@@ -84,6 +84,10 @@ export const dictionaries: { name: string; url: (word: string) => string }[] = [
         word,
       )}%22`,
   },
+  {
+    name: 'Idioms',
+    url: word => `https://idiom-encyclopedia.com/?s=${encodeURI(word)}`,
+  },
 ]
 
 export const sourceForSentence = (
