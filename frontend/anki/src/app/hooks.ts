@@ -205,13 +205,16 @@ export const useWordCollection = () => {
     }
   }, [])
 
-  const updateWord = (newWord: Word, id: string) => {
+  const updateWord = (newWord: Word, id: string, selectedWordId?: string) => {
     if (collection.words[id] === undefined) {
       return
     }
 
     const words = { ...collection.words, [id]: newWord }
-    const newCollection = { words, selectedId: collection.selectedId }
+    const newCollection = {
+      words,
+      selectedId: selectedWordId ?? collection.selectedId,
+    }
     setPersistedCollection(newCollection)
   }
 

@@ -25,7 +25,7 @@ const CardWizard = ({
 }: {
   words: WordCollection
   id: string | undefined
-  updateWord: (newWord: Word, id: string) => void
+  updateWord: (newWord: Word, id: string, selectedWordId?: string) => void
   deleteWord: (id: string) => void
 }) => {
   const word = words?.[id ?? 'none']
@@ -78,9 +78,14 @@ const CardWizard = ({
     try {
       await addAnkiNote(word)
 
+      const ids = Object.entries(words)
+        .filter(([_, word]) => !word.done)
+        .map(([id, _]) => id)
+      const nextIndex = ids.indexOf(id) + 1
+
       const newWord: Word = { ...word }
       newWord.done = true
-      updateWord(newWord, id)
+      updateWord(newWord, id, ids[nextIndex])
     } catch (e) {
       window.alert(e)
     }
