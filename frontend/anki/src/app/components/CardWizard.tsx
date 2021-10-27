@@ -239,6 +239,7 @@ const CardWizard = ({
         </div>
         <h2 className="text-xl font-bold my-4">Example sentences</h2>
         <SentenceList
+          word={word}
           sentences={sentences}
           activeSentence={word.meta.sentence}
           onSelect={(sentence: Sentence) => {

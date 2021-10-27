@@ -2,17 +2,21 @@ import Link from 'next/link'
 import classNames from 'classnames'
 
 import {
+  Word,
   SentencesResult,
   Sentence,
   compareSentences,
   sourceForSentence,
 } from '@app/domain'
+import { Fragment } from 'react'
 
 const SentenceList = ({
+  word,
   sentences,
   onSelect,
   activeSentence,
 }: {
+  word: Word
   sentences: SentencesResult | undefined
   activeSentence: Sentence | undefined
   onSelect: (sentence: Sentence) => void
@@ -26,6 +30,7 @@ const SentenceList = ({
       {sentences.results.map(s => (
         <SentenceListItem
           sentence={s}
+          word={word}
           isActive={
             activeSentence === undefined
               ? false
@@ -42,10 +47,12 @@ const SentenceList = ({
 export default SentenceList
 
 const SentenceListItem = ({
+  word,
   sentence,
   isActive,
   onSelect,
 }: {
+  word: Word
   sentence: Sentence
   isActive: boolean
   onSelect: (sentence: Sentence) => void
@@ -68,11 +75,39 @@ const SentenceListItem = ({
         </a>
       </Link>
       <a href="#" onClick={() => onSelect(sentence)}>
-        <span className={'block px-4 py-3'}>{sentence.line}</span>
+        <span className={'block px-4 py-3'}>
+          <SentenceView
+            line={sentence.line}
+            highlight={word.meta.highlight ?? word.value}
+          />
+        </span>
         <span className="block w-100 text-xs px-4 pb-2 text-gray-500">
           {sourceForSentence(sentence)}
         </span>
       </a>
     </li>
+  )
+}
+
+const SentenceView = ({
+  line,
+  highlight,
+}: {
+  line: string
+  highlight: string
+}) => {
+  const parts = line.split(highlight)
+
+  return (
+    <>
+      {parts.map((str, i) => (
+        <Fragment key={i}>
+          {str}
+          {i < parts.length - 1 && (
+            <span className="text-purple-700">{highlight}</span>
+          )}
+        </Fragment>
+      ))}
+    </>
   )
 }
