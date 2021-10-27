@@ -141,18 +141,6 @@ const CardWizard = ({
             />
           </div>
           <div className="mb-2">
-            <Label htmlFor="reading">Reading</Label>
-            <TextInput
-              id="reading"
-              value={word.meta.reading}
-              onChange={(newReading: string) => {
-                const newWord: Word = { ...word }
-                newWord.meta.reading = newReading
-                updateWord(newWord, id)
-              }}
-            />
-          </div>
-          <div className="mb-2">
             <Label htmlFor="highlight">Highlight</Label>
             <TextInput
               id="highlight"
@@ -160,6 +148,18 @@ const CardWizard = ({
               onChange={(value: string) => {
                 const newWord: Word = { ...word }
                 newWord.meta.highlight = value
+                updateWord(newWord, id)
+              }}
+            />
+          </div>
+          <div className="mb-2">
+            <Label htmlFor="reading">Reading</Label>
+            <TextInput
+              id="reading"
+              value={word.meta.reading}
+              onChange={(newReading: string) => {
+                const newWord: Word = { ...word }
+                newWord.meta.reading = newReading
                 updateWord(newWord, id)
               }}
             />
