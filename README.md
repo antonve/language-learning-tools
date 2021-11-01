@@ -1,6 +1,6 @@
-# jp-mining-tools
+# jp-learning-tools
 
-Tools to help with Japanese sentence mining. 
+Tools to help with learning Japanese.
 
 ## Disclaimer
 
@@ -14,8 +14,7 @@ The code is also of prototype quality because it's not meant to be ran in produc
 
 A frontend for creating Anki cards given a list of words.
 
-
-### Setup
+#### Setup
 
 1. Install AnkiConnect
 2. Add `http://localhost:3000` to AnkiConnect `webCorsOriginList`
@@ -32,7 +31,7 @@ A frontend for creating Anki cards given a list of words.
   go run cmd/api/main.go
   ```
 
-### Preview
+#### Preview
 
 ![Anki Miner preview](docs/assets/anki_miner_preview.png)
 
