@@ -28,7 +28,7 @@ A frontend for creating Anki cards given a list of words.
   yarn dev
 
   # API
-  go run cmd/api/main.go
+  go run cmd/api_miner/main.go
   ```
 
 #### Preview
