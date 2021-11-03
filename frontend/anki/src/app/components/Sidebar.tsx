@@ -13,6 +13,7 @@ const Sidebar = ({
   cleanWords: () => void
 }) => {
   const showDelete = Object.keys(words).length > 0
+  const doneCount = Object.values(words).filter(w => w.done).length
 
   return (
     <ul className="pr-6">
@@ -25,7 +26,7 @@ const Sidebar = ({
           updateActiveId={updateActiveId}
         />
       ))}
-      {showDelete && <CleanWordsLink onClick={cleanWords} />}
+      {showDelete && <CleanWordsLink onClick={cleanWords} count={doneCount} />}
     </ul>
   )
 }
@@ -73,7 +74,13 @@ const SidebarItem = ({
   </li>
 )
 
-const CleanWordsLink = ({ onClick }: { onClick: () => void }) => (
+const CleanWordsLink = ({
+  onClick,
+  count,
+}: {
+  onClick: () => void
+  count: number
+}) => (
   <li className="mt-4 pt-3 border-t-2">
     <a
       className={classNames(
@@ -82,7 +89,7 @@ const CleanWordsLink = ({ onClick }: { onClick: () => void }) => (
       onClick={onClick}
       href="#"
     >
-      <span className="relative">Clean up</span>
+      <span className="relative">Clean up ({count})</span>
     </a>
   </li>
 )
