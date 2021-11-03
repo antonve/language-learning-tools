@@ -240,7 +240,7 @@ export const useWordCollection = () => {
             reading: undefined,
             definitionEnglish: undefined,
             definitionJapanese: undefined,
-            vocabCard: false,
+            vocabCard: true,
             highlight: value,
           },
         } as Word),
