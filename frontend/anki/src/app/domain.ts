@@ -44,7 +44,7 @@ export interface SentencesResult {
 }
 
 export const formatDefinitions = (defs: Definition[]): string => {
-  return defs.map((d, i) => `${i + 1}. ${d.meaning}`).join('\n\n')
+  return defs.map((d, i) => `${i + 1}. ${d.meaning}`).join('\n')
 }
 
 export const compareSentences = (s1: Sentence, s2: Sentence): boolean =>
