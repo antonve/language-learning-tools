@@ -223,7 +223,7 @@ const CardWizard = ({
       <div className="bg-gray-50 w-1/2 px-8 py-6">
         <h2 className="text-xl font-bold mb-4">Dictionaries</h2>
         <div>
-          <ul className="flex gap-2">
+          <ul className="flex gap-2 flex-wrap">
             {dictionaries.map(d => (
               <li key={d.name}>
                 <a
