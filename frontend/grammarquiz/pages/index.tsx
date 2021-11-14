@@ -59,6 +59,33 @@ const Home: NextPage<Props> = ({ questions }) => {
   )
 }
 
+const answerMap: { [key: string]: string } = {
+  '1': 'a',
+  '2': 'b',
+  '3': 'c',
+  '4': 'd',
+}
+const getAnswerPrefix = (prefix: string) => answerMap[prefix] ?? ''
+
+const Answer = ({
+  id,
+  value,
+  onClick,
+}: {
+  id: string
+  value: string
+  onClick: (key: string) => void
+}) => {
+  return (
+    <button
+      onClick={() => onClick(id)}
+      className="bg-gray-700 px-5 py-4 rounded-xl text-gray-100 text-4xl text-left"
+    >
+      {getAnswerPrefix(id)}. {value}
+    </button>
+  )
+}
+
 const Question = ({ questions }: { questions: Question[] }) => {
   const { question, answers, check, next } = useQuestion(questions)
 
@@ -66,6 +93,11 @@ const Question = ({ questions }: { questions: Question[] }) => {
     <div>
       <div className="w-100 bg-gray-800 rounded-xl p-8 text-gray-300 text-4xl leading-relaxed">
         <QuestionView sentence={question} />
+      </div>
+      <div className="mt-8 grid grid-cols-2 gap-4">
+        {Object.entries(answers).map(([key, value]) => (
+          <Answer key={key} id={key} value={value} onClick={() => {}} />
+        ))}
       </div>
     </div>
   )
