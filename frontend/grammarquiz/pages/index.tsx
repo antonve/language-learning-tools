@@ -27,7 +27,7 @@ const useQuestion = (questions: Question[], initialQuestion: Question) => {
   return {
     question: question.sentence,
     answers,
-    check: (answer: number) => answer.toString() === question.answer,
+    check: (answer: string) => answer === question.answer.toString(),
     next: () => {
       setQuestion(randomValue(questions))
     },
@@ -80,15 +80,27 @@ const Answer = ({
   id,
   value,
   onClick,
+  isCorrect,
+  userAnswer,
 }: {
   id: string
   value: string
   onClick: (key: string) => void
+  isCorrect: boolean
+  userAnswer: string | undefined
 }) => {
+  let suffix = ''
+  if (isCorrect && userAnswer !== undefined) {
+    suffix = 'bg-green-600'
+  }
+  if (!isCorrect && userAnswer === id) {
+    suffix = 'bg-red-900'
+  }
+
   return (
     <button
       onClick={() => onClick(id)}
-      className="bg-gray-700 px-5 py-4 rounded-xl text-gray-100 text-4xl text-left"
+      className={`bg-gray-700 px-5 py-4 rounded-xl text-gray-100 text-4xl text-left ${suffix}`}
     >
       {getAnswerPrefix(id)}. {value}
     </button>
@@ -107,6 +119,8 @@ const Question = ({
     initialQuestion,
   )
 
+  const [userAnswer, setUserAnswer] = useState(undefined as undefined | string)
+
   return (
     <div>
       <div className="w-100 bg-gray-800 rounded-xl p-8 text-gray-300 text-4xl leading-relaxed">
@@ -114,7 +128,20 @@ const Question = ({
       </div>
       <div className="mt-8 grid grid-cols-2 gap-4">
         {Object.entries(answers).map(([key, value]) => (
-          <Answer key={key} id={key} value={value} onClick={() => {}} />
+          <Answer
+            key={key}
+            id={key}
+            value={value}
+            isCorrect={check(key)}
+            userAnswer={userAnswer}
+            onClick={(answer: string) => {
+              if (userAnswer !== undefined) {
+                setUserAnswer(undefined)
+                return next()
+              }
+              setUserAnswer(answer)
+            }}
+          />
         ))}
       </div>
     </div>
