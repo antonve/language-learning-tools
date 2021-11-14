@@ -15,12 +15,8 @@ interface Question {
   id: string
 }
 
-interface Props {
-  questions: Question[]
-}
-
-const useQuestion = (questions: Question[]) => {
-  const [question, setQuestion] = useState(() => randomValue(questions))
+const useQuestion = (questions: Question[], initialQuestion: Question) => {
+  const [question, setQuestion] = useState(initialQuestion)
   const answers = {
     1: question.a,
     2: question.b,
@@ -42,7 +38,12 @@ const randomValue = <T extends unknown>(arr: T[]): T => {
   return arr[Math.floor(Math.random() * arr.length)]
 }
 
-const Home: NextPage<Props> = ({ questions }) => {
+interface Props {
+  questions: Question[]
+  initialQuestion: Question
+}
+
+const Home: NextPage<Props> = ({ questions, initialQuestion }) => {
   return (
     <div className="mb-8 bg-gray-900 h-screen">
       <header
@@ -53,10 +54,18 @@ const Home: NextPage<Props> = ({ questions }) => {
         </h1>
       </header>
       <div className="px-10">
-        <Question questions={questions} />
+        <Question questions={questions} initialQuestion={initialQuestion} />
       </div>
     </div>
   )
+}
+
+Home.getInitialProps = async ({ req }) => {
+  const raw = new Buffer(publicRuntimeConfig.questions, 'base64')
+  const questions = JSON.parse(raw.toString())
+  const initialQuestion: Question = randomValue(questions)
+
+  return { questions, initialQuestion }
 }
 
 const answerMap: { [key: string]: string } = {
@@ -86,8 +95,17 @@ const Answer = ({
   )
 }
 
-const Question = ({ questions }: { questions: Question[] }) => {
-  const { question, answers, check, next } = useQuestion(questions)
+const Question = ({
+  questions,
+  initialQuestion,
+}: {
+  questions: Question[]
+  initialQuestion: Question
+}) => {
+  const { question, answers, check, next } = useQuestion(
+    questions,
+    initialQuestion,
+  )
 
   return (
     <div>
@@ -120,13 +138,6 @@ const QuestionView = ({ sentence }: { sentence: string }) => {
       ))}
     </>
   )
-}
-
-Home.getInitialProps = async ({ req }) => {
-  const raw = new Buffer(publicRuntimeConfig.questions, 'base64')
-  const questions = JSON.parse(raw.toString())
-
-  return { questions }
 }
 
 export default Home
