@@ -1,4 +1,4 @@
-name: build-frontend-web
+name: build-frontend-grammarquiz
 on:
   push:
     paths:
@@ -40,7 +40,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     defaults:
       run:
-        working-directory: frontend/web
+        working-directory: frontend/grammarquiz
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
