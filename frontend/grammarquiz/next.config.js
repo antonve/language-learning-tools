@@ -4,4 +4,5 @@ module.exports = {
   publicRuntimeConfig: {
     questions: process.env.QUESTIONS_JSON,
   },
+  basePath: '/grammar',
 }
