@@ -25,8 +25,8 @@ type corpus struct {
 
 var ErrChapterNotFound = errors.New("could not find chapter")
 
-func New(path string) (cor Corpus, err error) {
-	chapters, err := loadSeries(path)
+func New(path, language string) (cor Corpus, err error) {
+	chapters, err := loadSeries(language, path+"/"+language)
 
 	if err != nil {
 		return nil, err
@@ -56,7 +56,9 @@ func New(path string) (cor Corpus, err error) {
 
 	wg.Wait()
 
-	return &corpus{chapters: chapters}, err
+	return &corpus{
+		chapters: chapters,
+	}, err
 }
 
 func (c *corpus) FindOriginal(series, filename string) (*Chapter, error) {
@@ -108,7 +110,7 @@ func (c *corpus) Search(word string) []*Result {
 	return results
 }
 
-func loadSeries(path string) ([]*Chapter, error) {
+func loadSeries(lang, path string) ([]*Chapter, error) {
 	folders, err := ioutil.ReadDir(path)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to load series folder")
@@ -122,7 +124,7 @@ func loadSeries(path string) ([]*Chapter, error) {
 		}
 
 		seriesPath := fmt.Sprintf("%s/%s", path, f.Name())
-		c, err := loadChapters(f.Name(), seriesPath)
+		c, err := loadChapters(lang, f.Name(), seriesPath)
 
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to load chapters for series: "+seriesPath)
@@ -134,7 +136,7 @@ func loadSeries(path string) ([]*Chapter, error) {
 	return chapters, nil
 }
 
-func loadChapters(series string, path string) ([]*Chapter, error) {
+func loadChapters(lang, series, path string) ([]*Chapter, error) {
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to read directory for series: "+series)
@@ -149,7 +151,7 @@ func loadChapters(series string, path string) ([]*Chapter, error) {
 			continue
 		}
 
-		c := NewChapter(series, fp, f.Name())
+		c := NewChapter(lang, series, fp, f.Name())
 		chapters = append(chapters, c)
 	}
 
@@ -157,6 +159,7 @@ func loadChapters(series string, path string) ([]*Chapter, error) {
 }
 
 type Chapter struct {
+	Language string
 	Series   string
 	Path     string
 	Filename string
@@ -165,8 +168,9 @@ type Chapter struct {
 	title string
 }
 
-func NewChapter(series, path, filename string) *Chapter {
+func NewChapter(language, series, path, filename string) *Chapter {
 	c := &Chapter{
+		Language: language,
 		Series:   series,
 		Path:     path,
 		Filename: filename,
@@ -221,6 +225,7 @@ func (c *Chapter) Find(word string) []*Result {
 }
 
 type Result struct {
-	Line    string
-	Chapter *Chapter
+	Language string
+	Line     string
+	Chapter  *Chapter
 }
