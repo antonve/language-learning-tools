@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -22,10 +23,10 @@ func main() {
 		return c.NoContent(http.StatusOK)
 	})
 
-	e.GET("/corpus/:token", api.SearchCorpus)
-	e.GET("/chapter/:series/:filename", api.GetChapter)
-	e.GET("/jisho/:token", api.JishoProxy)
-	e.GET("/goo/:token", api.GooProxy)
+	e.GET("/:lang/corpus/:token", api.SearchCorpus)
+	e.GET("/:lang/chapter/:series/:filename", api.GetChapter)
+	e.GET("/jp/jisho/:token", api.JishoProxy)
+	e.GET("/jp/goo/:token", api.GooProxy)
 
 	e.Logger.Fatal(e.Start(":5555"))
 }
@@ -38,16 +39,22 @@ type API interface {
 }
 
 type api struct {
-	corpus corpus.Corpus
-	jisho  jisho.Jisho
-	goo    goo.Goo
+	jpCorpus corpus.Corpus
+	zhCorpus corpus.Corpus
+	jisho    jisho.Jisho
+	goo      goo.Goo
 
 	jishoCache map[string]*JishoProxyResponse
 	gooCache   map[string]*GooProxyResponse
 }
 
 func NewAPI() API {
-	c, err := corpus.New("./out")
+	cjp, err := corpus.New("./out/jp")
+	if err != nil {
+		panic(err)
+	}
+
+	czh, err := corpus.New("./out/zh")
 	if err != nil {
 		panic(err)
 	}
@@ -56,7 +63,8 @@ func NewAPI() API {
 	gooCache := map[string]*GooProxyResponse{}
 
 	return &api{
-		corpus:     c,
+		jpCorpus:   cjp,
+		zhCorpus:   czh,
 		jisho:      jisho.New(),
 		goo:        goo.New(),
 		jishoCache: jishoCache,
@@ -64,9 +72,25 @@ func NewAPI() API {
 	}
 }
 
+func (api *api) getCorpus(lang string) (corpus.Corpus, error) {
+	switch lang {
+	case "jp":
+		return api.jpCorpus, nil
+	case "zh":
+		return api.zhCorpus, nil
+	}
+
+	return nil, fmt.Errorf("no corpus found for language %s", lang)
+}
+
 func (api *api) SearchCorpus(c echo.Context) error {
 	token := c.Param("token")
-	res := api.corpus.Search(token)
+	cor, err := api.getCorpus(c.Param("lang"))
+	if err != nil {
+		return err
+	}
+
+	res := cor.Search(token)
 	results := make([]SearchResult, len(res))
 
 	for i, r := range res {
@@ -97,7 +121,12 @@ type SearchResult struct {
 func (api *api) GetChapter(c echo.Context) error {
 	series := c.Param("series")
 	filename := c.Param("filename")
-	chapter, err := api.corpus.FindOriginal(series, filename)
+	cor, err := api.getCorpus(c.Param("lang"))
+	if err != nil {
+		return err
+	}
+
+	chapter, err := cor.FindOriginal(series, filename)
 
 	if err != nil {
 		switch errors.Cause(err) {
