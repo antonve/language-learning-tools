@@ -62,8 +62,9 @@ export const TextArea: FC<{
   value: string | undefined
   onChange: (value: string) => void
   id: string | undefined
-  rows: number | undefined
-}> = ({ value, onChange, id, rows }) => (
+  rows?: number | undefined
+  autoFocus?: boolean | undefined
+}> = ({ value, onChange, id, rows, autoFocus }) => (
   <textarea
     className={
       'mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50'
@@ -75,6 +76,7 @@ export const TextArea: FC<{
       onChange(updatedValue)
     }}
     rows={rows ?? 3}
+    autoFocus={autoFocus ?? false}
   />
 )
 
