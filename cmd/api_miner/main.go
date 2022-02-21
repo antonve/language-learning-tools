@@ -49,12 +49,12 @@ type api struct {
 }
 
 func NewAPI() API {
-	cjp, err := corpus.New("./out/jp")
+	cjp, err := corpus.New("./out", "jp")
 	if err != nil {
 		panic(err)
 	}
 
-	czh, err := corpus.New("./out/zh")
+	czh, err := corpus.New("./out", "zh")
 	if err != nil {
 		panic(err)
 	}
@@ -95,6 +95,7 @@ func (api *api) SearchCorpus(c echo.Context) error {
 
 	for i, r := range res {
 		results[i] = SearchResult{
+			Language: r.Chapter.Language,
 			Filename: r.Chapter.Filename,
 			Series:   r.Chapter.Series,
 			Chapter:  r.Chapter.Title(),
@@ -112,6 +113,7 @@ type SearchCorpusResponse struct {
 }
 
 type SearchResult struct {
+	Language string `json:"language"`
 	Filename string `json:"filename"`
 	Series   string `json:"series"`
 	Chapter  string `json:"chapter"`
