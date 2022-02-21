@@ -4,6 +4,8 @@ import Layout from '@app/components/Layout'
 import Sidebar from '@app/components/Sidebar'
 import CardWizardJapanese from '@app/components/CardWizardJapanese'
 import { useWordCollection } from '@app/hooks'
+import AddWordsButton from '@app/components/AddWordsButton'
+import LanguageToggle from "@app/components/LanguageToggle"
 
 const Home: NextPage = () => {
   const {
@@ -17,7 +19,12 @@ const Home: NextPage = () => {
   } = useWordCollection()
 
   return (
-    <Layout addWords={addWords}>
+    <Layout navigation={() => (
+      <>
+      <LanguageToggle selectedLanguage='jp' languages={['jp', 'zh']} />
+      {addWords && <AddWordsButton addWords={addWords} />}
+      </>
+    )}>
       <div className="flex">
         <div className="w-1/6">
           <Sidebar
