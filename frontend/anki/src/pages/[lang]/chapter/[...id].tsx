@@ -7,8 +7,9 @@ import { useRouter } from 'next/dist/client/router'
 const Chapter: NextPage = () => {
   const router = useRouter()
   const [series, filename] = (router.query?.id ?? []) as string[]
+  const lang = router.query?.lang as string ?? ""
 
-  const { chapter, finished } = useChapter(series, filename)
+  const { chapter, finished } = useChapter(lang, series, filename)
 
   if (chapter === undefined || !finished) {
     return <Layout>Loading...</Layout>

@@ -17,7 +17,7 @@ import {
   getSentences,
 } from '@app/api'
 
-export const useSentences = (word: Word | undefined) => {
+export const useSentences = (lang: string, word: Word | undefined) => {
   const [sentences, setSentences] = useState(
     undefined as SentencesResult | undefined,
   )
@@ -30,7 +30,7 @@ export const useSentences = (word: Word | undefined) => {
       if (word.meta.highlight === undefined) {
         return
       }
-      const sentences = await getSentences(word.meta.highlight)
+      const sentences = await getSentences(lang, word.meta.highlight)
       setSentences(sentences)
     }
     update()
@@ -47,6 +47,7 @@ interface ChapterResult {
 }
 
 export const useChapter = (
+  lang: string,
   series: string | undefined,
   filename: string | undefined,
 ) => {
@@ -76,7 +77,7 @@ export const useChapter = (
         body: 'Something went wrong here.',
       }
 
-      const req = await getChapter(series, filename).catch(() => fallback)
+      const req = await getChapter(lang, series, filename).catch(() => fallback)
 
       setChapter({
         chapter: req,

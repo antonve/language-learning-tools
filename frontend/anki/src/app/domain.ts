@@ -25,6 +25,7 @@ interface Definition {
 }
 
 export interface Sentence {
+  language: string
   series: string | undefined
   filename: string | undefined
   chapter: string | undefined

@@ -66,7 +66,7 @@ const SentenceListItem = ({
         },
       )}
     >
-      <Link href={`/chapter/${sentence.series}/${sentence.filename}`}>
+      <Link href={`/${sentence.language}/chapter/${sentence.series}/${sentence.filename}`}>
         <a
           href="#"
           className="absolute bottom-0 right-0 uppercase text-white bg-black bg-opacity-text px-3 py-1 rounded-br text-xs hover:bg-purple-500"

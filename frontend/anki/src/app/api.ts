@@ -25,10 +25,11 @@ interface Definition {
 const root = 'http://localhost:5555'
 
 export const getChapter = async (
+  lang: string,
   series: string,
   filename: string,
 ): Promise<Chapter> => {
-  const url = `${root}/chapter/${encodeURI(series)}/${filename}`
+  const url = `${root}/${lang}/chapter/${encodeURI(series)}/${filename}`
   const response = await fetch(url)
 
   if (response.status !== 200) {
@@ -43,7 +44,7 @@ export const getChapter = async (
 export const getJishoDefinition = async (
   word: string,
 ): Promise<JishoResult> => {
-  const url = `${root}/jisho/${encodeURI(word)}`
+  const url = `${root}/jp/jisho/${encodeURI(word)}`
   const response = await fetch(url)
 
   if (response.status !== 200) {
@@ -58,8 +59,11 @@ export const getJishoDefinition = async (
   return body
 }
 
-export const getSentences = async (word: string): Promise<SentencesResult> => {
-  const url = `${root}/corpus/${encodeURI(word)}`
+export const getSentences = async (
+  lang: string,
+  word: string,
+): Promise<SentencesResult> => {
+  const url = `${root}/${lang}/corpus/${encodeURI(word)}`
   const response = await fetch(url)
 
   if (response.status !== 200) {
@@ -92,7 +96,7 @@ export const getSentences = async (word: string): Promise<SentencesResult> => {
 }
 
 export const getGooDefinition = async (word: string): Promise<GooResult> => {
-  const url = `${root}/goo/${encodeURI(word)}`
+  const url = `${root}/jp/goo/${encodeURI(word)}`
   const response = await fetch(url)
 
   if (response.status !== 200) {

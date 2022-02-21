@@ -32,7 +32,7 @@ const CardWizard = ({
 
   const { definition: english } = useEnglishDefition(word?.value)
   const { definition: japanese } = useJapaneseDefition(word?.value)
-  const { sentences } = useSentences(word)
+  const { sentences } = useSentences("jp", word)
 
   useEffect(() => {
     if (
@@ -127,6 +127,7 @@ const CardWizard = ({
                 const newWord: Word = { ...word }
                 if (newWord.meta.sentence === undefined) {
                   newWord.meta.sentence = {
+                    language: "jp", // todo: make dynamic
                     line: '',
                     filename: undefined,
                     series: undefined,
