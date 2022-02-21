@@ -17,7 +17,7 @@ import {
 import SentenceList from '@app/components/SentenceList'
 import { addAnkiNote } from '@app/api'
 
-const CardWizard = ({
+const CardWizardJapanese = ({
   words,
   id,
   updateWord,
@@ -127,7 +127,7 @@ const CardWizard = ({
                 const newWord: Word = { ...word }
                 if (newWord.meta.sentence === undefined) {
                   newWord.meta.sentence = {
-                    language: "jp", // todo: make dynamic
+                    language: "jp",
                     line: '',
                     filename: undefined,
                     series: undefined,
@@ -263,4 +263,4 @@ const CardWizard = ({
   )
 }
 
-export default CardWizard
+export default CardWizardJapanese

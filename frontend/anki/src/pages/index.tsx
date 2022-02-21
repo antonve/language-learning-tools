@@ -2,7 +2,7 @@ import type { NextPage } from 'next'
 
 import Layout from '@app/components/Layout'
 import Sidebar from '@app/components/Sidebar'
-import CardWizard from '@app/components/CardWizard'
+import CardWizardJapanese from '@app/components/CardWizardJapanese'
 import { useWordCollection } from '@app/hooks'
 
 const Home: NextPage = () => {
@@ -28,7 +28,7 @@ const Home: NextPage = () => {
           />
         </div>
         <div className="w-full rounded-sm">
-          <CardWizard
+          <CardWizardJapanese
             words={words}
             id={selectedWordId}
             updateWord={updateWord}
