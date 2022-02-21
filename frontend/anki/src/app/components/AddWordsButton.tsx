@@ -29,7 +29,7 @@ const AddWordsButton = ({ addWords }: Props) => {
         <form onSubmit={saveWords}>
           <div className="mb-4 w-96">
             <Label htmlFor="words">Words (one per line)</Label>
-            <TextArea id="words" rows={20} value={words} onChange={setWords} />
+            <TextArea id="words" rows={20} value={words} onChange={setWords} autoFocus={true} />
           </div>
 
           <div className="flex justify-end gap-x-4">
