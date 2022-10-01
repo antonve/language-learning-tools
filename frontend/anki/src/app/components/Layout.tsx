@@ -12,7 +12,7 @@ const Layout: FC<Props> = ({ children, navigation }) => (
       <h1 className="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl">
         Anki Miner
       </h1>
-      {navigation}
+      {navigation && navigation()}
     </header>
     <div className="px-10">{children}</div>
   </div>
