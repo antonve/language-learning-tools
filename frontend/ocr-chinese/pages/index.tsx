@@ -9,7 +9,7 @@ const Home: NextPage<{}> = () => {
           Chinese OCR
         </h1>
       </header>
-      <div className="px-10">
+      <div className="">
         <Reader book={undefined} />
       </div>
     </div>
