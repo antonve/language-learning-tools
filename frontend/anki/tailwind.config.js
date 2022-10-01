@@ -9,5 +9,5 @@ module.exports = {
       ringWidth: ['hover'],
     },
   },
-  plugins: [require('@tailwindcss/forms')],
+  plugins: [require('@tailwindcss/forms'), require('@headlessui/react')],
 }
