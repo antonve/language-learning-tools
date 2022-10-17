@@ -60,3 +60,9 @@ go run cmd/scrape_syosetu/main.go -series n9669bk -end 50
 ```sh
 go run cmd/find_sentence/main.go -word これから
 ```
+
+### Extract manga from EPUB
+
+```sh
+go run cmd/extract_epub/main.go '/tmp/manga.epub'
+````

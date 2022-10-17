@@ -18,6 +18,8 @@ github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e h1:1r7pUrabqp18h
 github.com/golang/groupcache v0.0.0-20200121045136-8c9f03a8e57e/go.mod h1:cIg4eruTrX1D+g88fzRXU5OdNfaM+9IcxsU14FzY7Hc=
 github.com/joho/godotenv v1.4.0 h1:3l4+N6zfMWnkbPEXKng2o2/MR5mSwTrBih4ZEkkz1lg=
 github.com/joho/godotenv v1.4.0/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
+github.com/kapmahc/epub v0.1.1 h1:a4fgmhh/q2vyzFR2QXOVohR2zAuQvbacCjMZ1LGr0lw=
+github.com/kapmahc/epub v0.1.1/go.mod h1:UpnUbQO78vpmp6TC4emDTAIG6XVcdnZTnaTx06qbtYM=
 github.com/kelseyhightower/envconfig v1.4.0 h1:Im6hONhd3pLkfDFsbRgu68RDNkGF1r3dvMUtDTo2cv8=
 github.com/kelseyhightower/envconfig v1.4.0/go.mod h1:cccZRl6mQpaq41TPp5QxidR+Sa3axMbJDNb//FQX6Gg=
 github.com/labstack/echo/v4 v4.6.1 h1:OMVsrnNFzYlGSdaiYGHbgWQnr+JM7NG+B9suCPie14M=

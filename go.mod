@@ -10,6 +10,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/joho/godotenv v1.4.0 // indirect
+	github.com/kapmahc/epub v0.1.1 // indirect
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/labstack/echo/v4 v4.6.1 // indirect
 	github.com/lib/pq v1.10.3 // indirect
