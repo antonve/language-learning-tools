@@ -3,14 +3,16 @@ import Reader from '../src/Reader'
 
 const Home: NextPage<{}> = () => {
   return (
-    <div className="mb-8 bg-gray-900 h-screen">
-      <header className={`border-t-4 border-pink-400 p-4 flex justify-between`}>
+    <div className="bg-gray-900 h-screen w-screen flex flex-col">
+      <header
+        className={`border-t-4 border-pink-400 p-4 justify-between box-border`}
+      >
         <h1 className="text-gray-100 text-base no-underline hover:no-underline font-extrabold text-xl">
           Chinese OCR
         </h1>
       </header>
-      <div className="">
-        <Reader book={undefined} />
+      <div className="flex bg-white flex-grow">
+        <Reader />
       </div>
     </div>
   )
