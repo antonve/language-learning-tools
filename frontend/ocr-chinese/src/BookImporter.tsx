@@ -1,31 +1,3 @@
-import { useEffect, useRef, useState } from 'react'
-import { EpubReader } from './EpubReader'
-import book from '../books/op1.epub'
-
-interface Props {}
-
-const Reader = ({}: Props) => {
-  // const [book, setBook] = useState()
-
-  // useEffect(() => {
-  //   if (!book) {
-  //     return
-  //   }
-
-  //   console.log(book)
-  // }, [book])
-
-  // if (!book) {
-  //   return <BookImporter setBook={setBook} />
-  // }
-
-  return (
-    <div className="w-full">
-      <EpubReader url={book} />
-    </div>
-  )
-}
-
 const BookImporter = ({ setBook }: { setBook: (book: any) => void }) => {
   return (
     <div className="border-4 border-indigo-400 border-dashed p-16 m-16 text-indigo-400 opacity-6 text-4xl text-center hover:opacity-50 cursor-move relative">
@@ -53,4 +25,4 @@ const BookImporter = ({ setBook }: { setBook: (book: any) => void }) => {
   )
 }
 
-export default Reader
+export default BookImporter
