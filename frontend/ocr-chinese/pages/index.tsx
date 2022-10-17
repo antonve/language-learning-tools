@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
 import { useState } from 'react'
 import BookImporter from '../src/BookImporter'
-import { Book } from '../src/domain'
+import { arrayBufferToBase64, Book } from '../src/domain'
 
 const Home: NextPage<{}> = () => {
   const [book, setBook] = useState<Book>()
@@ -43,8 +43,9 @@ const Reader = ({ book, setBook }: Props) => {
 }
 
 const Page = ({ book, index }: { book: Book; index: number }) => {
-  console.log(book)
-  const imageUrl = `data:image/jpeg;base64,${book.pages[index]}`
+  const imageUrl = `data:image/jpeg;base64,${arrayBufferToBase64(
+    book.pages[index],
+  )}`
 
   return <img src={imageUrl} />
 }

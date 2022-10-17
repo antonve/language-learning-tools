@@ -16,13 +16,13 @@ export async function processBook(file: File): Promise<Book> {
   pages.sort()
 
   for (const path of pages) {
-    book.pages.push(arrayBufferToBase64(zip[path]))
+    book.pages.push(zip[path])
   }
 
   return book
 }
 
-function arrayBufferToBase64(buffer: Uint8Array) {
+export function arrayBufferToBase64(buffer: Uint8Array) {
   var binary = ''
   var bytes = new Uint8Array(buffer)
   var len = bytes.byteLength
