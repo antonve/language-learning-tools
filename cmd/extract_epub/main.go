@@ -1,6 +1,7 @@
 package main
 
 import (
+	"archive/zip"
 	"fmt"
 	"io"
 	"os"
@@ -28,6 +29,33 @@ func main() {
 
 	imageURLs := getImages(book, pageReaders)
 	imageReaders := getReaders(book, imageURLs)
+
+	filename := fmt.Sprintf("%s.zip", book.Opf.Metadata.Title)
+	createArchive(filename, imageReaders)
+
+	fmt.Println("Converted: ", filename)
+}
+
+func createArchive(filename string, readers []io.Reader) {
+	archive, err := os.Create(filename)
+	if err != nil {
+		panic(err)
+	}
+	defer archive.Close()
+	zipWriter := zip.NewWriter(archive)
+
+	for i, r := range readers {
+		w, err := zipWriter.Create(fmt.Sprintf("%05d.jpg", i))
+		if err != nil {
+			panic(err)
+		}
+
+		if _, err := io.Copy(w, r); err != nil {
+			panic(err)
+		}
+	}
+
+	zipWriter.Close()
 }
 
 func getImages(book *epub.Book, readers []io.Reader) []string {
