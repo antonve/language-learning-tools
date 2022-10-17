@@ -1,5 +1,5 @@
 import type { NextPage } from 'next'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import BookImporter from '../src/BookImporter'
 import { arrayBufferToBase64, Book } from '../src/domain'
 
@@ -59,15 +59,13 @@ const Reader = ({ book, setBook }: Props) => {
 }
 
 const Page = ({ book, index }: { book: Book; index: number }) => {
-  const imageUrl = `data:image/jpeg;base64,${arrayBufferToBase64(
-    book.pages[index],
-  )}`
+  const imageUrl = useMemo(() => {
+    return `data:image/jpeg;base64,${arrayBufferToBase64(book.pages[index])}`
+  }, [index])
 
   return (
-    <div className="w-full h-full">
-      <div className="bg-green-200 m-24">
-        <img src={imageUrl} className="object-fit" />
-      </div>
+    <div className="flex-grow flex justify-center items-center h-48">
+      <img src={imageUrl} className="max-h-full max-w-full block m-8" />
     </div>
   )
 }
