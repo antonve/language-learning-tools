@@ -1,4 +1,3 @@
-import JSZip from 'jszip'
 import { unzipSync } from 'fflate'
 
 export interface Book {

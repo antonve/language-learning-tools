@@ -65,7 +65,11 @@ const Page = ({ book, index }: { book: Book; index: number }) => {
 
   return (
     <div className="flex-grow flex justify-center items-center h-48">
-      <img src={imageUrl} className="max-h-full max-w-full block m-8" />
+      <img
+        src={imageUrl}
+        className="max-h-full max-w-full block m-8"
+        draggable={false}
+      />
     </div>
   )
 }
