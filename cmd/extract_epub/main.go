@@ -23,22 +23,11 @@ func main() {
 		panic(err)
 	}
 
-	// for _, f := range book.Files() {
-	//   fmt.Println(f)
-	// }
-
 	pageURLs := getPageList(book)
-	// fmt.Println(pageURLs)
-	pageReaders := getPageReaders(book, pageURLs)
-	// fmt.Println(pageReaders)
+	pageReaders := getReaders(book, pageURLs)
 
-	images := getImages(book, pageReaders)
-
-	fmt.Println(len(images))
-
-	for _, image := range images {
-		fmt.Println(image)
-	}
+	imageURLs := getImages(book, pageReaders)
+	imageReaders := getReaders(book, imageURLs)
 }
 
 func getImages(book *epub.Book, readers []io.Reader) []string {
@@ -73,13 +62,13 @@ func trimURL(url string) string {
 	return strings.TrimPrefix(url, "../")
 }
 
-func getPageReaders(book *epub.Book, pages []string) []io.Reader {
+func getReaders(book *epub.Book, files []string) []io.Reader {
 	res := []io.Reader{}
 
-	for _, page := range pages {
-		p := trimURL(page)
+	for _, file := range files {
+		f := trimURL(file)
 
-		r, err := book.Open(p)
+		r, err := book.Open(f)
 		if err != nil {
 			panic(err)
 		}
