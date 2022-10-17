@@ -1,5 +1,6 @@
 import type { NextPage } from 'next'
-import Reader from '../src/Reader'
+import { EpubReader } from '../src/EpubReader'
+import book from '../books/op1.epub'
 
 const Home: NextPage<{}> = () => {
   return (
@@ -11,8 +12,18 @@ const Home: NextPage<{}> = () => {
           Chinese OCR
         </h1>
       </header>
-      <div className="flex bg-white flex-grow">
-        <Reader />
+      <div className="flex bg-white flex-grow bg-red-200">
+        <div className="w-full flex h-full flex-grow bg-blue-200">
+          <div className="flex-grow h-full bg-green-200">
+            <EpubReader
+              url={book}
+              onRelocated={loc => {
+                console.log(loc)
+              }}
+            />
+          </div>
+          <div className="bg-pink-400 w-1/5">sidebar</div>
+        </div>
       </div>
     </div>
   )

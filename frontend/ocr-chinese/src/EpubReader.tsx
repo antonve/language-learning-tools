@@ -32,7 +32,7 @@ export const EpubReader: React.FC<ReaderProps> = ({
   const ref = useRef<HTMLDivElement>(null)
   const [rendition, setRendition] = useState<Rendition | null>(null)
   const [isMoreShow, setIsMoreShow] = useState<boolean>(false)
-  const [info, setInfo] = useState()
+  const [info, setInfo] = useState<any>()
   const [percent, setPercent] = useState(0)
   const swipeHandlers = useSwipeable({
     onSwiped: (eventData: SwipeEventData) => {
@@ -59,64 +59,72 @@ export const EpubReader: React.FC<ReaderProps> = ({
     if (!rendition) return
     setRendition(rendition)
 
-    cfi ? rendition.display(cfi) : rendition.display()
-
-    setupStyles(rendition)
+    rendition.display(cfi)
 
     ebook.ready.then(async () => {
       const { package: { metadata = {} } = {} } = ebook
       setInfo(metadata)
+      console.log('metadata', metadata)
 
       await ebook.locations.generate(1600)
 
-      onLoad && onLoad(rendition)
-      onRelocated && rendition.on('relocated', handleRelocated(ebook))
+      if (onLoad) {
+        onLoad(rendition)
+      }
+
+      console.log('loaded')
+      rendition.on('relocated', handleRelocated(ebook))
     })
   }
 
-  const setupStyles = (rendition: any) => {
-    fontSize &&
-      rendition.themes.default({ p: { 'font-size': `${fontSize} !important` } })
-    fontColor &&
-      rendition.themes.default({ p: { color: `${fontColor} !important` } })
-    fontFamily &&
-      rendition.themes.default({
-        p: { fontFamily: `${fontFamily} !important` },
-      })
-  }
-
-  const handleRelocated =
-    (ebook: any) =>
-    (location: Location): void => {
-      onRelocated && onRelocated(location)
+  const handleRelocated = (ebook: any) => {
+    debugger
+    return (location: Location): void => {
+      if (onRelocated) {
+        onRelocated(location)
+      }
 
       const percent = ebook.locations.percentageFromCfi(location.start.cfi)
       setPercent(percent)
     }
+  }
 
   const handleNext = () => {
-    if (!rendition) return
+    if (!rendition) {
+      return
+    }
+
     rendition.next()
-    onNext && onNext(rendition)
+    if (onNext) {
+      onNext(rendition)
+    }
   }
 
   const handlePrev = () => {
-    if (!rendition) return
+    if (!rendition) {
+      return
+    }
+
     rendition.prev()
-    onPrev && onPrev(rendition)
+    if (onPrev) {
+      onPrev(rendition)
+    }
   }
 
   return (
-    <>
-      <div className="flex space-x-16">
+    <div className="bg-purple-200 w-full h-full">
+      <div className="flex space-x-16 bg-red-200">
         <button onClick={handlePrev}>prev</button>
+        <span>
+          {info?.title ?? ''} ({percent}%)
+        </span>
         <button onClick={handleNext}>next</button>
       </div>
-      <div {...swipeHandlers} className="w-full h-full">
+      <div {...swipeHandlers} className="w-full h-full bg-green-200">
         {!rendition && <>Loading...</>}
-        <div ref={ref} className="w-full h-full" />
+        <div ref={ref} className="w-full h-full bg-yellow-200" />
       </div>
-    </>
+    </div>
   )
 }
 
