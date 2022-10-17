@@ -30,7 +30,7 @@ func main() {
 	imageURLs := getImages(book, pageReaders)
 	imageReaders := getReaders(book, imageURLs)
 
-	filename := fmt.Sprintf("%s.zip", book.Opf.Metadata.Title)
+	filename := fmt.Sprintf("out/extract_epub/%s.zip", book.Opf.Metadata.Title)
 	createArchive(filename, imageReaders)
 
 	fmt.Println("Converted: ", filename)
