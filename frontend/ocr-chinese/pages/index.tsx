@@ -49,9 +49,20 @@ const Reader = ({ book, setBook }: Props) => {
 
   return (
     <>
-      <div className="space-x-10">
-        <button onClick={onNext}>Next</button>
-        <button onClick={onPrev}>Prev</button>
+      <div className="flex space-x-10 justify-center items-center">
+        <button
+          onClick={onNext}
+          className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4"
+        >
+          next
+        </button>
+        <h1>{book.title}</h1>
+        <button
+          onClick={onPrev}
+          className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4"
+        >
+          prev
+        </button>
       </div>
       <Page book={book} index={page} />
     </>

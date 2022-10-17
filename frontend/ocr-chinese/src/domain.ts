@@ -1,6 +1,7 @@
 import { unzipSync } from 'fflate'
 
 export interface Book {
+  title: string
   pages: any[]
 }
 
@@ -9,6 +10,7 @@ export async function processBook(file: File): Promise<Book> {
 
   const book: Book = {
     pages: [],
+    title: file.name.replace(/\.[^/.]+$/, ''),
   }
 
   const pages = Object.keys(zip)
