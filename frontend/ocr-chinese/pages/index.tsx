@@ -1,9 +1,10 @@
 import type { NextPage } from 'next'
 import { useState } from 'react'
 import BookImporter from '../src/BookImporter'
+import { Book } from '../src/domain'
 
 const Home: NextPage<{}> = () => {
-  const [book, setBook] = useState<File>()
+  const [book, setBook] = useState<Book>()
 
   return (
     <div className="bg-gray-900 h-screen w-screen flex flex-col">
@@ -27,16 +28,25 @@ const Home: NextPage<{}> = () => {
 }
 
 interface Props {
-  book: File | undefined
-  setBook: (file: File | undefined) => void
+  book: Book | undefined
+  setBook: (file: Book | undefined) => void
 }
 
 const Reader = ({ book, setBook }: Props) => {
+  const [page, setPage] = useState(0)
+
   if (!book) {
     return <BookImporter setBook={setBook} />
   }
 
-  return null
+  return <Page book={book} index={page} />
+}
+
+const Page = ({ book, index }: { book: Book; index: number }) => {
+  console.log(book)
+  const imageUrl = `data:image/jpeg;base64,${book.pages[index]}`
+
+  return <img src={imageUrl} />
 }
 
 export default Home
