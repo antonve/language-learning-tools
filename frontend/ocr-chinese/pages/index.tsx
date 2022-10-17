@@ -7,21 +7,12 @@ const Home: NextPage<{}> = () => {
   const [book, setBook] = useState<Book>()
 
   return (
-    <div className="bg-gray-900 h-screen w-screen flex flex-col overflow-hidden">
-      <header
-        className={`border-t-4 border-pink-400 p-4 justify-between box-border`}
-      >
-        <h1 className="text-gray-100 text-base no-underline hover:no-underline font-extrabold text-xl">
-          Chinese OCR
-        </h1>
-      </header>
-      <div className="flex bg-white flex-grow ">
-        <div className="w-full flex h-full flex-grow">
-          <div className="flex-grow h-full flex flex-col">
-            <Reader book={book} setBook={setBook} />
-          </div>
-          <div className="bg-pink-400 w-1/5 flex-shrink-0">sidebar</div>
+    <div className="h-screen w-screen flex flex-col overflow-hidden">
+      <div className="w-full flex h-full flex-grow">
+        <div className="flex-grow h-full flex flex-col">
+          <Reader book={book} setBook={setBook} />
         </div>
+        <div className="bg-pink-400 w-1/5 flex-shrink-0">sidebar</div>
       </div>
     </div>
   )
