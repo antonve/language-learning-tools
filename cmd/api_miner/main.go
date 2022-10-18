@@ -1,8 +1,8 @@
 package main
 
 import (
+	_ "embed"
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -238,12 +238,15 @@ type GooProxyResponse struct {
 	Definition string `json:"definition"`
 }
 
-func (api *api) OCR(c echo.Context) error {
-	res, err := api.ocr.Do(c.Request().Context(), c.Request().Body)
-	if err != nil {
-		log.Println("could not process ocr request:", err)
-		return c.NoContent(http.StatusInternalServerError)
-	}
+//go:embed mock_response.json
+var ocrStub string
 
-	return c.JSON(http.StatusOK, res)
+func (api *api) OCR(c echo.Context) error {
+	// res, err := api.ocr.Do(c.Request().Context(), c.Request().Body)
+	// if err != nil {
+	//   log.Println("could not process ocr request:", err)
+	//   return c.NoContent(http.StatusInternalServerError)
+	// }
+
+	return c.JSON(http.StatusOK, ocrStub)
 }
