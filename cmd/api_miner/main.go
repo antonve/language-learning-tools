@@ -65,6 +65,11 @@ func NewAPI() API {
 		panic(err)
 	}
 
+	ocrClient, err := ocr.New()
+	if err != nil {
+		panic(err)
+	}
+
 	jishoCache := map[string]*JishoProxyResponse{}
 	gooCache := map[string]*GooProxyResponse{}
 
@@ -75,7 +80,7 @@ func NewAPI() API {
 		goo:        goo.New(),
 		jishoCache: jishoCache,
 		gooCache:   gooCache,
-		ocr:        ocr.New(),
+		ocr:        ocrClient,
 	}
 }
 
