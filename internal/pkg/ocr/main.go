@@ -3,8 +3,7 @@ package ocr
 import (
 	"context"
 
-	"golang.org/x/oauth2/google"
-	"google.golang.org/api/vision/v1"
+	vision "cloud.google.com/go/vision/apiv1"
 )
 
 type Client interface {
@@ -12,18 +11,13 @@ type Client interface {
 }
 
 type client struct {
-	service *vision.Service
+	service *vision.ImageAnnotatorClient
 }
 
 func New() (*client, error) {
 	ctx := context.Background()
 
-	googleClient, err := google.DefaultClient(ctx, vision.CloudPlatformScope)
-	if err != nil {
-		return nil, err
-	}
-
-	service, err := vision.New(googleClient)
+	service, err := vision.NewImageAnnotatorClient(ctx)
 	if err != nil {
 		return nil, err
 	}
