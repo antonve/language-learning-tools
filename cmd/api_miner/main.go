@@ -27,8 +27,9 @@ func main() {
 	e.GET("/:lang/chapter/:series/:filename", api.GetChapter)
 	e.GET("/jp/jisho/:token", api.JishoProxy)
 	e.GET("/jp/goo/:token", api.GooProxy)
+	e.POST("/ocr", api.OCR)
 
-	e.Logger.Fatal(e.Start(":5555"))
+	e.Logger.Fatal(e.Start(":8080"))
 }
 
 type API interface {
@@ -36,6 +37,7 @@ type API interface {
 	GetChapter(c echo.Context) error
 	JishoProxy(c echo.Context) error
 	GooProxy(c echo.Context) error
+	OCR(c echo.Context) error
 }
 
 type api struct {
@@ -225,4 +227,8 @@ type GooProxyResponse struct {
 	Word       string `json:"word"`
 	Reading    string `json:"reading"`
 	Definition string `json:"definition"`
+}
+
+func (api *api) OCR(c echo.Context) error {
+	return c.NoContent(http.StatusNotImplemented)
 }
