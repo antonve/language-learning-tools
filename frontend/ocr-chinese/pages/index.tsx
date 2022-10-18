@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import BookImporter from '../src/BookImporter'
-import { arrayBufferToBase64, Book } from '../src/domain'
+import { arrayBufferToBase64, Book, getOcr, getOCR } from '../src/domain'
 
 const Home: NextPage<{}> = () => {
   const [book, setBook] = useState<Book>()
@@ -25,6 +25,17 @@ interface Props {
 
 const Reader = ({ book, setBook }: Props) => {
   const [page, setPage] = useState(0)
+  const [ocr, setOcr] = useState()
+
+  useEffect(() => {
+    if (!book) {
+      return
+    }
+
+    getOcr(book.pages[page]).then(res => {
+      setOcr(res)
+    })
+  }, [book, page])
 
   function onNext() {
     setPage(page + 1)

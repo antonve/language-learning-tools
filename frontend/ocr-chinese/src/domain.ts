@@ -1,5 +1,20 @@
 import { unzipSync } from 'fflate'
 
+const root = 'http://localhost:8080'
+
+export const getOcr = async (image: Uint8Array): Promise<any> => {
+  const url = `${root}/ocr`
+  const response = await fetch(url, { method: 'POST', body: image })
+
+  if (response.status !== 200) {
+    throw new Error('not found')
+  }
+
+  const body = await response.json()
+
+  return body
+}
+
 export interface Book {
   title: string
   pages: any[]
