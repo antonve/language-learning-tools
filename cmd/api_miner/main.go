@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -11,6 +13,7 @@ import (
 	"github.com/antonve/jp-mining-tools/internal/pkg/corpus"
 	"github.com/antonve/jp-mining-tools/internal/pkg/goo"
 	"github.com/antonve/jp-mining-tools/internal/pkg/jisho"
+	"github.com/antonve/jp-mining-tools/internal/pkg/ocr"
 )
 
 func main() {
@@ -45,6 +48,7 @@ type api struct {
 	zhCorpus corpus.Corpus
 	jisho    jisho.Jisho
 	goo      goo.Goo
+	ocr      ocr.Client
 
 	jishoCache map[string]*JishoProxyResponse
 	gooCache   map[string]*GooProxyResponse
@@ -71,6 +75,7 @@ func NewAPI() API {
 		goo:        goo.New(),
 		jishoCache: jishoCache,
 		gooCache:   gooCache,
+		ocr:        ocr.New(),
 	}
 }
 
@@ -230,5 +235,13 @@ type GooProxyResponse struct {
 }
 
 func (api *api) OCR(c echo.Context) error {
-	return c.NoContent(http.StatusNotImplemented)
+	img, err := ioutil.ReadAll(c.Request().Body)
+	if err != nil || len(img) == 0 {
+		log.Printf("missing body: %v", err)
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	res, err := api.ocr.Do(string(img))
+
+	return c.JSON(http.StatusOK, res)
 }
