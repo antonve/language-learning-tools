@@ -2,6 +2,7 @@ package ocr
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 
@@ -38,7 +39,12 @@ func (c *client) Do(ctx context.Context, image io.Reader) (*Result, error) {
 		return nil, err
 	}
 
-	fmt.Println(res)
+	json, err := json.MarshalIndent(res, "", "  ")
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(string(json))
 
 	return nil, nil
 }
