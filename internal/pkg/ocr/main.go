@@ -2,12 +2,14 @@ package ocr
 
 import (
 	"context"
+	"fmt"
+	"io"
 
 	vision "cloud.google.com/go/vision/apiv1"
 )
 
 type Client interface {
-	Do(image string) (*Result, error)
+	Do(ctx context.Context, image io.Reader) (*Result, error)
 }
 
 type client struct {
@@ -25,7 +27,19 @@ func New() (*client, error) {
 	return &client{service: service}, nil
 }
 
-func (c *client) Do(image string) (*Result, error) {
+func (c *client) Do(ctx context.Context, image io.Reader) (*Result, error) {
+	img, err := vision.NewImageFromReader(image)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := c.service.DetectDocumentText(ctx, img, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(res)
+
 	return nil, nil
 }
 

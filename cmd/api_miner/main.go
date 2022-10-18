@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -240,13 +239,11 @@ type GooProxyResponse struct {
 }
 
 func (api *api) OCR(c echo.Context) error {
-	img, err := ioutil.ReadAll(c.Request().Body)
-	if err != nil || len(img) == 0 {
-		log.Printf("missing body: %v", err)
-		return c.NoContent(http.StatusBadRequest)
+	res, err := api.ocr.Do(c.Request().Context(), c.Request().Body)
+	if err != nil {
+		log.Println("could not process ocr request:", err)
+		return c.NoContent(http.StatusInternalServerError)
 	}
-
-	res, err := api.ocr.Do(string(img))
 
 	return c.JSON(http.StatusOK, res)
 }
