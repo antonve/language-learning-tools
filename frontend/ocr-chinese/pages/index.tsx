@@ -1,5 +1,5 @@
 import type { NextPage } from 'next'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import BookImporter from '../src/BookImporter'
 import { arrayBufferToBase64, Book, getOcr, getOCR } from '../src/domain'
 
@@ -9,7 +9,7 @@ const Home: NextPage<{}> = () => {
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden">
       <div className="w-full flex h-full flex-grow">
-        <div className="flex-grow h-full flex flex-col">
+        <div className="flex-grow h-screen flex flex-col">
           <Reader book={book} setBook={setBook} />
         </div>
         <div className="bg-pink-400 w-1/5 flex-shrink-0">sidebar</div>
@@ -66,24 +66,66 @@ const Reader = ({ book, setBook }: Props) => {
           prev
         </button>
       </div>
-      <Page book={book} index={page} />
+      <Page book={book} index={page} ocr={ocr} />
     </>
   )
 }
 
-const Page = ({ book, index }: { book: Book; index: number }) => {
+const Page = ({
+  book,
+  index,
+  ocr,
+}: {
+  book: Book
+  index: number
+  ocr: any
+}) => {
   const imageUrl = useMemo(() => {
     return `data:image/jpeg;base64,${arrayBufferToBase64(book.pages[index])}`
   }, [index])
 
   return (
-    <div className="flex-grow flex justify-center items-center h-48">
-      <img
-        src={imageUrl}
-        className="max-h-full max-w-full block m-8"
-        draggable={false}
-      />
+    <div className="flex-grow bg-red-200 p-4">
+      <div className="max-w-full w-auto h-full bg-green-300 relative">
+        <div className="absolute bg-indigo-300 top-0 bottom-0 left-1/2 transform -translate-x-1/2">
+          <img
+            src={imageUrl}
+            className="h-full w-full block"
+            draggable={false}
+          />
+        </div>
+      </div>
     </div>
+  )
+}
+
+const Canvas = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) {
+      return
+    }
+
+    const context = canvas.getContext('2d')
+    if (!context) {
+      return
+    }
+    //Our first draw
+    context.fillStyle = '#000000'
+    context.fillRect(0, 0, context.canvas.width, context.canvas.height)
+
+    return () => {
+      context.clearRect(0, 0, canvas.width, canvas.height)
+    }
+  }, [canvasRef])
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute left-0 right-0 top-0 bottom-0"
+    />
   )
 }
 
