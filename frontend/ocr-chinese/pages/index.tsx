@@ -7,13 +7,11 @@ const Home: NextPage<{}> = () => {
   const [book, setBook] = useState<Book>()
 
   return (
-    <div className="h-screen w-screen flex flex-col overflow-hidden">
-      <div className="w-full flex h-full flex-grow">
-        <div className="flex-grow h-screen flex flex-col">
-          <Reader book={book} setBook={setBook} />
-        </div>
-        <div className="bg-pink-400 w-1/5 flex-shrink-0">sidebar</div>
+    <div className="w-screen h-screen flex">
+      <div className="flex-grow h-screen flex flex-col">
+        <Reader book={book} setBook={setBook} />
       </div>
+      <div className="bg-pink-400 w-1/5 flex-shrink-0">sidebar</div>
     </div>
   )
 }
@@ -32,13 +30,14 @@ const Reader = ({ book, setBook }: Props) => {
       return
     }
 
-    getOcr(book.pages[page]).then(res => {
-      setOcr(res)
-    })
+    // getOcr(book.pages[page]).then(res => {
+    //   setOcr(res)
+    // })
   }, [book, page])
 
   function onNext() {
     setPage(page + 1)
+    console.log('next', page + 1)
   }
 
   function onPrev() {
@@ -82,25 +81,12 @@ const Page = ({
 }) => {
   const imageUrl = useMemo(() => {
     return `data:image/jpeg;base64,${arrayBufferToBase64(book.pages[index])}`
-  }, [index])
+  }, [book.pages, index])
 
-  return (
-    <div className="flex-grow bg-red-200 p-4">
-      <div className="max-w-full w-auto h-full bg-green-300 relative">
-        <div className="absolute bg-indigo-300 top-0 bottom-0 left-1/2 transform -translate-x-1/2">
-          <img
-            src={imageUrl}
-            className="h-full w-full block"
-            draggable={false}
-          />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-const Canvas = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  const containerSize = useSize(containerRef.current)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -112,21 +98,67 @@ const Canvas = () => {
     if (!context) {
       return
     }
-    //Our first draw
-    context.fillStyle = '#000000'
-    context.fillRect(0, 0, context.canvas.width, context.canvas.height)
+
+    const container = containerRef.current
+    if (!container) {
+      return
+    }
+    var img = new Image()
+    img.src = imageUrl
+
+    img.onload = function () {
+      canvas.width = containerSize.width
+      canvas.height = containerSize.height
+
+      console.log(img.width, img.height, canvas.width, canvas.height)
+
+      let scale = Math.min(canvas.width / img.width, canvas.height / img.height)
+      let width = img.width * scale
+      let height = img.height * scale
+      let x = canvas.width / 2 - width / 2
+      let y = canvas.height / 2 - height / 2
+
+      context.drawImage(img, x, y, width, height)
+    }
 
     return () => {
       context.clearRect(0, 0, canvas.width, canvas.height)
     }
-  }, [canvasRef])
+  }, [canvasRef, containerRef, imageUrl, containerSize])
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="absolute left-0 right-0 top-0 bottom-0"
-    />
+    <div ref={containerRef} className="flex-grow bg-red-200 relative">
+      <canvas ref={canvasRef} className="w-full h-full absolute" />
+    </div>
   )
+}
+
+function useSize(ref: HTMLDivElement | null) {
+  const [size, setSize] = useState({
+    width: 0,
+    height: 0,
+  })
+
+  useEffect(() => {
+    if (!ref) {
+      return
+    }
+
+    function handleResize() {
+      console.log('hook', ref?.offsetWidth, ref?.offsetHeight)
+      setSize({
+        width: ref?.offsetWidth ?? 0,
+        height: ref?.offsetHeight ?? 0,
+      })
+    }
+
+    window.addEventListener('resize', handleResize)
+    handleResize()
+
+    return () => window.removeEventListener('resize', handleResize)
+  }, [ref])
+
+  return size
 }
 
 export default Home
