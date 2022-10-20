@@ -2,14 +2,14 @@ import { unzipSync } from 'fflate'
 
 const root = 'http://localhost:8080'
 
-interface OcrBoundingBox {
+export interface OcrBoundingBox {
   vertices: {
     x: number
     y: number
   }[]
 }
 
-interface OcrWord {
+export interface OcrWord {
   bounding_box: OcrBoundingBox
   symbols: {
     bounding_box: OcrBoundingBox
@@ -18,13 +18,13 @@ interface OcrWord {
   }[]
 }
 
-interface OcrParagraph {
+export interface OcrParagraph {
   bounding_box: OcrBoundingBox
   words: OcrWord[]
   confidence: number
 }
 
-interface OcrBlock {
+export interface OcrBlock {
   bounding_box: OcrBoundingBox
   block_type: number
   confidence: number
@@ -35,7 +35,7 @@ export interface OcrResult {
   text: string
   pages: {
     blocks: OcrBlock[]
-  }
+  }[]
 }
 
 export interface Word {
@@ -62,7 +62,7 @@ const getTextForParagraph = (p: OcrParagraph): Sentence => {
   for (const word of p.words) {
     const w = []
     for (const symbol of word.symbols) {
-      w.push(symbol)
+      w.push(symbol.text)
     }
 
     words.push({ text: w.join('') })

@@ -8,7 +8,15 @@ import {
   useState,
 } from 'react'
 import BookImporter from '../src/BookImporter'
-import { arrayBufferToBase64, Book, getOcr, OcrResult } from '../src/domain'
+import {
+  arrayBufferToBase64,
+  Book,
+  getOcr,
+  getTextForBlock,
+  OcrResult,
+  OcrBlock,
+  Sentence,
+} from '../src/domain'
 
 const Home: NextPage<{}> = () => {
   const [book, setBook] = useState<Book>()
@@ -36,8 +44,46 @@ const Home: NextPage<{}> = () => {
           ocr={ocr}
         />
       </div>
-      <div className="bg-pink-400 w-1/5 flex-shrink-0">sidebar</div>
+      <div className="bg-gray-100 w-1/2 flex-shrink-0">
+        <PageTranscript ocr={ocr} />
+      </div>
     </div>
+  )
+}
+
+const PageTranscript = ({ ocr }: Props) => {
+  if (!ocr) {
+    return <p>No text found</p>
+  }
+
+  return (
+    <ul>
+      {ocr.pages.map(page =>
+        page.blocks.map(block => <BlockTranscript block={block} />),
+      )}
+    </ul>
+  )
+}
+
+const BlockTranscript = ({ block }: { block: OcrBlock }) => {
+  const sentences = getTextForBlock(block)
+
+  return (
+    <li className="bg-green-200 my-4">
+      {sentences.map(s => (
+        <SentenceTranscript sentence={s} />
+      ))}
+    </li>
+  )
+}
+
+const SentenceTranscript = ({ sentence }: { sentence: Sentence }) => {
+  return (
+    <span>
+      {sentence.words.map(s => (
+        <span className="hover:bg-red-200">{s.text}</span>
+      ))}
+    </span>
   )
 }
 
