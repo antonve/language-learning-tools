@@ -1,34 +1,17 @@
 import type { NextPage } from 'next'
-import { useEffect, useMemo, useRef, useState } from 'react'
-import BookImporter from '../src/BookImporter'
 import {
-  arrayBufferToBase64,
-  Book,
-  getOcr,
-  getOCR,
-  getTextForBlock,
-  OcrResult,
-} from '../src/domain'
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
+import BookImporter from '../src/BookImporter'
+import { arrayBufferToBase64, Book, getOcr, OcrResult } from '../src/domain'
 
 const Home: NextPage<{}> = () => {
   const [book, setBook] = useState<Book>()
-
-  return (
-    <div className="w-screen h-screen flex">
-      <div className="flex-grow h-screen flex flex-col">
-        <Reader book={book} setBook={setBook} />
-      </div>
-      <div className="bg-pink-400 w-1/5 flex-shrink-0">sidebar</div>
-    </div>
-  )
-}
-
-interface Props {
-  book: Book | undefined
-  setBook: (file: Book | undefined) => void
-}
-
-const Reader = ({ book, setBook }: Props) => {
   const [page, setPage] = useState(170)
   const [ocr, setOcr] = useState<OcrResult>()
 
@@ -42,6 +25,35 @@ const Reader = ({ book, setBook }: Props) => {
     })
   }, [book, page])
 
+  return (
+    <div className="w-screen h-screen flex">
+      <div className="flex-grow h-screen flex flex-col">
+        <Reader
+          book={book}
+          setBook={setBook}
+          page={page}
+          setPage={setPage}
+          ocr={ocr}
+        />
+      </div>
+      <div className="bg-pink-400 w-1/5 flex-shrink-0">sidebar</div>
+    </div>
+  )
+}
+
+interface Props {
+  book: Book | undefined
+  setBook: (file: Book | undefined) => void
+  page: number
+  setPage: Dispatch<SetStateAction<number>>
+  ocr: OcrResult | undefined
+}
+
+const Reader = ({ book, setBook, page, setPage, ocr }: Props) => {
+  if (!book) {
+    return <BookImporter setBook={setBook} />
+  }
+
   function onNext() {
     setPage(page + 1)
     console.log('next', page + 1)
@@ -49,10 +61,6 @@ const Reader = ({ book, setBook }: Props) => {
 
   function onPrev() {
     setPage(page - 1)
-  }
-
-  if (!book) {
-    return <BookImporter setBook={setBook} />
   }
 
   return (
@@ -143,12 +151,6 @@ const Page = ({
           context.strokeStyle = 'rgba(173, 216, 230, 0.5)'
           context.lineWidth = 2
           context.stroke()
-
-          context.fillText(
-            getTextForBlock(block).join(''),
-            x + vertices[3].x * scale,
-            20 + y + vertices[3].y * scale,
-          )
         }
       }
     }
