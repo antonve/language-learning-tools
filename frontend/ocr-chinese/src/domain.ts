@@ -2,7 +2,23 @@ import { unzipSync } from 'fflate'
 
 const root = 'http://localhost:8080'
 
-export const getOcr = async (image: Uint8Array): Promise<any> => {
+export interface OcrResult {
+  pages: {
+    blocks: {
+      bounding_box: {
+        vertices: {
+          x: number
+          y: number
+        }[]
+      }
+      block_type: number
+      confidence: number
+      paragraphs: any
+    }[]
+  }[]
+}
+
+export const getOcr = async (image: Uint8Array): Promise<OcrResult> => {
   const url = `${root}/ocr`
   const response = await fetch(url, { method: 'POST', body: image })
 

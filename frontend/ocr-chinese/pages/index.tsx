@@ -1,7 +1,13 @@
 import type { NextPage } from 'next'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import BookImporter from '../src/BookImporter'
-import { arrayBufferToBase64, Book, getOcr, getOCR } from '../src/domain'
+import {
+  arrayBufferToBase64,
+  Book,
+  getOcr,
+  getOCR,
+  OcrResult,
+} from '../src/domain'
 
 const Home: NextPage<{}> = () => {
   const [book, setBook] = useState<Book>()
@@ -23,7 +29,7 @@ interface Props {
 
 const Reader = ({ book, setBook }: Props) => {
   const [page, setPage] = useState(0)
-  const [ocr, setOcr] = useState()
+  const [ocr, setOcr] = useState<OcrResult>()
 
   useEffect(() => {
     if (!book) {
@@ -77,7 +83,7 @@ const Page = ({
 }: {
   book: Book
   index: number
-  ocr: any
+  ocr: OcrResult | undefined
 }) => {
   const imageUrl = useMemo(() => {
     return `data:image/jpeg;base64,${arrayBufferToBase64(book.pages[index])}`
@@ -119,12 +125,31 @@ const Page = ({
       let y = canvas.height / 2 - height / 2
 
       context.drawImage(img, x, y, width, height)
+
+      if (!ocr) {
+        return
+      }
+
+      for (const page of ocr.pages) {
+        for (const block of page.blocks) {
+          const { vertices } = block.bounding_box
+          context.beginPath()
+          context.moveTo(x + vertices[0].x * scale, y + vertices[0].y * scale)
+          context.lineTo(x + vertices[1].x * scale, y + vertices[1].y * scale)
+          context.lineTo(x + vertices[2].x * scale, y + vertices[2].y * scale)
+          context.lineTo(x + vertices[3].x * scale, y + vertices[3].y * scale)
+          context.closePath()
+          context.strokeStyle = 'rgba(173, 216, 230, 0.5)'
+          context.lineWidth = 2
+          context.stroke()
+        }
+      }
     }
 
     return () => {
       context.clearRect(0, 0, canvas.width, canvas.height)
     }
-  }, [canvasRef, containerRef, imageUrl, containerSize])
+  }, [canvasRef, containerRef, imageUrl, containerSize, ocr])
 
   return (
     <div ref={containerRef} className="flex-grow relative">
