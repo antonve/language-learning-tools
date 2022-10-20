@@ -6,6 +6,7 @@ import {
   Book,
   getOcr,
   getOCR,
+  getTextForBlock,
   OcrResult,
 } from '../src/domain'
 
@@ -28,7 +29,7 @@ interface Props {
 }
 
 const Reader = ({ book, setBook }: Props) => {
-  const [page, setPage] = useState(0)
+  const [page, setPage] = useState(170)
   const [ocr, setOcr] = useState<OcrResult>()
 
   useEffect(() => {
@@ -142,6 +143,12 @@ const Page = ({
           context.strokeStyle = 'rgba(173, 216, 230, 0.5)'
           context.lineWidth = 2
           context.stroke()
+
+          context.fillText(
+            getTextForBlock(block).join(''),
+            x + vertices[3].x * scale,
+            20 + y + vertices[3].y * scale,
+          )
         }
       }
     }

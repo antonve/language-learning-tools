@@ -2,20 +2,62 @@ import { unzipSync } from 'fflate'
 
 const root = 'http://localhost:8080'
 
-export interface OcrResult {
-  pages: {
-    blocks: {
-      bounding_box: {
-        vertices: {
-          x: number
-          y: number
-        }[]
-      }
-      block_type: number
-      confidence: number
-      paragraphs: any
-    }[]
+interface BoundingBox {
+  vertices: {
+    x: number
+    y: number
   }[]
+}
+
+interface Word {
+  bounding_box: BoundingBox
+  symbols: {
+    bounding_box: BoundingBox
+    text: string
+    confidence: number
+  }[]
+}
+
+interface Paragraph {
+  bounding_box: BoundingBox
+  words: Word[]
+  confidence: number
+}
+
+interface Block {
+  bounding_box: BoundingBox
+  block_type: number
+  confidence: number
+  paragraphs: Paragraph[]
+}
+
+export interface OcrResult {
+  text: string
+  pages: {
+    blocks: Block[]
+  }
+}
+
+export const getTextForBlock = (block: Block): string[] => {
+  const result = []
+
+  for (const p of block.paragraphs) {
+    result.push(getTextForParagraph(p))
+  }
+
+  return result
+}
+
+const getTextForParagraph = (p: Paragraph): string => {
+  const symbols = []
+
+  for (const word of p.words) {
+    for (const symbol of word.symbols) {
+      symbols.push(symbol.text)
+    }
+  }
+
+  return symbols.join('')
 }
 
 export const getOcr = async (image: Uint8Array): Promise<OcrResult> => {
