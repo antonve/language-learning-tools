@@ -127,7 +127,7 @@ const Page = ({
   }, [canvasRef, containerRef, imageUrl, containerSize])
 
   return (
-    <div ref={containerRef} className="flex-grow bg-red-200 relative">
+    <div ref={containerRef} className="flex-grow relative">
       <canvas ref={canvasRef} className="w-full h-full absolute" />
     </div>
   )
