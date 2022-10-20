@@ -2,62 +2,73 @@ import { unzipSync } from 'fflate'
 
 const root = 'http://localhost:8080'
 
-interface BoundingBox {
+interface OcrBoundingBox {
   vertices: {
     x: number
     y: number
   }[]
 }
 
-interface Word {
-  bounding_box: BoundingBox
+interface OcrWord {
+  bounding_box: OcrBoundingBox
   symbols: {
-    bounding_box: BoundingBox
+    bounding_box: OcrBoundingBox
     text: string
     confidence: number
   }[]
 }
 
-interface Paragraph {
-  bounding_box: BoundingBox
-  words: Word[]
+interface OcrParagraph {
+  bounding_box: OcrBoundingBox
+  words: OcrWord[]
   confidence: number
 }
 
-interface Block {
-  bounding_box: BoundingBox
+interface OcrBlock {
+  bounding_box: OcrBoundingBox
   block_type: number
   confidence: number
-  paragraphs: Paragraph[]
+  paragraphs: OcrParagraph[]
 }
 
 export interface OcrResult {
   text: string
   pages: {
-    blocks: Block[]
+    blocks: OcrBlock[]
   }
 }
 
-export const getTextForBlock = (block: Block): string[] => {
-  const result = []
+export interface Word {
+  text: string
+}
+
+export interface Sentence {
+  words: Word[]
+}
+
+export const getTextForBlock = (block: OcrBlock): Sentence[] => {
+  const sentences = []
 
   for (const p of block.paragraphs) {
-    result.push(getTextForParagraph(p))
+    sentences.push(getTextForParagraph(p))
   }
 
-  return result
+  return sentences
 }
 
-const getTextForParagraph = (p: Paragraph): string => {
-  const symbols = []
+const getTextForParagraph = (p: OcrParagraph): Sentence => {
+  const words = []
 
   for (const word of p.words) {
+    const w = []
     for (const symbol of word.symbols) {
-      symbols.push(symbol.text)
+      w.push(symbol)
     }
+
+    words.push({ text: w.join('') })
   }
 
-  return symbols.join('')
+  return { words }
 }
 
 export const getOcr = async (image: Uint8Array): Promise<OcrResult> => {
