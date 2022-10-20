@@ -248,5 +248,5 @@ func (api *api) OCR(c echo.Context) error {
 	//   return c.NoContent(http.StatusInternalServerError)
 	// }
 
-	return c.JSON(http.StatusOK, ocrStub)
+	return c.String(http.StatusOK, ocrStub)
 }

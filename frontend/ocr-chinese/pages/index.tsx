@@ -30,9 +30,9 @@ const Reader = ({ book, setBook }: Props) => {
       return
     }
 
-    // getOcr(book.pages[page]).then(res => {
-    //   setOcr(res)
-    // })
+    getOcr(book.pages[page]).then(res => {
+      setOcr(res)
+    })
   }, [book, page])
 
   function onNext() {
