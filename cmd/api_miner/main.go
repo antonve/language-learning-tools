@@ -271,12 +271,10 @@ func (api *api) OCR(c echo.Context) error {
 	}
 
 	if response, ok := api.ocrCache.Get(sum); ok {
-		log.Println("found in cache")
 		return c.String(http.StatusOK, string(response))
 	}
 
 	res, err := api.ocr.Do(c.Request().Context(), buf)
-	log.Println("not found in cache")
 	if err != nil {
 		log.Println("could not process ocr request:", err)
 		return c.NoContent(http.StatusInternalServerError)

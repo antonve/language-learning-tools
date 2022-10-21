@@ -20,7 +20,7 @@ import {
 
 const Home: NextPage<{}> = () => {
   const [book, setBook] = useState<Book>()
-  const [page, setPage] = useState(170)
+  const [page, setPage] = useState(0)
   const [ocr, setOcr] = useState<OcrResult>()
 
   useEffect(() => {
