@@ -13,6 +13,7 @@ import (
 	"github.com/antonve/jp-mining-tools/internal/pkg/goo"
 	"github.com/antonve/jp-mining-tools/internal/pkg/jisho"
 	"github.com/antonve/jp-mining-tools/internal/pkg/ocr"
+	"github.com/antonve/jp-mining-tools/internal/pkg/persistedcache"
 )
 
 func main() {
@@ -51,6 +52,7 @@ type api struct {
 
 	jishoCache map[string]*JishoProxyResponse
 	gooCache   map[string]*GooProxyResponse
+	ocrCache   persistedcache.PersistedCache
 }
 
 func NewAPI() API {
@@ -71,6 +73,10 @@ func NewAPI() API {
 
 	jishoCache := map[string]*JishoProxyResponse{}
 	gooCache := map[string]*GooProxyResponse{}
+	ocrCache, err := persistedcache.New("out/ocr_cache/")
+	if err != nil {
+		panic(err)
+	}
 
 	return &api{
 		jpCorpus:   cjp,
@@ -80,6 +86,7 @@ func NewAPI() API {
 		jishoCache: jishoCache,
 		gooCache:   gooCache,
 		ocr:        ocrClient,
+		ocrCache:   ocrCache,
 	}
 }
 
