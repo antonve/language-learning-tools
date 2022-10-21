@@ -3,14 +3,13 @@ package ocr
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 
 	vision "cloud.google.com/go/vision/apiv1"
 )
 
 type Client interface {
-	Do(ctx context.Context, image io.Reader) (*Result, error)
+	Do(ctx context.Context, image io.Reader) ([]byte, error)
 }
 
 type client struct {
@@ -28,7 +27,7 @@ func New() (*client, error) {
 	return &client{service: service}, nil
 }
 
-func (c *client) Do(ctx context.Context, image io.Reader) (*Result, error) {
+func (c *client) Do(ctx context.Context, image io.Reader) ([]byte, error) {
 	img, err := vision.NewImageFromReader(image)
 	if err != nil {
 		return nil, err
@@ -44,9 +43,7 @@ func (c *client) Do(ctx context.Context, image io.Reader) (*Result, error) {
 		return nil, err
 	}
 
-	fmt.Println(string(json))
-
-	return nil, nil
+	return json, nil
 }
 
 type Result struct {

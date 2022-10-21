@@ -1,10 +1,6 @@
 package persistedcache
 
 import (
-	"bytes"
-	"crypto/sha256"
-	"fmt"
-	"io"
 	"io/fs"
 	"io/ioutil"
 	"os"
@@ -12,22 +8,22 @@ import (
 )
 
 type PersistedCache interface {
-	Get(key string) string
-	Put(key, value string)
+	Get(key string) (value []byte, ok bool)
+	Put(key string, value []byte) error
 }
 
 type persistedCache struct {
 	path   string
-	lookup map[string]string
+	lookup map[string][]byte
 }
 
 func New(cachePath string) (PersistedCache, error) {
 	c := &persistedCache{
 		path:   cachePath,
-		lookup: map[string]string{},
+		lookup: map[string][]byte{},
 	}
 
-	err := filepath.WalkDir(cachePath, func(path string, d fs.DirEntry, err error) error {
+	err := filepath.WalkDir(cachePath, func(path string, d fs.DirEntry, _ error) error {
 		if d.IsDir() {
 			return nil
 		}
@@ -37,7 +33,7 @@ func New(cachePath string) (PersistedCache, error) {
 			return err
 		}
 
-		c.lookup[d.Name()] = string(content)
+		c.lookup[d.Name()] = content
 		return nil
 	})
 
@@ -48,26 +44,25 @@ func New(cachePath string) (PersistedCache, error) {
 
 func (c *persistedCache) getFileContents(path string) ([]byte, error) {
 	f, err := os.Open(path)
-	defer f.Close()
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
 
 	return ioutil.ReadAll(f)
 }
 
-func (c *persistedCache) hash(content []byte) (string, error) {
-	r := bytes.NewReader(content)
-	hash := sha256.New()
-	if _, err := io.Copy(hash, r); err != nil {
-		return "", err
-	}
-
-	sum := hash.Sum(nil)
-
-	return fmt.Sprintf("%x", sum), nil
+func (c *persistedCache) Get(key string) ([]byte, bool) {
+	val, ok := c.lookup[key]
+	return val, ok
 }
 
-func (c *persistedCache) Get(key string) string { return "" }
+func (c *persistedCache) Put(key string, value []byte) error {
+	if err := os.WriteFile(c.path+key, value, 0644); err != nil {
+		return err
+	}
 
-func (c *persistedCache) Put(key, value string) {}
+	c.lookup[key] = value
+
+	return nil
+}

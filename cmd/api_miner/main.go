@@ -1,8 +1,12 @@
 package main
 
 import (
+	"bytes"
+	"crypto/sha256"
 	_ "embed"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -248,12 +252,40 @@ type GooProxyResponse struct {
 //go:embed mock_response.json
 var ocrStub string
 
-func (api *api) OCR(c echo.Context) error {
-	// res, err := api.ocr.Do(c.Request().Context(), c.Request().Body)
-	// if err != nil {
-	//   log.Println("could not process ocr request:", err)
-	//   return c.NoContent(http.StatusInternalServerError)
-	// }
+func Hash(r io.Reader) (string, error) {
+	hash := sha256.New()
+	if _, err := io.Copy(hash, r); err != nil {
+		return "", err
+	}
 
-	return c.String(http.StatusOK, ocrStub)
+	sum := hash.Sum(nil)
+
+	return fmt.Sprintf("%x", sum), nil
+}
+
+func (api *api) OCR(c echo.Context) error {
+	buf := &bytes.Buffer{}
+	r := io.TeeReader(c.Request().Body, buf)
+
+	sum, err := Hash(r)
+	if err != nil {
+		log.Println("could not process ocr request:", err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	if response, ok := api.ocrCache.Get(sum); ok {
+		log.Println("found in cache")
+		return c.String(http.StatusOK, string(response))
+	}
+
+	res, err := api.ocr.Do(c.Request().Context(), buf)
+	log.Println("not found in cache")
+	if err != nil {
+		log.Println("could not process ocr request:", err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	api.ocrCache.Put(sum, res)
+
+	return c.String(http.StatusOK, string(res))
 }
