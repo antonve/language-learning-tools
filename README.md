@@ -28,6 +28,7 @@ A frontend for creating Anki cards given a list of words.
   yarn dev
 
   # API
+  export GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp_key.json
   go run cmd/api_miner/main.go
   ```
 

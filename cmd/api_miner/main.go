@@ -1,7 +1,12 @@
 package main
 
 import (
+	"bytes"
+	"crypto/sha256"
+	_ "embed"
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -11,6 +16,8 @@ import (
 	"github.com/antonve/jp-mining-tools/internal/pkg/corpus"
 	"github.com/antonve/jp-mining-tools/internal/pkg/goo"
 	"github.com/antonve/jp-mining-tools/internal/pkg/jisho"
+	"github.com/antonve/jp-mining-tools/internal/pkg/ocr"
+	"github.com/antonve/jp-mining-tools/internal/pkg/persistedcache"
 )
 
 func main() {
@@ -27,8 +34,9 @@ func main() {
 	e.GET("/:lang/chapter/:series/:filename", api.GetChapter)
 	e.GET("/jp/jisho/:token", api.JishoProxy)
 	e.GET("/jp/goo/:token", api.GooProxy)
+	e.POST("/ocr", api.OCR)
 
-	e.Logger.Fatal(e.Start(":5555"))
+	e.Logger.Fatal(e.Start(":8080"))
 }
 
 type API interface {
@@ -36,6 +44,7 @@ type API interface {
 	GetChapter(c echo.Context) error
 	JishoProxy(c echo.Context) error
 	GooProxy(c echo.Context) error
+	OCR(c echo.Context) error
 }
 
 type api struct {
@@ -43,9 +52,11 @@ type api struct {
 	zhCorpus corpus.Corpus
 	jisho    jisho.Jisho
 	goo      goo.Goo
+	ocr      ocr.Client
 
 	jishoCache map[string]*JishoProxyResponse
 	gooCache   map[string]*GooProxyResponse
+	ocrCache   persistedcache.PersistedCache
 }
 
 func NewAPI() API {
@@ -59,8 +70,17 @@ func NewAPI() API {
 		panic(err)
 	}
 
+	ocrClient, err := ocr.New()
+	if err != nil {
+		panic(err)
+	}
+
 	jishoCache := map[string]*JishoProxyResponse{}
 	gooCache := map[string]*GooProxyResponse{}
+	ocrCache, err := persistedcache.New("out/ocr_cache/")
+	if err != nil {
+		panic(err)
+	}
 
 	return &api{
 		jpCorpus:   cjp,
@@ -69,6 +89,8 @@ func NewAPI() API {
 		goo:        goo.New(),
 		jishoCache: jishoCache,
 		gooCache:   gooCache,
+		ocr:        ocrClient,
+		ocrCache:   ocrCache,
 	}
 }
 
@@ -225,4 +247,40 @@ type GooProxyResponse struct {
 	Word       string `json:"word"`
 	Reading    string `json:"reading"`
 	Definition string `json:"definition"`
+}
+
+func Hash(r io.Reader) (string, error) {
+	hash := sha256.New()
+	if _, err := io.Copy(hash, r); err != nil {
+		return "", err
+	}
+
+	sum := hash.Sum(nil)
+
+	return fmt.Sprintf("%x", sum), nil
+}
+
+func (api *api) OCR(c echo.Context) error {
+	buf := &bytes.Buffer{}
+	r := io.TeeReader(c.Request().Body, buf)
+
+	sum, err := Hash(r)
+	if err != nil {
+		log.Println("could not process ocr request:", err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	if response, ok := api.ocrCache.Get(sum); ok {
+		return c.String(http.StatusOK, string(response))
+	}
+
+	res, err := api.ocr.Do(c.Request().Context(), buf)
+	if err != nil {
+		log.Println("could not process ocr request:", err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	api.ocrCache.Put(sum, res)
+
+	return c.String(http.StatusOK, string(res))
 }

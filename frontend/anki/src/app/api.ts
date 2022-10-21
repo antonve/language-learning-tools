@@ -22,7 +22,7 @@ interface Definition {
   meaning: string
 }
 
-const root = 'http://localhost:5555'
+const root = 'http://localhost:8080'
 
 export const getChapter = async (
   lang: string,
