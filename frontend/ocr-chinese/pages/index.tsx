@@ -23,7 +23,9 @@ const Home: NextPage<{}> = () => {
   const [page, setPage] = useState(0)
   const [ocr, setOcr] = useState<OcrResult>()
 
-  useEffect(() => {
+  useEffect(() => setOcr(undefined), [page])
+
+  const fetchOcr = () => {
     if (!book) {
       return
     }
@@ -31,7 +33,7 @@ const Home: NextPage<{}> = () => {
     getOcr(book.pages[page]).then(res => {
       setOcr(res)
     })
-  }, [book, page])
+  }
 
   return (
     <div className="w-screen h-screen flex">
@@ -45,15 +47,15 @@ const Home: NextPage<{}> = () => {
         />
       </div>
       <div className="bg-gray-100 w-1/2 flex-shrink-0">
-        <PageTranscript ocr={ocr} />
+        <PageTranscript ocr={ocr} book={book} fetchOcr={fetchOcr} />
       </div>
     </div>
   )
 }
 
-const PageTranscript = ({ ocr }: Props) => {
+const PageTranscript = ({ ocr, fetchOcr }: Props) => {
   if (!ocr) {
-    return <p>No text found</p>
+    return <button onClick={fetchOcr}>Load transcript</button>
   }
 
   return (
@@ -93,6 +95,7 @@ interface Props {
   page: number
   setPage: Dispatch<SetStateAction<number>>
   ocr: OcrResult | undefined
+  fetchOcr?: () => void
 }
 
 const Reader = ({ book, setBook, page, setPage, ocr }: Props) => {
