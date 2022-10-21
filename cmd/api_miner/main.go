@@ -249,9 +249,6 @@ type GooProxyResponse struct {
 	Definition string `json:"definition"`
 }
 
-//go:embed mock_response.json
-var ocrStub string
-
 func Hash(r io.Reader) (string, error) {
 	hash := sha256.New()
 	if _, err := io.Copy(hash, r); err != nil {
