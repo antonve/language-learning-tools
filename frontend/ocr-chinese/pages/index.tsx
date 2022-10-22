@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react'
 import BookImporter from '../src/BookImporter'
 import BookNavigation from '../src/BookNavigation'
 import BookPage from '../src/BookPage'
-import { Book, getOcr, OcrResult } from '../src/domain'
+import { Book, fetchOcr, OcrResult } from '../src/domain'
 import Transcript from '../src/Transcript'
 
 const Home: NextPage<{}> = () => {
@@ -13,12 +13,12 @@ const Home: NextPage<{}> = () => {
 
   useEffect(() => setOcr(undefined), [page])
 
-  const fetchOcr = () => {
+  const loadTranscript = () => {
     if (!book) {
       return
     }
 
-    getOcr(book.pages[page]).then(res => {
+    fetchOcr(book.pages[page]).then(res => {
       setOcr(res)
     })
   }
@@ -40,8 +40,8 @@ const Home: NextPage<{}> = () => {
         <BookNavigation book={book} page={page} setPage={setPage} />
         <div className="flex flex-row">
           <h2
-            className="text-2xl font-bold my-4 cursor-pointer"
-            onClick={fetchOcr}
+            className="text-xl font-bold my-4 cursor-pointer"
+            onClick={loadTranscript}
             title="Click to load transcript"
           >
             Transcript

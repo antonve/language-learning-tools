@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"crypto/sha256"
 	_ "embed"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 
+	"github.com/jcramb/cedict"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
@@ -34,6 +36,7 @@ func main() {
 	e.GET("/:lang/chapter/:series/:filename", api.GetChapter)
 	e.GET("/jp/jisho/:token", api.JishoProxy)
 	e.GET("/jp/goo/:token", api.GooProxy)
+	e.POST("/zh/cedict", api.Cedict)
 	e.POST("/ocr", api.OCR)
 
 	e.Logger.Fatal(e.Start(":8080"))
@@ -45,6 +48,7 @@ type API interface {
 	JishoProxy(c echo.Context) error
 	GooProxy(c echo.Context) error
 	OCR(c echo.Context) error
+	Cedict(c echo.Context) error
 }
 
 type api struct {
@@ -57,6 +61,7 @@ type api struct {
 	jishoCache map[string]*JishoProxyResponse
 	gooCache   map[string]*GooProxyResponse
 	ocrCache   persistedcache.PersistedCache
+	cedict     *cedict.Dict
 }
 
 func NewAPI() API {
@@ -91,6 +96,7 @@ func NewAPI() API {
 		gooCache:   gooCache,
 		ocr:        ocrClient,
 		ocrCache:   ocrCache,
+		cedict:     cedict.New(),
 	}
 }
 
@@ -283,4 +289,56 @@ func (api *api) OCR(c echo.Context) error {
 	api.ocrCache.Put(sum, res)
 
 	return c.String(http.StatusOK, string(res))
+}
+
+func (api *api) Cedict(c echo.Context) error {
+	body, err := io.ReadAll(c.Request().Body)
+	if err != nil {
+		log.Println("could not process cedict request:", err)
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	req := &CedictRequest{}
+	if err := json.Unmarshal(body, req); err != nil {
+		log.Println("could not process cedict request:", err)
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	res := map[string]*CedictResponse{}
+	for _, token := range req.Words {
+		if _, ok := res[token]; ok {
+			continue
+		}
+
+		pinyin := api.cedict.HanziToPinyin(token)
+		pinyinTones := cedict.PinyinTones(pinyin)
+		meaning := api.cedict.GetByHanzi(token)
+
+		res[token] = &CedictResponse{
+			Source:      token,
+			Pinyin:      pinyin,
+			PinyinTones: pinyinTones,
+		}
+
+		if meaning != nil {
+			res[token].HanziSimplified = meaning.Simplified
+			res[token].HanziTraditional = meaning.Traditional
+			res[token].Meanings = meaning.Meanings
+		}
+	}
+
+	return c.JSON(http.StatusOK, res)
+}
+
+type CedictRequest struct {
+	Words []string `json:"words"`
+}
+
+type CedictResponse struct {
+	Source           string   `json:"source"`
+	PinyinTones      string   `json:"pinyin_tones"`
+	Pinyin           string   `json:"pinyin"`
+	HanziSimplified  string   `json:"hanzi_simplified"`
+	HanziTraditional string   `json:"hanzi_traditional"`
+	Meanings         []string `json:"meanings"`
 }
