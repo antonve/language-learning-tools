@@ -13,7 +13,9 @@ const Transcript = ({ ocr }: Props) => {
     <>
       <ul>
         {ocr.pages.map(page =>
-          page.blocks.map(block => <BlockTranscript block={block} />),
+          page.blocks.map((block, i) => (
+            <BlockTranscript block={block} key={i} />
+          )),
         )}
       </ul>
     </>
@@ -27,8 +29,8 @@ const BlockTranscript = ({ block }: { block: OcrBlock }) => {
 
   return (
     <li className="bg-green-200 my-4">
-      {sentences.map(s => (
-        <SentenceTranscript sentence={s} />
+      {sentences.map((s, i) => (
+        <SentenceTranscript sentence={s} key={i} />
       ))}
     </li>
   )
@@ -37,8 +39,10 @@ const BlockTranscript = ({ block }: { block: OcrBlock }) => {
 const SentenceTranscript = ({ sentence }: { sentence: Sentence }) => {
   return (
     <span>
-      {sentence.words.map(s => (
-        <span className="hover:bg-red-200">{s.text}</span>
+      {sentence.words.map((s, i) => (
+        <span className="hover:bg-red-200" key={i}>
+          {s.text}
+        </span>
       ))}
     </span>
   )
