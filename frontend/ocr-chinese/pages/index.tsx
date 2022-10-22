@@ -40,7 +40,7 @@ const Home: NextPage<{}> = () => {
         <BookNavigation book={book} page={page} setPage={setPage} />
         <div className="flex flex-row">
           <h2
-            className="text-2xl font-bold my-4 cursor-pointer"
+            className="text-xl font-bold my-4 cursor-pointer"
             onClick={fetchOcr}
             title="Click to load transcript"
           >
