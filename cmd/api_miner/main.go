@@ -296,15 +296,19 @@ func (api *api) Cedict(c echo.Context) error {
 	pinyin := api.cedict.HanziToPinyin(token)
 	pinyinTones := cedict.PinyinTones(pinyin)
 
+	meaning := api.cedict.GetByHanzi(token)
+
 	return c.JSON(http.StatusOK, &CedictResponse{
 		Source:      token,
 		Pinyin:      pinyin,
 		PinyinTones: pinyinTones,
+		Meaning:     meaning,
 	})
 }
 
 type CedictResponse struct {
-	Source      string `json:"source"`
-	PinyinTones string `json:"pinyin_tones"`
-	Pinyin      string `json:"pinyin"`
+	Source      string        `json:"source"`
+	PinyinTones string        `json:"pinyin_tones"`
+	Pinyin      string        `json:"pinyin"`
+	Meaning     *cedict.Entry `json:"meaning"`
 }
