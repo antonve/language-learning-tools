@@ -36,14 +36,18 @@ const Home: NextPage<{}> = () => {
     })
   }
 
+  if (!book) {
+    return (
+      <div className="w-screen h-screen flex flex-col">
+        <BookImporter setBook={setBook} />
+      </div>
+    )
+  }
+
   return (
     <div className="w-screen h-screen flex">
       <div className="flex-grow h-screen flex flex-col">
-        {!book ? (
-          <BookImporter setBook={setBook} />
-        ) : (
-          <Page book={book} index={page} ocr={ocr} />
-        )}
+        <Page book={book} index={page} ocr={ocr} />
       </div>
       <div className="w-1/2 flex-shrink-0 p-8 border-l-2 border-gray-200">
         <BookNavigation book={book} page={page} setPage={setPage} />
@@ -105,7 +109,7 @@ const SentenceTranscript = ({ sentence }: { sentence: Sentence }) => {
 }
 
 interface Props {
-  book: Book | undefined
+  book: Book
   page: number
   setPage: Dispatch<SetStateAction<number>>
   ocr?: OcrResult | undefined
@@ -113,10 +117,6 @@ interface Props {
 }
 
 const BookNavigation = ({ book, page, setPage }: Props) => {
-  if (!book) {
-    return null
-  }
-
   function onNext() {
     setPage(page + 1)
     console.log('next', page + 1)
