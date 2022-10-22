@@ -1,4 +1,12 @@
-import { getTextForBlock, OcrResult, OcrBlock, Sentence } from './domain'
+import { useEffect, useState } from 'react'
+import {
+  getTextForBlock,
+  OcrResult,
+  OcrBlock,
+  Sentence,
+  CedictResponse,
+  fetchCedict,
+} from './domain'
 
 interface Props {
   ocr?: OcrResult | undefined
@@ -37,6 +45,15 @@ const BlockTranscript = ({ block }: { block: OcrBlock }) => {
 }
 
 const SentenceTranscript = ({ sentence }: { sentence: Sentence }) => {
+  const [cedict, setCedict] = useState<CedictResponse>()
+
+  useEffect(() => {
+    fetchCedict(sentence.words).then(res => {
+      console.log(res)
+      setCedict(res)
+    })
+  }, [sentence])
+
   return (
     <span>
       {sentence.words.map((s, i) => (

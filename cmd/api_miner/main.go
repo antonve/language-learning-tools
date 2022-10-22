@@ -36,7 +36,7 @@ func main() {
 	e.GET("/:lang/chapter/:series/:filename", api.GetChapter)
 	e.GET("/jp/jisho/:token", api.JishoProxy)
 	e.GET("/jp/goo/:token", api.GooProxy)
-	e.GET("/zh/cedict", api.Cedict)
+	e.POST("/zh/cedict", api.Cedict)
 	e.POST("/ocr", api.OCR)
 
 	e.Logger.Fatal(e.Start(":8080"))
@@ -315,12 +315,15 @@ func (api *api) Cedict(c echo.Context) error {
 		meaning := api.cedict.GetByHanzi(token)
 
 		res[token] = &CedictResponse{
-			Source:           token,
-			Pinyin:           pinyin,
-			PinyinTones:      pinyinTones,
-			HanziSimplified:  meaning.Simplified,
-			HanziTraditional: meaning.Traditional,
-			Meanings:         meaning.Meanings,
+			Source:      token,
+			Pinyin:      pinyin,
+			PinyinTones: pinyinTones,
+		}
+
+		if meaning != nil {
+			res[token].HanziSimplified = meaning.Simplified
+			res[token].HanziTraditional = meaning.Traditional
+			res[token].Meanings = meaning.Meanings
 		}
 	}
 
