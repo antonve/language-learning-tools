@@ -38,7 +38,7 @@ const BlockTranscript = ({ block }: { block: OcrBlock }) => {
   const sentences = getTextForBlock(block)
 
   return (
-    <li className="my-4 text-2xl tracking-wide">
+    <li className="my-4 text-2xl tracking-wide border-b-2 border-opacity-30">
       {sentences.map((s, i) => (
         <SentenceTranscript sentence={s} key={i} />
       ))}
@@ -58,7 +58,7 @@ const SentenceTranscript = ({ sentence }: { sentence: Sentence }) => {
   return (
     <span>
       {sentence.words.map((w, i) => (
-        <ruby className="hover:bg-yellow-100" key={i}>
+        <ruby className="hover:bg-yellow-100 cursor-pointer group" key={i}>
           {w.text} <RubyText cedict={cedict[w.text]} word={w} />
         </ruby>
       ))}
@@ -85,5 +85,9 @@ const RubyText = ({
     return null
   }
 
-  return <rt>{cedict.pinyin_tones.toLowerCase()}</rt>
+  return (
+    <rt className="opacity-0 group-hover:opacity-80 text-xs my-8">
+      {cedict.pinyin_tones.toLowerCase()}
+    </rt>
+  )
 }
