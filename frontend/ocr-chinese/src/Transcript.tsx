@@ -6,6 +6,8 @@ import {
   Sentence,
   CedictResponse,
   fetchCedict,
+  CedictEntry,
+  Word,
 } from './domain'
 
 interface Props {
@@ -45,22 +47,43 @@ const BlockTranscript = ({ block }: { block: OcrBlock }) => {
 }
 
 const SentenceTranscript = ({ sentence }: { sentence: Sentence }) => {
-  const [cedict, setCedict] = useState<CedictResponse>()
+  const [cedict, setCedict] = useState<CedictResponse>({})
 
   useEffect(() => {
     fetchCedict(sentence.words).then(res => {
-      console.log(res)
       setCedict(res)
     })
   }, [sentence])
 
   return (
     <span>
-      {sentence.words.map((s, i) => (
-        <span className="hover:bg-yellow-100" key={i}>
-          {s.text}
-        </span>
+      {sentence.words.map((w, i) => (
+        <ruby className="hover:bg-yellow-100" key={i}>
+          {w.text} <RubyText cedict={cedict[w.text]} word={w} />
+        </ruby>
       ))}
     </span>
   )
+}
+
+const RubyText = ({
+  cedict,
+  word,
+}: {
+  cedict: CedictEntry | undefined
+  word: Word
+}) => {
+  if (!cedict) {
+    return null
+  }
+
+  if (word.text.toLowerCase() === cedict.pinyin_tones.toLowerCase()) {
+    return null
+  }
+
+  if (cedict.pinyin_tones.includes('\uFFFD')) {
+    return null
+  }
+
+  return <rt>{cedict.pinyin_tones.toLowerCase()}</rt>
 }
