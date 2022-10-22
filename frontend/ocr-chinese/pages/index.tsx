@@ -9,16 +9,9 @@ import {
 } from 'react'
 import BookImporter from '../src/BookImporter'
 import { Button } from '../src/Components'
-import {
-  arrayBufferToBase64,
-  Book,
-  getOcr,
-  getTextForBlock,
-  OcrResult,
-  OcrBlock,
-  Sentence,
-} from '../src/domain'
+import { arrayBufferToBase64, Book, getOcr, OcrResult } from '../src/domain'
 import { useKeyPress, useWindowSize } from '../src/hooks'
+import Transcript from '../src/Transcript'
 
 const Home: NextPage<{}> = () => {
   const [book, setBook] = useState<Book>()
@@ -61,51 +54,9 @@ const Home: NextPage<{}> = () => {
             Transcript
           </h2>
         </div>
-        <PageTranscript ocr={ocr} />
+        <Transcript ocr={ocr} />
       </div>
     </div>
-  )
-}
-
-interface TranscriptProps {
-  ocr?: OcrResult | undefined
-}
-
-const PageTranscript = ({ ocr }: TranscriptProps) => {
-  if (!ocr) {
-    return <p>Not yet loaded, click title to load.</p>
-  }
-
-  return (
-    <>
-      <ul>
-        {ocr.pages.map(page =>
-          page.blocks.map(block => <BlockTranscript block={block} />),
-        )}
-      </ul>
-    </>
-  )
-}
-
-const BlockTranscript = ({ block }: { block: OcrBlock }) => {
-  const sentences = getTextForBlock(block)
-
-  return (
-    <li className="bg-green-200 my-4">
-      {sentences.map(s => (
-        <SentenceTranscript sentence={s} />
-      ))}
-    </li>
-  )
-}
-
-const SentenceTranscript = ({ sentence }: { sentence: Sentence }) => {
-  return (
-    <span>
-      {sentence.words.map(s => (
-        <span className="hover:bg-red-200">{s.text}</span>
-      ))}
-    </span>
   )
 }
 
@@ -178,8 +129,6 @@ const Page = ({
     img.onload = function () {
       canvas.width = containerSize.width
       canvas.height = containerSize.height
-
-      console.log(img.width, img.height, canvas.width, canvas.height)
 
       let scale = Math.min(canvas.width / img.width, canvas.height / img.height)
       let width = img.width * scale
