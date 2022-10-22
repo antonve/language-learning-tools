@@ -18,7 +18,7 @@ import {
   OcrBlock,
   Sentence,
 } from '../src/domain'
-import { useKeyPress } from '../src/hooks'
+import { useKeyPress, useWindowSize } from '../src/hooks'
 
 const Home: NextPage<{}> = () => {
   const [book, setBook] = useState<Book>()
@@ -155,7 +155,7 @@ const Page = ({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const containerSize = useSize(containerRef.current)
+  const containerSize = useWindowSize(containerRef.current)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -219,34 +219,6 @@ const Page = ({
       <canvas ref={canvasRef} className="w-full h-full absolute" />
     </div>
   )
-}
-
-function useSize(ref: HTMLDivElement | null) {
-  const [size, setSize] = useState({
-    width: 0,
-    height: 0,
-  })
-
-  useEffect(() => {
-    if (!ref) {
-      return
-    }
-
-    function handleResize() {
-      console.log('hook', ref?.offsetWidth, ref?.offsetHeight)
-      setSize({
-        width: ref?.offsetWidth ?? 0,
-        height: ref?.offsetHeight ?? 0,
-      })
-    }
-
-    window.addEventListener('resize', handleResize)
-    handleResize()
-
-    return () => window.removeEventListener('resize', handleResize)
-  }, [ref])
-
-  return size
 }
 
 export default Home
