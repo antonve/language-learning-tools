@@ -1,10 +1,9 @@
 import type { NextPage } from 'next'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import BookImporter from '../src/BookImporter'
+import BookNavigation from '../src/BookNavigation'
 import BookPage from '../src/BookPage'
-import { Button } from '../src/Components'
 import { Book, getOcr, OcrResult } from '../src/domain'
-import { useKeyPress } from '../src/hooks'
 import Transcript from '../src/Transcript'
 
 const Home: NextPage<{}> = () => {
@@ -50,36 +49,6 @@ const Home: NextPage<{}> = () => {
         </div>
         <Transcript ocr={ocr} />
       </div>
-    </div>
-  )
-}
-
-interface Props {
-  book: Book
-  page: number
-  setPage: Dispatch<SetStateAction<number>>
-  ocr?: OcrResult | undefined
-  fetchOcr?: () => void
-}
-
-const BookNavigation = ({ book, page, setPage }: Props) => {
-  function onNext() {
-    setPage(page + 1)
-    console.log('next', page + 1)
-  }
-
-  function onPrev() {
-    setPage(page - 1)
-  }
-
-  useKeyPress('ArrowLeft', onNext)
-  useKeyPress('ArrowRight', onPrev)
-
-  return (
-    <div className="flex space-x-10 justify-center items-center">
-      <Button onClick={onNext}>next</Button>
-      <h1>{book.title}</h1>
-      <Button onClick={onPrev}>prev</Button>
     </div>
   )
 }
