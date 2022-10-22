@@ -18,6 +18,7 @@ import {
   OcrBlock,
   Sentence,
 } from '../src/domain'
+import { useKeyPress } from '../src/hooks'
 
 const Home: NextPage<{}> = () => {
   const [book, setBook] = useState<Book>()
@@ -125,6 +126,9 @@ const BookNavigation = ({ book, page, setPage }: Props) => {
   function onPrev() {
     setPage(page - 1)
   }
+
+  useKeyPress('ArrowLeft', onNext)
+  useKeyPress('ArrowRight', onPrev)
 
   return (
     <div className="flex space-x-10 justify-center items-center">
