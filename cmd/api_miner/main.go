@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/jcramb/cedict"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
@@ -34,6 +35,7 @@ func main() {
 	e.GET("/:lang/chapter/:series/:filename", api.GetChapter)
 	e.GET("/jp/jisho/:token", api.JishoProxy)
 	e.GET("/jp/goo/:token", api.GooProxy)
+	e.GET("/zh/cedict/:token", api.Cedict)
 	e.POST("/ocr", api.OCR)
 
 	e.Logger.Fatal(e.Start(":8080"))
@@ -45,6 +47,7 @@ type API interface {
 	JishoProxy(c echo.Context) error
 	GooProxy(c echo.Context) error
 	OCR(c echo.Context) error
+	Cedict(c echo.Context) error
 }
 
 type api struct {
@@ -57,6 +60,7 @@ type api struct {
 	jishoCache map[string]*JishoProxyResponse
 	gooCache   map[string]*GooProxyResponse
 	ocrCache   persistedcache.PersistedCache
+	cedict     *cedict.Dict
 }
 
 func NewAPI() API {
@@ -91,6 +95,7 @@ func NewAPI() API {
 		gooCache:   gooCache,
 		ocr:        ocrClient,
 		ocrCache:   ocrCache,
+		cedict:     cedict.New(),
 	}
 }
 
@@ -283,4 +288,23 @@ func (api *api) OCR(c echo.Context) error {
 	api.ocrCache.Put(sum, res)
 
 	return c.String(http.StatusOK, string(res))
+}
+
+func (api *api) Cedict(c echo.Context) error {
+	token := c.Param("token")
+
+	pinyin := api.cedict.HanziToPinyin(token)
+	pinyinTones := cedict.PinyinTones(pinyin)
+
+	return c.JSON(http.StatusOK, &CedictResponse{
+		Source:      token,
+		Pinyin:      pinyin,
+		PinyinTones: pinyinTones,
+	})
+}
+
+type CedictResponse struct {
+	Source      string `json:"source"`
+	PinyinTones string `json:"pinyin_tones"`
+	Pinyin      string `json:"pinyin"`
 }
