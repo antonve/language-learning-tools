@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/sha256"
 	_ "embed"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -35,7 +36,7 @@ func main() {
 	e.GET("/:lang/chapter/:series/:filename", api.GetChapter)
 	e.GET("/jp/jisho/:token", api.JishoProxy)
 	e.GET("/jp/goo/:token", api.GooProxy)
-	e.GET("/zh/cedict/:token", api.Cedict)
+	e.GET("/zh/cedict", api.Cedict)
 	e.POST("/ocr", api.OCR)
 
 	e.Logger.Fatal(e.Start(":8080"))
@@ -291,24 +292,50 @@ func (api *api) OCR(c echo.Context) error {
 }
 
 func (api *api) Cedict(c echo.Context) error {
-	token := c.Param("token")
+	body, err := io.ReadAll(c.Request().Body)
+	if err != nil {
+		log.Println("could not process cedict request:", err)
+		return c.NoContent(http.StatusBadRequest)
+	}
 
-	pinyin := api.cedict.HanziToPinyin(token)
-	pinyinTones := cedict.PinyinTones(pinyin)
+	req := &CedictRequest{}
+	if err := json.Unmarshal(body, req); err != nil {
+		log.Println("could not process cedict request:", err)
+		return c.NoContent(http.StatusBadRequest)
+	}
 
-	meaning := api.cedict.GetByHanzi(token)
+	res := map[string]*CedictResponse{}
+	for _, token := range req.Words {
+		if _, ok := res[token]; ok {
+			continue
+		}
 
-	return c.JSON(http.StatusOK, &CedictResponse{
-		Source:      token,
-		Pinyin:      pinyin,
-		PinyinTones: pinyinTones,
-		Meaning:     meaning,
-	})
+		pinyin := api.cedict.HanziToPinyin(token)
+		pinyinTones := cedict.PinyinTones(pinyin)
+		meaning := api.cedict.GetByHanzi(token)
+
+		res[token] = &CedictResponse{
+			Source:           token,
+			Pinyin:           pinyin,
+			PinyinTones:      pinyinTones,
+			HanziSimplified:  meaning.Simplified,
+			HanziTraditional: meaning.Traditional,
+			Meanings:         meaning.Meanings,
+		}
+	}
+
+	return c.JSON(http.StatusOK, res)
+}
+
+type CedictRequest struct {
+	Words []string `json:"words"`
 }
 
 type CedictResponse struct {
-	Source      string        `json:"source"`
-	PinyinTones string        `json:"pinyin_tones"`
-	Pinyin      string        `json:"pinyin"`
-	Meaning     *cedict.Entry `json:"meaning"`
+	Source           string   `json:"source"`
+	PinyinTones      string   `json:"pinyin_tones"`
+	Pinyin           string   `json:"pinyin"`
+	HanziSimplified  string   `json:"hanzi_simplified"`
+	HanziTraditional string   `json:"hanzi_traditional"`
+	Meanings         []string `json:"meanings"`
 }
