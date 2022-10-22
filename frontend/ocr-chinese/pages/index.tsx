@@ -8,6 +8,7 @@ import {
   useState,
 } from 'react'
 import BookImporter from '../src/BookImporter'
+import { Button } from '../src/Components'
 import {
   arrayBufferToBase64,
   Book,
@@ -38,32 +39,46 @@ const Home: NextPage<{}> = () => {
   return (
     <div className="w-screen h-screen flex">
       <div className="flex-grow h-screen flex flex-col">
-        <Reader
-          book={book}
-          setBook={setBook}
-          page={page}
-          setPage={setPage}
-          ocr={ocr}
-        />
+        {!book ? (
+          <BookImporter setBook={setBook} />
+        ) : (
+          <Page book={book} index={page} ocr={ocr} />
+        )}
       </div>
-      <div className="bg-gray-100 w-1/2 flex-shrink-0">
-        <PageTranscript ocr={ocr} book={book} fetchOcr={fetchOcr} />
+      <div className="w-1/2 flex-shrink-0 p-8 border-l-2 border-gray-200">
+        <BookNavigation book={book} page={page} setPage={setPage} />
+        <div className="flex flex-row">
+          <h2
+            className="text-2xl font-bold my-4 cursor-pointer"
+            onClick={fetchOcr}
+            title="Click to load transcript"
+          >
+            Transcript
+          </h2>
+        </div>
+        <PageTranscript ocr={ocr} />
       </div>
     </div>
   )
 }
 
-const PageTranscript = ({ ocr, fetchOcr }: Props) => {
+interface TranscriptProps {
+  ocr?: OcrResult | undefined
+}
+
+const PageTranscript = ({ ocr }: TranscriptProps) => {
   if (!ocr) {
-    return <button onClick={fetchOcr}>Load transcript</button>
+    return <p>Not yet loaded, click title to load.</p>
   }
 
   return (
-    <ul>
-      {ocr.pages.map(page =>
-        page.blocks.map(block => <BlockTranscript block={block} />),
-      )}
-    </ul>
+    <>
+      <ul>
+        {ocr.pages.map(page =>
+          page.blocks.map(block => <BlockTranscript block={block} />),
+        )}
+      </ul>
+    </>
   )
 }
 
@@ -91,16 +106,15 @@ const SentenceTranscript = ({ sentence }: { sentence: Sentence }) => {
 
 interface Props {
   book: Book | undefined
-  setBook: (file: Book | undefined) => void
   page: number
   setPage: Dispatch<SetStateAction<number>>
-  ocr: OcrResult | undefined
+  ocr?: OcrResult | undefined
   fetchOcr?: () => void
 }
 
-const Reader = ({ book, setBook, page, setPage, ocr }: Props) => {
+const BookNavigation = ({ book, page, setPage }: Props) => {
   if (!book) {
-    return <BookImporter setBook={setBook} />
+    return null
   }
 
   function onNext() {
@@ -113,24 +127,11 @@ const Reader = ({ book, setBook, page, setPage, ocr }: Props) => {
   }
 
   return (
-    <>
-      <div className="flex space-x-10 justify-center items-center">
-        <button
-          onClick={onNext}
-          className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4"
-        >
-          next
-        </button>
-        <h1>{book.title}</h1>
-        <button
-          onClick={onPrev}
-          className="bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4"
-        >
-          prev
-        </button>
-      </div>
-      <Page book={book} index={page} ocr={ocr} />
-    </>
+    <div className="flex space-x-10 justify-center items-center">
+      <Button onClick={onNext}>next</Button>
+      <h1>{book.title}</h1>
+      <Button onClick={onPrev}>prev</Button>
+    </div>
   )
 }
 
