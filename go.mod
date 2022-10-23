@@ -11,7 +11,7 @@ require (
 	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/googleapis/gax-go/v2 v2.6.0 // indirect
-	github.com/jcramb/cedict v1.0.0 // indirect
+	github.com/jcramb/cedict v1.0.0
 	github.com/joho/godotenv v1.4.0 // indirect
 	github.com/kapmahc/epub v0.1.1
 	github.com/kelseyhightower/envconfig v1.4.0 // indirect
