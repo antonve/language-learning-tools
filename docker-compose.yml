@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  api:
+    container_name: api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    volumes:
+      - .:/app
+    environment:
+      # PostgreSQL
+      API_POSTGRES_HOST: "postgres"
+      API_POSTGRES_USERNAME: "root"
+      API_POSTGRES_PASSWORD: "hunter2"
+      API_POSTGRES_DATABASE: "mining_tools"
+      API_POSTGRES_SSLMODE: "disable"
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: hunter2
+      POSTGRES_DB: mining_tools
+    logging:
+      driver: none
+  pgweb:
+    container_name: pgweb
+    image: sosedoff/pgweb
+    ports:
+      - '8081:8081'
+    links:
+      - postgres:postgres
+    environment:
+      - DATABASE_URL=postgres://root:hunter2@postgres:5432/mining_tools?sslmode=disable
+    depends_on:
+      - postgres

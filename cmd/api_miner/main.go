@@ -65,12 +65,12 @@ type api struct {
 }
 
 func NewAPI() API {
-	cjp, err := corpus.New("./out", "jp")
+	cjp, err := corpus.New("/app/out", "jp")
 	if err != nil {
 		panic(err)
 	}
 
-	czh, err := corpus.New("./out", "zh")
+	czh, err := corpus.New("/app/out", "zh")
 	if err != nil {
 		panic(err)
 	}
@@ -82,7 +82,7 @@ func NewAPI() API {
 
 	jishoCache := map[string]*JishoProxyResponse{}
 	gooCache := map[string]*GooProxyResponse{}
-	ocrCache, err := persistedcache.New("out/ocr_cache/")
+	ocrCache, err := persistedcache.New("/app/out/ocr_cache/")
 	if err != nil {
 		panic(err)
 	}
