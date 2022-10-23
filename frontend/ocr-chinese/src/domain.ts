@@ -40,6 +40,7 @@ export interface OcrResult {
 
 export interface Word {
   text: string
+  boundingBox: OcrBoundingBox
 }
 
 export interface FocusWord {
@@ -75,7 +76,7 @@ const getTextForParagraph = (p: OcrParagraph): Sentence => {
       w.push(symbol.text)
     }
 
-    words.push({ text: w.join('') })
+    words.push({ text: w.join(''), boundingBox: word.bounding_box })
   }
 
   return { words }

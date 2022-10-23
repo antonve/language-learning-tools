@@ -35,12 +35,7 @@ const Home: NextPage<{}> = () => {
   return (
     <div className="w-screen h-screen flex">
       <div className="flex-grow h-screen flex flex-col">
-        <BookPage
-          book={book}
-          index={page}
-          ocr={ocr}
-          highlight={focusWord?.block.bounding_box}
-        />
+        <BookPage book={book} index={page} ocr={ocr} focusWord={focusWord} />
       </div>
       <div className="w-1/2 flex-shrink-0 p-8 border-l-2 border-gray-200">
         <BookNavigation book={book} page={page} setPage={setPage} />
