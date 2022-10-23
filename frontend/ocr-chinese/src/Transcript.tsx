@@ -56,7 +56,11 @@ const BlockTranscript = ({
   const sentences = getTextForBlock(block)
 
   const toggleSentence = (word: Word, cedict: CedictEntry) => {
-    setFocusWord({ word, block, cedict })
+    if (word.text == focusWord?.word.text) {
+      setFocusWord(undefined)
+    } else {
+      setFocusWord({ word, block, cedict })
+    }
   }
 
   return (
