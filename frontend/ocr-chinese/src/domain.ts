@@ -42,8 +42,18 @@ export interface Word {
   text: string
 }
 
+export interface FocusWord {
+  word: Word
+  block: OcrBlock
+}
+
 export interface Sentence {
   words: Word[]
+}
+
+export const getBoundingBoxHash = (box: OcrBoundingBox): string => {
+  const res = ['block', ...box.vertices.map(({ x, y }) => [x, y]).flat()]
+  return res.join('_')
 }
 
 export const getTextForBlock = (block: OcrBlock): Sentence[] => {

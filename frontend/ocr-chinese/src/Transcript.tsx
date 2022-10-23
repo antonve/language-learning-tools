@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import {
   getTextForBlock,
   OcrResult,
@@ -8,13 +8,16 @@ import {
   fetchCedict,
   CedictEntry,
   Word,
+  FocusWord,
 } from './domain'
 
 interface Props {
   ocr?: OcrResult | undefined
+  focusWord: FocusWord | undefined
+  setFocusWord: Dispatch<SetStateAction<FocusWord | undefined>>
 }
 
-const Transcript = ({ ocr }: Props) => {
+const Transcript = ({ ocr, focusWord, setFocusWord }: Props) => {
   if (!ocr) {
     return <p>Not yet loaded, click title to load.</p>
   }
@@ -24,7 +27,12 @@ const Transcript = ({ ocr }: Props) => {
       <ul>
         {ocr.pages.map(page =>
           page.blocks.map((block, i) => (
-            <BlockTranscript block={block} key={i} />
+            <BlockTranscript
+              block={block}
+              key={i}
+              setFocusWord={setFocusWord}
+              focusWord={focusWord}
+            />
           )),
         )}
       </ul>
@@ -34,19 +42,37 @@ const Transcript = ({ ocr }: Props) => {
 
 export default Transcript
 
-const BlockTranscript = ({ block }: { block: OcrBlock }) => {
+const BlockTranscript = ({
+  block,
+  focusWord,
+  setFocusWord,
+}: {
+  block: OcrBlock
+  focusWord: FocusWord | undefined
+  setFocusWord: Dispatch<SetStateAction<FocusWord | undefined>>
+}) => {
   const sentences = getTextForBlock(block)
+
+  const toggleSentence = (word: Word) => {
+    setFocusWord({ word, block })
+  }
 
   return (
     <li className="my-4 text-2xl tracking-wide border-b-2 border-opacity-30">
       {sentences.map((s, i) => (
-        <SentenceTranscript sentence={s} key={i} />
+        <SentenceTranscript sentence={s} key={i} toggle={toggleSentence} />
       ))}
     </li>
   )
 }
 
-const SentenceTranscript = ({ sentence }: { sentence: Sentence }) => {
+const SentenceTranscript = ({
+  sentence,
+  toggle,
+}: {
+  sentence: Sentence
+  toggle: (word: Word) => void
+}) => {
   const [cedict, setCedict] = useState<CedictResponse>({})
 
   useEffect(() => {
@@ -58,7 +84,11 @@ const SentenceTranscript = ({ sentence }: { sentence: Sentence }) => {
   return (
     <span>
       {sentence.words.map((w, i) => (
-        <ruby className="hover:bg-yellow-100 cursor-pointer group" key={i}>
+        <ruby
+          className="hover:bg-yellow-100 cursor-pointer group"
+          key={i}
+          onClick={() => toggle(w)}
+        >
           {w.text} <RubyText cedict={cedict[w.text]} word={w} />
         </ruby>
       ))}

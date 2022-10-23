@@ -1,14 +1,15 @@
 import { useEffect, useMemo, useRef } from 'react'
-import { arrayBufferToBase64, Book, OcrResult } from './domain'
+import { arrayBufferToBase64, Book, OcrBoundingBox, OcrResult } from './domain'
 import { useWindowSize } from './hooks'
 
 interface Props {
   book: Book
   index: number
   ocr: OcrResult | undefined
+  highlight: OcrBoundingBox | undefined
 }
 
-const BookPage = ({ book, index, ocr }: Props) => {
+const BookPage = ({ book, index, ocr, highlight }: Props) => {
   const imageUrl = useMemo(() => {
     return `data:image/jpeg;base64,${arrayBufferToBase64(book.pages[index])}`
   }, [book.pages, index])
@@ -48,30 +49,26 @@ const BookPage = ({ book, index, ocr }: Props) => {
 
       context.drawImage(img, x, y, width, height)
 
-      if (!ocr) {
-        return
+      const drawBoundingBox = (box: OcrBoundingBox) => {
+        const { vertices } = box
+        context.beginPath()
+        context.moveTo(x + vertices[0].x * scale, y + vertices[0].y * scale)
+        context.lineTo(x + vertices[1].x * scale, y + vertices[1].y * scale)
+        context.lineTo(x + vertices[2].x * scale, y + vertices[2].y * scale)
+        context.lineTo(x + vertices[3].x * scale, y + vertices[3].y * scale)
+        context.closePath()
+        context.strokeStyle = 'rgba(173, 216, 230, 0.5)'
+        context.lineWidth = 2
+        context.stroke()
       }
 
-      for (const page of ocr.pages) {
-        for (const block of page.blocks) {
-          const { vertices } = block.bounding_box
-          context.beginPath()
-          context.moveTo(x + vertices[0].x * scale, y + vertices[0].y * scale)
-          context.lineTo(x + vertices[1].x * scale, y + vertices[1].y * scale)
-          context.lineTo(x + vertices[2].x * scale, y + vertices[2].y * scale)
-          context.lineTo(x + vertices[3].x * scale, y + vertices[3].y * scale)
-          context.closePath()
-          context.strokeStyle = 'rgba(173, 216, 230, 0.5)'
-          context.lineWidth = 2
-          context.stroke()
-        }
+      if (highlight) {
+        drawBoundingBox(highlight)
       }
     }
 
-    return () => {
-      context.clearRect(0, 0, canvas.width, canvas.height)
-    }
-  }, [canvasRef, containerRef, imageUrl, containerSize, ocr])
+    return () => {}
+  }, [canvasRef, containerRef, imageUrl, containerSize, ocr, highlight])
 
   return (
     <div ref={containerRef} className="flex-grow relative">
