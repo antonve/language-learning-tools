@@ -1,6 +1,6 @@
-# jp-learning-tools
+# language-learning-tools
 
-Tools to help with learning Japanese.
+Tools to help with learning languages.
 
 ## Disclaimer
 
@@ -21,15 +21,15 @@ A frontend for creating Anki cards given a list of words.
 3. Make sure the Note type `ankiminer_jp` exists, check `frontend/anki/src/app/api.ts` for the format
 4. Update the deck name in `frontend/anki/src/app/api.ts` if using a different deck name
 5. Make sure to use `Syosetu scraper` to build a corpus to find example sentences
-6. Run the frontend and API
+6. Copy a `google_credentials.json` file into the project containing a JSON key for Google Cloud platform
+7. Run the frontend and API
   ```sh
   # Frontend
   cd frontend/anki
   yarn dev
 
   # API
-  export GOOGLE_APPLICATION_CREDENTIALS=/tmp/gcp_key.json
-  go run cmd/api_miner/main.go
+  make run
   ```
 
 #### Preview
