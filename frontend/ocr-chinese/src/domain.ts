@@ -39,6 +39,7 @@ export interface OcrResult {
 }
 
 export interface Word {
+  id: string
   text: string
   boundingBox: OcrBoundingBox
 }
@@ -76,8 +77,12 @@ const getTextForParagraph = (p: OcrParagraph): Sentence => {
     for (const symbol of word.symbols) {
       w.push(symbol.text)
     }
-
-    words.push({ text: w.join(''), boundingBox: word.bounding_box })
+    const text = w.join('')
+    words.push({
+      text,
+      boundingBox: word.bounding_box,
+      id: `word_${text}_${getBoundingBoxHash(word.bounding_box)}`,
+    })
   }
 
   return { words }

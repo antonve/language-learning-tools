@@ -67,7 +67,12 @@ const BlockTranscript = ({
     <>
       <li className="my-4 text-2xl tracking-wide border-b-2 border-opacity-30">
         {sentences.map((s, i) => (
-          <SentenceTranscript sentence={s} key={i} toggle={toggleSentence} />
+          <SentenceTranscript
+            sentence={s}
+            key={i}
+            toggle={toggleSentence}
+            focusWord={focusWord}
+          />
         ))}
       </li>
       <FocusWordPanel word={focusWord} block={block} />
@@ -127,9 +132,11 @@ const Reading = ({ entry }: { entry: CedictEntry }) => {
 const SentenceTranscript = ({
   sentence,
   toggle,
+  focusWord,
 }: {
   sentence: Sentence
   toggle: (word: Word, cedict: CedictEntry) => void
+  focusWord: FocusWord | undefined
 }) => {
   const [cedict, setCedict] = useState<CedictResponse>({})
 
@@ -143,7 +150,9 @@ const SentenceTranscript = ({
     <span>
       {sentence.words.map((w, i) => (
         <ruby
-          className="hover:bg-yellow-100 cursor-pointer group"
+          className={`hover:bg-yellow-100 cursor-pointer group ${
+            w.id == focusWord?.word.id ? 'bg-yellow-100' : ''
+          }`}
           key={i}
           onClick={() => toggle(w, cedict[w.text])}
         >
