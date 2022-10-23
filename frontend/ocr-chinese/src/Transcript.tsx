@@ -91,7 +91,7 @@ const FocusWordPanel = ({
   }
 
   return (
-    <li className="border-2 border-opacity-30 border-yellow-400 p-4">
+    <li className="border-2 border-opacity-30 border-yellow-400 bg-yellow-50 p-4">
       <div className="flex space-between text-4xl mb-4 justify-between">
         <h2>{word.word.text}</h2>
         <Reading entry={word.cedict} />
@@ -125,7 +125,7 @@ const SentenceTranscript = ({
   toggle,
 }: {
   sentence: Sentence
-  toggle: (word: Word) => void
+  toggle: (word: Word, cedict: CedictEntry) => void
 }) => {
   const [cedict, setCedict] = useState<CedictResponse>({})
 
