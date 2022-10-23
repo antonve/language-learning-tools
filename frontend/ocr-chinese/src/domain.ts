@@ -46,6 +46,7 @@ export interface Word {
 export interface FocusWord {
   word: Word
   block: OcrBlock
+  cedict: CedictEntry | undefined
 }
 
 export interface Sentence {
@@ -120,6 +121,37 @@ export const fetchCedict = async (words: Word[]): Promise<CedictResponse> => {
   const body = await response.json()
 
   return body
+}
+
+const zip = <T>(a: T[], b: T[]) => a.map((k, i) => [k, b[i]])
+
+export const getReadingPairs = (
+  entry: CedictEntry,
+): { reading: string; tone: number }[] => {
+  const pairs = zip(entry.pinyin_tones.split(' '), entry.pinyin.split(' '))
+
+  return pairs.map(([reading, tone]) => {
+    const t = tone.match(/\d+/)
+
+    return {
+      reading: reading.toLowerCase(),
+      tone: t ? Number(t) : -1,
+    }
+  })
+}
+
+const toneColors: { [key: number]: string } = {
+  1: 'text-red-500',
+  2: 'text-orange-500',
+  3: 'text-green-500',
+  4: 'text-blue-500',
+}
+
+export const toneToColor = (tone: number) => {
+  if (tone in toneColors) {
+    return toneColors[tone]
+  }
+  return ''
 }
 
 export interface Book {

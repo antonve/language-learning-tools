@@ -9,6 +9,8 @@ import {
   CedictEntry,
   Word,
   FocusWord,
+  getReadingPairs,
+  toneToColor,
 } from './domain'
 
 interface Props {
@@ -53,16 +55,68 @@ const BlockTranscript = ({
 }) => {
   const sentences = getTextForBlock(block)
 
-  const toggleSentence = (word: Word) => {
-    setFocusWord({ word, block })
+  const toggleSentence = (word: Word, cedict: CedictEntry) => {
+    setFocusWord({ word, block, cedict })
   }
 
   return (
-    <li className="my-4 text-2xl tracking-wide border-b-2 border-opacity-30">
-      {sentences.map((s, i) => (
-        <SentenceTranscript sentence={s} key={i} toggle={toggleSentence} />
-      ))}
+    <>
+      <li className="my-4 text-2xl tracking-wide border-b-2 border-opacity-30">
+        {sentences.map((s, i) => (
+          <SentenceTranscript sentence={s} key={i} toggle={toggleSentence} />
+        ))}
+      </li>
+      <FocusWordPanel word={focusWord} block={block} />
+    </>
+  )
+}
+
+const FocusWordPanel = ({
+  word,
+  block,
+}: {
+  word: FocusWord | undefined
+  block: OcrBlock
+}) => {
+  if (!word || block != word.block) {
+    return null
+  }
+
+  if (!word.cedict) {
+    return (
+      <li className="border-2 border-opacity-30 border-yellow-400 p-4">
+        No dictionary results
+      </li>
+    )
+  }
+
+  return (
+    <li className="border-2 border-opacity-30 border-yellow-400 p-4">
+      <div className="flex space-between text-4xl mb-4 justify-between">
+        <h2>{word.word.text}</h2>
+        <Reading entry={word.cedict} />
+        {word.cedict.hanzi_simplified != word.word.text ? (
+          <span title="simplified">{word.cedict.hanzi_simplified}</span>
+        ) : null}
+      </div>
+      <ol className="list-decimal pl-5">
+        {word.cedict.meanings.map(m => (
+          <li>{m}</li>
+        ))}
+      </ol>
     </li>
+  )
+}
+
+const Reading = ({ entry }: { entry: CedictEntry }) => {
+  const pairs = getReadingPairs(entry)
+
+  return (
+    <span>
+      {pairs.map(p => (
+        <span className={toneToColor(p.tone)}>{p.reading}</span>
+      ))}
+    </span>
   )
 }
 
@@ -87,7 +141,7 @@ const SentenceTranscript = ({
         <ruby
           className="hover:bg-yellow-100 cursor-pointer group"
           key={i}
-          onClick={() => toggle(w)}
+          onClick={() => toggle(w, cedict[w.text])}
         >
           {w.text} <RubyText cedict={cedict[w.text]} word={w} />
         </ruby>
