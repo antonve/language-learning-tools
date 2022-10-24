@@ -495,7 +495,40 @@ func (api *api) CreatePendingCard(c echo.Context) error {
 	return c.NoContent(http.StatusCreated)
 }
 
+type UpdateCardRequest struct {
+	Meta json.RawMessage `json:"meta"`
+}
+
 func (api *api) UpdateCard(c echo.Context) error {
+	body, err := io.ReadAll(c.Request().Body)
+	if err != nil {
+		log.Println("could not process request:", err)
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	req := &UpdateCardRequest{}
+	if err := json.Unmarshal(body, req); err != nil {
+		log.Println("could not process request:", err)
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	id := c.Param("id")
+	if id == "" {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	intId, err := strconv.Atoi(id)
+	if err != nil {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	if err := api.queries.UpdateCard(c.Request().Context(), postgres.UpdateCardParams{
+		Meta: req.Meta,
+		ID:   int64(intId),
+	}); err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
 	return nil
 }
 
