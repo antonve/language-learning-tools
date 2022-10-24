@@ -17,6 +17,7 @@ services:
       API_POSTGRES_PASSWORD: "hunter2"
       API_POSTGRES_DATABASE: "mining_tools"
       API_POSTGRES_SSLMODE: "disable"
+      API_PORT: 8080
       GOOGLE_APPLICATION_CREDENTIALS: /app/google_credentials.json
   postgres:
     image: postgres:14

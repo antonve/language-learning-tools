@@ -11,6 +11,7 @@ import (
 	"net/http"
 
 	"github.com/jcramb/cedict"
+	"github.com/kelseyhightower/envconfig"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
@@ -42,6 +43,18 @@ func main() {
 	e.Logger.Fatal(e.Start(":8080"))
 }
 
+type Config struct {
+	Postgres struct {
+		Host     string `valid:"required"`
+		Username string `valid:"required"`
+		Password string `valid:"required"`
+		Database string `valid:"required"`
+		SSLMode  string `valid:"required"`
+	}
+
+	Port int `valid:"required"`
+}
+
 type API interface {
 	SearchCorpus(c echo.Context) error
 	GetChapter(c echo.Context) error
@@ -52,6 +65,8 @@ type API interface {
 }
 
 type api struct {
+	config Config
+
 	jpCorpus corpus.Corpus
 	zhCorpus corpus.Corpus
 	jisho    jisho.Jisho
@@ -65,6 +80,9 @@ type api struct {
 }
 
 func NewAPI() API {
+	cfg := Config{}
+	envconfig.Process("API", &cfg)
+
 	cjp, err := corpus.New("/app/out", "jp")
 	if err != nil {
 		panic(err)
@@ -88,6 +106,7 @@ func NewAPI() API {
 	}
 
 	return &api{
+		config:     cfg,
 		jpCorpus:   cjp,
 		zhCorpus:   czh,
 		jisho:      jisho.New(),
