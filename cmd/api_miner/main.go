@@ -40,7 +40,7 @@ func main() {
 	e.POST("/zh/cedict", api.Cedict)
 	e.POST("/ocr", api.OCR)
 
-	e.Logger.Fatal(e.Start(":8080"))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", api.Config().Port)))
 }
 
 type Config struct {
@@ -62,6 +62,8 @@ type API interface {
 	GooProxy(c echo.Context) error
 	OCR(c echo.Context) error
 	Cedict(c echo.Context) error
+
+	Config() Config
 }
 
 type api struct {
@@ -117,6 +119,10 @@ func NewAPI() API {
 		ocrCache:   ocrCache,
 		cedict:     cedict.New(),
 	}
+}
+
+func (api *api) Config() Config {
+	return api.config
 }
 
 func (api *api) getCorpus(lang string) (corpus.Corpus, error) {
