@@ -20,7 +20,7 @@ insert into pending_cards (
 ) values (
   $1,
   $2,
-  $3,
+  decode($3::text, 'base64'),
   $4
 )
 returning id
@@ -29,7 +29,7 @@ returning id
 type CreatePendingCardParams struct {
 	LanguageCode string
 	Token        string
-	SourceImage  []byte
+	SourceImage  string
 	Meta         json.RawMessage
 }
 

@@ -410,7 +410,53 @@ func (api *api) ListPendingCards(c echo.Context) error {
 	return nil
 }
 
+type CreatePendingCardRequest struct {
+	LanguageCode string          `json:"language_code"`
+	Token        string          `json:"token"`
+	SourceImage  string          `json:"source_image"`
+	Meta         json.RawMessage `json:"meta"`
+}
+
+func (req *CreatePendingCardRequest) Validate() error {
+	if req.LanguageCode == "" {
+		return errors.Errorf("language_code is required")
+	}
+
+	if req.Token == "" {
+		return errors.Errorf("token is required")
+	}
+
+	return nil
+}
+
 func (api *api) CreatePendingCard(c echo.Context) error {
+	body, err := io.ReadAll(c.Request().Body)
+	if err != nil {
+		log.Println("could not process request:", err)
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	req := &CreatePendingCardRequest{}
+	if err := json.Unmarshal(body, req); err != nil {
+		log.Println("could not process request:", err)
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	if err := req.Validate(); err != nil {
+		log.Println("could not process request:", err)
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	_, err = api.queries.CreatePendingCard(c.Request().Context(), postgres.CreatePendingCardParams{
+		LanguageCode: req.LanguageCode,
+		Token:        req.Token,
+		SourceImage:  req.SourceImage,
+		Meta:         req.Meta,
+	})
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
 	return nil
 }
 

@@ -22,7 +22,7 @@ insert into pending_cards (
 ) values (
   sqlc.arg('language_code'),
   sqlc.arg('token'),
-  sqlc.arg('source_image'),
+  decode(sqlc.arg('source_image')::text, 'base64'),
   sqlc.arg('meta')
 )
 returning id;
