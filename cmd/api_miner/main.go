@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jcramb/cedict"
@@ -46,7 +47,7 @@ func main() {
 	e.GET("/pending_cards", api.ListPendingCards)
 	e.POST("/pending_cards", api.CreatePendingCard)
 	e.PUT("/pending_cards/:id", api.UpdateCard)
-	e.POST("/pending_cards/mark", api.MarkCardAsExported)
+	e.POST("/pending_cards/:id/mark", api.MarkCardAsExported)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", api.Config().Port)))
 }
@@ -412,7 +413,6 @@ func (api *api) ListPendingCards(c echo.Context) error {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-	fmt.Println(languageCode)
 	rows, err := api.queries.ListPendingCards(c.Request().Context(), languageCode)
 	if err != nil {
 		return c.NoContent(http.StatusInternalServerError)
@@ -468,7 +468,7 @@ func (api *api) CreatePendingCard(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	return nil
+	return c.NoContent(http.StatusCreated)
 }
 
 func (api *api) UpdateCard(c echo.Context) error {
@@ -476,5 +476,19 @@ func (api *api) UpdateCard(c echo.Context) error {
 }
 
 func (api *api) MarkCardAsExported(c echo.Context) error {
-	return nil
+	id := c.Param("id")
+	if id == "" {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	intId, err := strconv.Atoi(id)
+	if err != nil {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	if err := api.queries.MarkCardAsExported(c.Request().Context(), int64(intId)); err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	return c.NoContent(http.StatusCreated)
 }
