@@ -13,7 +13,7 @@ where
   and language_code = sqlc.arg('language_code')
 order by created_at asc;
 
--- name: CreatePendingCards :one
+-- name: CreatePendingCard :one
 insert into pending_cards (
   language_code,
   token,

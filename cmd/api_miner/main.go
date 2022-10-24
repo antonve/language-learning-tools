@@ -43,6 +43,11 @@ func main() {
 	e.POST("/zh/cedict", api.Cedict)
 	e.POST("/ocr", api.OCR)
 
+	e.GET("/pending_cards", api.ListPendingCards)
+	e.POST("/pending_cards", api.CreatePendingCard)
+	e.PUT("/pending_cards/:id", api.UpdateCard)
+	e.POST("/pending_cards/mark", api.MarkCardAsExported)
+
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", api.Config().Port)))
 }
 
@@ -65,6 +70,11 @@ type API interface {
 	GooProxy(c echo.Context) error
 	OCR(c echo.Context) error
 	Cedict(c echo.Context) error
+
+	ListPendingCards(c echo.Context) error
+	CreatePendingCard(c echo.Context) error
+	UpdateCard(c echo.Context) error
+	MarkCardAsExported(c echo.Context) error
 
 	Config() Config
 }
@@ -394,4 +404,20 @@ type CedictResponse struct {
 	HanziSimplified  string   `json:"hanzi_simplified"`
 	HanziTraditional string   `json:"hanzi_traditional"`
 	Meanings         []string `json:"meanings"`
+}
+
+func (api *api) ListPendingCards(c echo.Context) error {
+	return nil
+}
+
+func (api *api) CreatePendingCard(c echo.Context) error {
+	return nil
+}
+
+func (api *api) UpdateCard(c echo.Context) error {
+	return nil
+}
+
+func (api *api) MarkCardAsExported(c echo.Context) error {
+	return nil
 }

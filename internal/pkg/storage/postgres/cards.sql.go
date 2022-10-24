@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const createPendingCards = `-- name: CreatePendingCards :one
+const createPendingCard = `-- name: CreatePendingCard :one
 insert into pending_cards (
   language_code,
   token,
@@ -26,15 +26,15 @@ insert into pending_cards (
 returning id
 `
 
-type CreatePendingCardsParams struct {
+type CreatePendingCardParams struct {
 	LanguageCode string
 	Token        string
 	SourceImage  []byte
 	Meta         json.RawMessage
 }
 
-func (q *Queries) CreatePendingCards(ctx context.Context, arg CreatePendingCardsParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, createPendingCards,
+func (q *Queries) CreatePendingCard(ctx context.Context, arg CreatePendingCardParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, createPendingCard,
 		arg.LanguageCode,
 		arg.Token,
 		arg.SourceImage,
