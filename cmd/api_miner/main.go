@@ -407,7 +407,18 @@ type CedictResponse struct {
 }
 
 func (api *api) ListPendingCards(c echo.Context) error {
-	return nil
+	languageCode := c.QueryParam("language_code")
+	if languageCode == "" {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	fmt.Println(languageCode)
+	rows, err := api.queries.ListPendingCards(c.Request().Context(), languageCode)
+	if err != nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	return c.JSON(http.StatusOK, rows)
 }
 
 type CreatePendingCardRequest struct {
