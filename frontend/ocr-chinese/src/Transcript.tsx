@@ -164,11 +164,15 @@ const SentenceTranscript = ({
     <span>
       {sentence.words.map((w, i) => (
         <ruby
-          className={`hover:bg-yellow-100 cursor-pointer group ${
+          className={`group ${
             w.id == focusWord?.word.id ? 'bg-yellow-100' : ''
-          }`}
+          } ${w.text in cedict ? 'hover:bg-yellow-100 cursor-pointer' : ''}`}
           key={i}
-          onClick={() => toggle(w, cedict[w.text])}
+          onClick={() => {
+            if (w.text in cedict) {
+              toggle(w, cedict[w.text])
+            }
+          }}
         >
           {w.text} <RubyText cedict={cedict[w.text]} word={w} />
         </ruby>
