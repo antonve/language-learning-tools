@@ -3,7 +3,7 @@ select
   id,
   language_code,
   token,
-  source_image,
+  encode(source_image, 'base64') as source_image,
   meta,
   created_at,
   updated_at

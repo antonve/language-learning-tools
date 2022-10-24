@@ -407,6 +407,18 @@ type CedictResponse struct {
 	Meanings         []string `json:"meanings"`
 }
 
+type Card struct {
+	ID           int64           `json:"id"`
+	LanguageCode string          `json:"language_code"`
+	Token        string          `json:"token"`
+	SourceImage  string          `json:"source_image"`
+	Meta         json.RawMessage `json:"meta"`
+}
+
+type ListPendingCardsResponse struct {
+	Cards []Card `json:"cards"`
+}
+
 func (api *api) ListPendingCards(c echo.Context) error {
 	languageCode := c.QueryParam("language_code")
 	if languageCode == "" {
@@ -418,7 +430,19 @@ func (api *api) ListPendingCards(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	return c.JSON(http.StatusOK, rows)
+	res := &ListPendingCardsResponse{Cards: []Card{}}
+
+	for _, row := range rows {
+		res.Cards = append(res.Cards, Card{
+			ID:           row.ID,
+			LanguageCode: row.LanguageCode,
+			Token:        row.Token,
+			SourceImage:  row.SourceImage,
+			Meta:         row.Meta,
+		})
+	}
+
+	return c.JSON(http.StatusOK, res)
 }
 
 type CreatePendingCardRequest struct {

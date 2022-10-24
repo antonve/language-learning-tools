@@ -50,7 +50,7 @@ select
   id,
   language_code,
   token,
-  source_image,
+  encode(source_image, 'base64') as source_image,
   meta,
   created_at,
   updated_at
@@ -65,7 +65,7 @@ type ListPendingCardsRow struct {
 	ID           int64
 	LanguageCode string
 	Token        string
-	SourceImage  []byte
+	SourceImage  string
 	Meta         json.RawMessage
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
