@@ -71,7 +71,7 @@ const BlockTranscript = ({
 
   return (
     <>
-      <li className="my-4 text-2xl tracking-wide border-b-2 border-opacity-30">
+      <li className="my-2 text-2xl tracking-wide">
         {sentences.map((s, i) => (
           <SentenceTranscript
             sentence={s}

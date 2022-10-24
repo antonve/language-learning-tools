@@ -81,7 +81,7 @@ const Home: NextPage<{}> = () => {
         <div className="p-8 min-h-0 flex-1 overflow-auto">
           <div className="flex flex-row">
             <h2
-              className="text-xl font-bold my-4 cursor-pointer"
+              className="text-xl font-bold cursor-pointer"
               onClick={loadTranscript}
               title="Click to load transcript"
             >
