@@ -2,6 +2,8 @@ import { unzipSync } from 'fflate'
 
 const root = 'http://localhost:8080'
 
+export type CardType = 'sentence' | 'vocab'
+
 export interface OcrBoundingBox {
   vertices: {
     x: number
@@ -67,6 +69,19 @@ export const getTextForBlock = (block: OcrBlock): Sentence[] => {
   }
 
   return sentences
+}
+
+export const getRawTextForBlock = (block: OcrBlock): string => {
+  const sentences = getTextForBlock(block)
+  const res = []
+
+  for (const sentence of sentences) {
+    for (const word of sentence.words) {
+      res.push(word.text)
+    }
+  }
+
+  return res.join('')
 }
 
 const getTextForParagraph = (p: OcrParagraph): Sentence => {

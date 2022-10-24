@@ -12,13 +12,14 @@ import {
   FocusWord,
   getReadingPairs,
   toneToColor,
+  CardType,
 } from './domain'
 
 interface Props {
   ocr?: OcrResult | undefined
   focusWord: FocusWord | undefined
   setFocusWord: Dispatch<SetStateAction<FocusWord | undefined>>
-  exportWord: () => Promise<void>
+  exportWord: (cardType: CardType) => Promise<void>
 }
 
 const Transcript = ({ ocr, focusWord, setFocusWord, exportWord }: Props) => {
@@ -56,7 +57,7 @@ const BlockTranscript = ({
   block: OcrBlock
   focusWord: FocusWord | undefined
   setFocusWord: Dispatch<SetStateAction<FocusWord | undefined>>
-  exportWord: () => Promise<void>
+  exportWord: (cardType: CardType) => Promise<void>
 }) => {
   const sentences = getTextForBlock(block)
 
@@ -92,7 +93,7 @@ const FocusWordPanel = ({
 }: {
   word: FocusWord | undefined
   block: OcrBlock
-  exportWord: () => Promise<void>
+  exportWord: (cardType: CardType) => Promise<void>
 }) => {
   if (!word || block != word.block) {
     return null
@@ -116,13 +117,16 @@ const FocusWordPanel = ({
         ) : null}
       </div>
       <div className="flex">
-        <ol className="list-decimal pl-5">
+        <ol className="list-decimal pl-5 flex-grow">
           {word.cedict.meanings.map((m, i) => (
             <li key={i}>{m}</li>
           ))}
         </ol>
         <div>
-          <Button onClick={exportWord}>Export</Button>
+          <Button onClick={() => exportWord('sentence')}>
+            Export sentence
+          </Button>
+          <Button onClick={() => exportWord('vocab')}>Export vocab</Button>
         </div>
       </div>
     </li>

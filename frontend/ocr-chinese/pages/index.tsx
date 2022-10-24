@@ -9,6 +9,8 @@ import {
   OcrResult,
   FocusWord,
   createPendingCard,
+  CardType,
+  getRawTextForBlock,
 } from '../src/domain'
 import Transcript from '../src/Transcript'
 
@@ -19,7 +21,7 @@ const Home: NextPage<{}> = () => {
   const [ocr, setOcr] = useState<OcrResult>()
   const [focusWord, setFocusWord] = useState<FocusWord>()
 
-  const exportWord = () => {
+  const exportWord = (cardType: CardType) => {
     if (!focusWord) {
       return
     }
@@ -31,7 +33,15 @@ const Home: NextPage<{}> = () => {
       language_code: 'zho',
       token: focusWord.word.text,
       source_image: canvasData.slice(prefix.length),
-      meta: {},
+      meta: {
+        sentence: getRawTextForBlock(focusWord.block),
+        card_type: cardType,
+        hanzi_traditional: focusWord.cedict?.hanzi_traditional,
+        hanzi_simplified: focusWord.cedict?.hanzi_simplified,
+        pinyin: focusWord.cedict?.pinyin.toLowerCase(),
+        pinyin_tones: focusWord.cedict?.pinyin_tones.toLowerCase(),
+        meanings: focusWord.cedict?.meanings ?? [],
+      },
     })
   }
 
