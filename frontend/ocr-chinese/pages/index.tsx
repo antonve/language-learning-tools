@@ -23,7 +23,7 @@ const Home: NextPage<{}> = () => {
 
   const exportWord = (cardType: CardType) => {
     if (!focusWord) {
-      return
+      return Promise.reject()
     }
 
     const prefix = 'data:image/jpeg;base64,'
