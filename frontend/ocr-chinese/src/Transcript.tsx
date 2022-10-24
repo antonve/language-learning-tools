@@ -134,8 +134,10 @@ const Reading = ({ entry }: { entry: CedictEntry }) => {
 
   return (
     <span>
-      {pairs.map(p => (
-        <span className={toneToColor(p.tone)}>{p.reading}</span>
+      {pairs.map((p, i) => (
+        <span key={i} className={toneToColor(p.tone)}>
+          {p.reading}
+        </span>
       ))}
     </span>
   )
