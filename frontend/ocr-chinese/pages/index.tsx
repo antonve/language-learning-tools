@@ -76,23 +76,25 @@ const Home: NextPage<{}> = () => {
           setCanvasData={setCanvasData}
         />
       </div>
-      <div className="w-1/2 flex-shrink-0 p-8 border-l-2 border-gray-200">
+      <div className="w-1/2 flex-1 border-l-2 border-gray-200 flex flex-col">
         <BookNavigation book={book} page={page} setPage={setPage} />
-        <div className="flex flex-row">
-          <h2
-            className="text-xl font-bold my-4 cursor-pointer"
-            onClick={loadTranscript}
-            title="Click to load transcript"
-          >
-            Transcript
-          </h2>
+        <div className="p-8 min-h-0 flex-1 overflow-auto">
+          <div className="flex flex-row">
+            <h2
+              className="text-xl font-bold my-4 cursor-pointer"
+              onClick={loadTranscript}
+              title="Click to load transcript"
+            >
+              Transcript
+            </h2>
+          </div>
+          <Transcript
+            ocr={ocr}
+            focusWord={focusWord}
+            setFocusWord={setFocusWord}
+            exportWord={exportWord}
+          />
         </div>
-        <Transcript
-          ocr={ocr}
-          focusWord={focusWord}
-          setFocusWord={setFocusWord}
-          exportWord={exportWord}
-        />
       </div>
     </div>
   )
