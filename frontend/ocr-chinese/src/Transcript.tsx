@@ -81,7 +81,12 @@ const BlockTranscript = ({
           />
         ))}
       </li>
-      <FocusWordPanel word={focusWord} block={block} exportWord={exportWord} />
+      <FocusWordPanel
+        word={focusWord}
+        block={block}
+        exportWord={exportWord}
+        setFocusWord={setFocusWord}
+      />
     </>
   )
 }
@@ -90,10 +95,12 @@ const FocusWordPanel = ({
   word,
   block,
   exportWord,
+  setFocusWord,
 }: {
   word: FocusWord | undefined
   block: OcrBlock
   exportWord: (cardType: CardType) => Promise<void>
+  setFocusWord: Dispatch<SetStateAction<FocusWord | undefined>>
 }) => {
   if (!word || block != word.block) {
     return null
@@ -123,10 +130,28 @@ const FocusWordPanel = ({
           ))}
         </ol>
         <div>
-          <Button onClick={() => exportWord('sentence')}>
+          <Button
+            onClick={() =>
+              exportWord('sentence')
+                .then(() => setFocusWord(undefined))
+                .catch(reason =>
+                  window.alert('could not export word: ' + reason),
+                )
+            }
+          >
             Export sentence
           </Button>
-          <Button onClick={() => exportWord('vocab')}>Export vocab</Button>
+          <Button
+            onClick={() =>
+              exportWord('vocab')
+                .then(() => setFocusWord(undefined))
+                .catch(reason =>
+                  window.alert('could not export word: ' + reason),
+                )
+            }
+          >
+            Export vocab
+          </Button>
         </div>
       </div>
     </li>
