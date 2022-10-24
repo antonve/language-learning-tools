@@ -191,3 +191,25 @@ export function arrayBufferToBase64(buffer: Uint8Array) {
   }
   return window.btoa(binary)
 }
+
+export interface Card {
+  id: undefined | number
+  token: string
+  language_code: string
+  source_image: string
+  meta: object
+}
+
+export const createPendingCard = async (card: Card): Promise<void> => {
+  const url = `${root}/pending_cards`
+  const response = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(card),
+  })
+
+  if (response.status !== 201) {
+    throw new Error('could not create card')
+  }
+
+  return
+}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef } from 'react'
 import {
   arrayBufferToBase64,
   Book,
@@ -13,9 +13,10 @@ interface Props {
   index: number
   ocr: OcrResult | undefined
   focusWord: FocusWord | undefined
+  setCanvasData: Dispatch<SetStateAction<string>>
 }
 
-const BookPage = ({ book, index, ocr, focusWord }: Props) => {
+const BookPage = ({ book, index, ocr, focusWord, setCanvasData }: Props) => {
   const imageUrl = useMemo(() => {
     return `data:image/jpeg;base64,${arrayBufferToBase64(book.pages[index])}`
   }, [book.pages, index])
@@ -88,10 +89,20 @@ const BookPage = ({ book, index, ocr, focusWord }: Props) => {
         context.fillStyle = 'rgba(254, 240, 138, 0.2)'
         context.fill()
       }
+
+      setCanvasData(canvas.toDataURL('image/jpeg'))
     }
 
     return () => {}
-  }, [canvasRef, containerRef, imageUrl, containerSize, ocr, focusWord])
+  }, [
+    canvasRef,
+    containerRef,
+    imageUrl,
+    containerSize,
+    ocr,
+    focusWord,
+    setCanvasData,
+  ])
 
   return (
     <div ref={containerRef} className="flex-grow relative">

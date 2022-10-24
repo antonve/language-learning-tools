@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Button } from './Components'
 import {
   getTextForBlock,
   OcrResult,
@@ -17,9 +18,10 @@ interface Props {
   ocr?: OcrResult | undefined
   focusWord: FocusWord | undefined
   setFocusWord: Dispatch<SetStateAction<FocusWord | undefined>>
+  exportWord: () => Promise<void>
 }
 
-const Transcript = ({ ocr, focusWord, setFocusWord }: Props) => {
+const Transcript = ({ ocr, focusWord, setFocusWord, exportWord }: Props) => {
   if (!ocr) {
     return <p>Not yet loaded, click title to load.</p>
   }
@@ -34,6 +36,7 @@ const Transcript = ({ ocr, focusWord, setFocusWord }: Props) => {
               key={i}
               setFocusWord={setFocusWord}
               focusWord={focusWord}
+              exportWord={exportWord}
             />
           )),
         )}
@@ -48,10 +51,12 @@ const BlockTranscript = ({
   block,
   focusWord,
   setFocusWord,
+  exportWord,
 }: {
   block: OcrBlock
   focusWord: FocusWord | undefined
   setFocusWord: Dispatch<SetStateAction<FocusWord | undefined>>
+  exportWord: () => Promise<void>
 }) => {
   const sentences = getTextForBlock(block)
 
@@ -75,7 +80,7 @@ const BlockTranscript = ({
           />
         ))}
       </li>
-      <FocusWordPanel word={focusWord} block={block} />
+      <FocusWordPanel word={focusWord} block={block} exportWord={exportWord} />
     </>
   )
 }
@@ -83,9 +88,11 @@ const BlockTranscript = ({
 const FocusWordPanel = ({
   word,
   block,
+  exportWord,
 }: {
   word: FocusWord | undefined
   block: OcrBlock
+  exportWord: () => Promise<void>
 }) => {
   if (!word || block != word.block) {
     return null
@@ -108,11 +115,16 @@ const FocusWordPanel = ({
           <span title="simplified">{word.cedict.hanzi_simplified}</span>
         ) : null}
       </div>
-      <ol className="list-decimal pl-5">
-        {word.cedict.meanings.map(m => (
-          <li>{m}</li>
-        ))}
-      </ol>
+      <div className="flex">
+        <ol className="list-decimal pl-5">
+          {word.cedict.meanings.map((m, i) => (
+            <li key={i}>{m}</li>
+          ))}
+        </ol>
+        <div>
+          <Button onClick={exportWord}>Export</Button>
+        </div>
+      </div>
     </li>
   )
 }
