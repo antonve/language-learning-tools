@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"crypto/sha256"
+	"database/sql"
 	_ "embed"
 	"encoding/json"
 	"fmt"
@@ -10,6 +11,7 @@ import (
 	"log"
 	"net/http"
 
+	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jcramb/cedict"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/labstack/echo/v4"
@@ -21,6 +23,7 @@ import (
 	"github.com/antonve/jp-mining-tools/internal/pkg/jisho"
 	"github.com/antonve/jp-mining-tools/internal/pkg/ocr"
 	"github.com/antonve/jp-mining-tools/internal/pkg/persistedcache"
+	"github.com/antonve/jp-mining-tools/internal/pkg/storage/postgres"
 )
 
 func main() {
@@ -69,6 +72,9 @@ type API interface {
 type api struct {
 	config Config
 
+	psql    *sql.DB
+	queries *postgres.Queries
+
 	jpCorpus corpus.Corpus
 	zhCorpus corpus.Corpus
 	jisho    jisho.Jisho
@@ -107,6 +113,8 @@ func NewAPI() API {
 		panic(err)
 	}
 
+	psql := initPostgres(cfg)
+
 	return &api{
 		config:     cfg,
 		jpCorpus:   cjp,
@@ -118,7 +126,27 @@ func NewAPI() API {
 		ocr:        ocrClient,
 		ocrCache:   ocrCache,
 		cedict:     cedict.New(),
+		psql:       psql,
+		queries:    postgres.New(psql),
 	}
+}
+
+func initPostgres(config Config) *sql.DB {
+	cfg := &config.Postgres
+	conn := fmt.Sprintf(
+		"host=%s user=%s dbname=%s password=%s sslmode=%s",
+		cfg.Host,
+		cfg.Username,
+		cfg.Database,
+		cfg.Password,
+		cfg.SSLMode,
+	)
+	psql, err := sql.Open("pgx", conn)
+	if err != nil {
+		panic(fmt.Errorf("failed opening connection to postgres: %v", err))
+	}
+
+	return psql
 }
 
 func (api *api) Config() Config {
