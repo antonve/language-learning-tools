@@ -15,5 +15,5 @@
 # vendor/
 
 out/
-
+tmp/
 google_credentials.json
