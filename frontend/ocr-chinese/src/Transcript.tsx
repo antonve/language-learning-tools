@@ -129,7 +129,7 @@ const FocusWordPanel = ({
             <li key={i}>{m}</li>
           ))}
         </ol>
-        <div>
+        <div className="flex flex-col space-y-4">
           <Button
             onClick={() =>
               exportWord('sentence')
@@ -138,6 +138,7 @@ const FocusWordPanel = ({
                   window.alert('could not export word: ' + reason),
                 )
             }
+            className="bg-green-100 text-green-500 hover:bg-green-200 hover:text-green-500"
           >
             Export sentence
           </Button>
@@ -149,6 +150,7 @@ const FocusWordPanel = ({
                   window.alert('could not export word: ' + reason),
                 )
             }
+            className="bg-blue-100 text-blue-500 hover:bg-blue-200 hover:text-blue-500"
           >
             Export vocab
           </Button>
