@@ -1,4 +1,4 @@
-module github.com/antonve/jp-mining-tools
+module github.com/antonve/language-learning-tools
 
 go 1.19
 

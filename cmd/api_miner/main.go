@@ -19,12 +19,12 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
 
-	"github.com/antonve/jp-mining-tools/internal/pkg/corpus"
-	"github.com/antonve/jp-mining-tools/internal/pkg/goo"
-	"github.com/antonve/jp-mining-tools/internal/pkg/jisho"
-	"github.com/antonve/jp-mining-tools/internal/pkg/ocr"
-	"github.com/antonve/jp-mining-tools/internal/pkg/persistedcache"
-	"github.com/antonve/jp-mining-tools/internal/pkg/storage/postgres"
+	"github.com/antonve/language-learning-tools/internal/pkg/corpus"
+	"github.com/antonve/language-learning-tools/internal/pkg/goo"
+	"github.com/antonve/language-learning-tools/internal/pkg/jisho"
+	"github.com/antonve/language-learning-tools/internal/pkg/ocr"
+	"github.com/antonve/language-learning-tools/internal/pkg/persistedcache"
+	"github.com/antonve/language-learning-tools/internal/pkg/storage/postgres"
 )
 
 func main() {

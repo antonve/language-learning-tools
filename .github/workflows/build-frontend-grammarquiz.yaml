@@ -50,7 +50,7 @@ jobs:
           # Setup credentials for GitHub packages
           echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u antonve --password-stdin
           # Push images
-          IMAGE_NAME=ghcr.io/antonve/jp-learning-tools/frontend-grammarquiz
+          IMAGE_NAME=ghcr.io/antonve/language-learning-tools/frontend-grammarquiz
           docker build --no-cache -t $IMAGE_NAME:latest .
           docker tag $IMAGE_NAME:latest $IMAGE_NAME:$GITHUB_SHA
           docker push $IMAGE_NAME

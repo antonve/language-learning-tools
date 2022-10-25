@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/antonve/jp-mining-tools/internal/pkg/corpus"
+	"github.com/antonve/language-learning-tools/internal/pkg/corpus"
 )
 
 func main() {
