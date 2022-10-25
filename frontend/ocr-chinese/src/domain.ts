@@ -56,6 +56,20 @@ export interface Sentence {
   words: Word[]
 }
 
+export const getWordsFromOcrResult = (ocr: OcrResult): Word[] => {
+  const res = []
+
+  for (const page of ocr.pages) {
+    for (const block of page.blocks) {
+      const sentences = getTextForBlock(block)
+      const words = sentences.map(s => s.words)
+      res.push(...words.flat())
+    }
+  }
+
+  return Array.from(new Set(res))
+}
+
 export const getBoundingBoxHash = (box: OcrBoundingBox): string => {
   const res = ['block', ...box.vertices.map(({ x, y }) => [x, y]).flat()]
   return res.join('_')

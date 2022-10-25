@@ -378,16 +378,17 @@ func (api *api) Cedict(c echo.Context) error {
 		pinyinTones := cedict.PinyinTones(pinyin)
 		meaning := api.cedict.GetByHanzi(token)
 
-		if meaning != nil {
-			res[token] = &CedictResponse{
-				Source:           token,
-				Pinyin:           pinyin,
-				PinyinTones:      pinyinTones,
-				HanziSimplified:  meaning.Simplified,
-				HanziTraditional: meaning.Traditional,
-				Meanings:         meaning.Meanings,
-			}
+		res[token] = &CedictResponse{
+			Source:      token,
+			Pinyin:      pinyin,
+			PinyinTones: pinyinTones,
+			Meanings:    []string{},
+		}
 
+		if meaning != nil {
+			res[token].HanziSimplified = meaning.Simplified
+			res[token].HanziTraditional = meaning.Traditional
+			res[token].Meanings = meaning.Meanings
 		}
 	}
 

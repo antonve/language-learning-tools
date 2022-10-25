@@ -13,6 +13,7 @@ import {
   getReadingPairs,
   toneToColor,
   CardType,
+  getWordsFromOcrResult,
 } from './domain'
 
 interface Props {
@@ -23,6 +24,16 @@ interface Props {
 }
 
 const Transcript = ({ ocr, focusWord, setFocusWord, exportWord }: Props) => {
+  const [cedict, setCedict] = useState<CedictResponse>({})
+
+  useEffect(() => {
+    if (ocr) {
+      fetchCedict(getWordsFromOcrResult(ocr)).then(res => {
+        setCedict(res)
+      })
+    }
+  }, [ocr])
+
   if (!ocr) {
     return <p>Not yet loaded, click title to load.</p>
   }
@@ -38,6 +49,7 @@ const Transcript = ({ ocr, focusWord, setFocusWord, exportWord }: Props) => {
               setFocusWord={setFocusWord}
               focusWord={focusWord}
               exportWord={exportWord}
+              cedict={cedict}
             />
           )),
         )}
@@ -53,11 +65,13 @@ const BlockTranscript = ({
   focusWord,
   setFocusWord,
   exportWord,
+  cedict,
 }: {
   block: OcrBlock
   focusWord: FocusWord | undefined
   setFocusWord: Dispatch<SetStateAction<FocusWord | undefined>>
   exportWord: (cardType: CardType) => Promise<void>
+  cedict: CedictResponse
 }) => {
   const sentences = getTextForBlock(block)
 
@@ -78,6 +92,7 @@ const BlockTranscript = ({
             key={i}
             toggle={toggleSentence}
             focusWord={focusWord}
+            cedict={cedict}
           />
         ))}
       </li>
@@ -178,39 +193,31 @@ const SentenceTranscript = ({
   sentence,
   toggle,
   focusWord,
+  cedict,
 }: {
   sentence: Sentence
   toggle: (word: Word, cedict: CedictEntry) => void
   focusWord: FocusWord | undefined
-}) => {
-  const [cedict, setCedict] = useState<CedictResponse>({})
-
-  useEffect(() => {
-    fetchCedict(sentence.words).then(res => {
-      setCedict(res)
-    })
-  }, [sentence])
-
-  return (
-    <span>
-      {sentence.words.map((w, i) => (
-        <ruby
-          className={`group ${
-            w.id == focusWord?.word.id ? 'bg-yellow-100' : ''
-          } ${w.text in cedict ? 'hover:bg-yellow-100 cursor-pointer' : ''}`}
-          key={i}
-          onClick={() => {
-            if (w.text in cedict) {
-              toggle(w, cedict[w.text])
-            }
-          }}
-        >
-          {w.text} <RubyText cedict={cedict[w.text]} word={w} />
-        </ruby>
-      ))}
-    </span>
-  )
-}
+  cedict: CedictResponse
+}) => (
+  <span>
+    {sentence.words.map((w, i) => (
+      <ruby
+        className={`group ${
+          w.id == focusWord?.word.id ? 'bg-yellow-100' : ''
+        } ${w.text in cedict ? 'hover:bg-yellow-100 cursor-pointer' : ''}`}
+        key={i}
+        onClick={() => {
+          if (w.text in cedict) {
+            toggle(w, cedict[w.text])
+          }
+        }}
+      >
+        {w.text} <RubyText cedict={cedict[w.text]} word={w} />
+      </ruby>
+    ))}
+  </span>
+)
 
 const RubyText = ({
   cedict,
