@@ -21,16 +21,26 @@ interface Props {
   ocr: OcrResult | undefined
   focusWord: FocusWord | undefined
   setCanvasData: Dispatch<SetStateAction<string>>
+  onPrevPage: () => void
+  onNextPage: () => void
 }
 
-const BookPage = ({ book, index, ocr, focusWord, setCanvasData }: Props) => {
+const BookPage = ({
+  book,
+  index,
+  ocr,
+  focusWord,
+  setCanvasData,
+  onNextPage,
+  onPrevPage,
+}: Props) => {
   const imageUrl = useMemo(() => {
     return `data:image/jpeg;base64,${arrayBufferToBase64(book.pages[index])}`
   }, [book.pages, index])
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const [fitToScreen, setFitToScreen] = useState(false)
+  const [fitToScreen, setFitToScreen] = useState(true)
 
   const containerSize = useWindowSize(containerRef.current)
 
@@ -127,7 +137,7 @@ const BookPage = ({ book, index, ocr, focusWord, setCanvasData }: Props) => {
       className={`${fitToScreen ? 'flex-grow' : ''} relative`}
     >
       <div className="absolute left-0 top-0 bottom-0 right-0 flex z-50">
-        <div className="w-1/5" />
+        <div className="w-1/5 cursor-w-resize" onClick={onNextPage} />
         <div
           className={`w-3/5 ${
             fitToScreen ? 'cursor-zoom-in' : 'cursor-zoom-out'
@@ -137,7 +147,7 @@ const BookPage = ({ book, index, ocr, focusWord, setCanvasData }: Props) => {
             setFitToScreen(!fitToScreen)
           }}
         />
-        <div className="w-1/5" />
+        <div className="w-1/5 cursor-e-resize" onClick={onPrevPage} />
       </div>
       <canvas
         ref={canvasRef}

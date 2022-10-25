@@ -65,6 +65,20 @@ const Home: NextPage<{}> = () => {
     )
   }
 
+  function onNextPage() {
+    if (!book || book.pages.length - 1 <= page) {
+      return
+    }
+    setPage(page + 1)
+  }
+
+  function onPrevPage() {
+    if (page <= 0) {
+      return
+    }
+    setPage(page - 1)
+  }
+
   return (
     <div className="w-screen h-screen flex">
       <div className="w-1/2 h-screen flex flex-col overflow-auto">
@@ -74,10 +88,18 @@ const Home: NextPage<{}> = () => {
           ocr={ocr}
           focusWord={focusWord}
           setCanvasData={setCanvasData}
+          onNextPage={onNextPage}
+          onPrevPage={onPrevPage}
         />
       </div>
       <div className="w-1/2 flex-1 border-l-2 border-gray-200 flex flex-col">
-        <BookNavigation book={book} page={page} setPage={setPage} />
+        <BookNavigation
+          book={book}
+          page={page}
+          setPage={setPage}
+          onNextPage={onNextPage}
+          onPrevPage={onPrevPage}
+        />
         <div className="p-8 min-h-0 flex-1 overflow-auto">
           <div className="flex flex-row">
             <h2

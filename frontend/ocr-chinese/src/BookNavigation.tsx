@@ -9,23 +9,23 @@ interface Props {
   setPage: Dispatch<SetStateAction<number>>
   ocr?: OcrResult | undefined
   fetchOcr?: () => void
+  onPrevPage: () => void
+  onNextPage: () => void
 }
 
-const BookNavigation = ({ book, page, setPage }: Props) => {
-  function onNext() {
-    setPage(page + 1)
-  }
-
-  function onPrev() {
-    setPage(page - 1)
-  }
-
-  useKeyPress('ArrowLeft', onNext)
-  useKeyPress('ArrowRight', onPrev)
+const BookNavigation = ({
+  book,
+  page,
+  setPage,
+  onNextPage,
+  onPrevPage,
+}: Props) => {
+  useKeyPress('ArrowLeft', onNextPage)
+  useKeyPress('ArrowRight', onPrevPage)
 
   return (
     <div className="flex space-x-10 justify-center items-center">
-      <Button onClick={onNext} disabled={book.pages.length - 1 <= page}>
+      <Button onClick={onNextPage} disabled={book.pages.length - 1 <= page}>
         next
       </Button>
       <h1
@@ -47,7 +47,7 @@ const BookNavigation = ({ book, page, setPage }: Props) => {
           {page + 1} / {book.pages.length}
         </span>
       </h1>
-      <Button onClick={onPrev} disabled={page <= 0}>
+      <Button onClick={onPrevPage} disabled={page <= 0}>
         prev
       </Button>
     </div>
