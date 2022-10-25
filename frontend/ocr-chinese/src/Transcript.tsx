@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { Button } from './Components'
+import { Button, ButtonLink } from './Components'
 import {
   getTextForBlock,
   OcrResult,
@@ -14,6 +14,7 @@ import {
   toneToColor,
   CardType,
   getWordsFromOcrResult,
+  getRawTextForBlock,
 } from './domain'
 
 interface Props {
@@ -138,13 +139,13 @@ const FocusWordPanel = ({
           <span title="simplified">{word.cedict.hanzi_simplified}</span>
         ) : null}
       </div>
+      <ol className="list-decimal pl-5 flex-grow">
+        {word.cedict.meanings.map((m, i) => (
+          <li key={i}>{m}</li>
+        ))}
+      </ol>
       <div className="flex">
-        <ol className="list-decimal pl-5 flex-grow">
-          {word.cedict.meanings.map((m, i) => (
-            <li key={i}>{m}</li>
-          ))}
-        </ol>
-        <div className="flex flex-col space-y-4">
+        <div className="flex flex-row space-x-4 mt-4">
           <Button
             onClick={() =>
               exportWord('sentence')
@@ -169,6 +170,15 @@ const FocusWordPanel = ({
           >
             Export vocab
           </Button>
+          <ButtonLink
+            href={`https://www.mdbg.net/chinese/dictionary?page=worddict&wdrst=1&wdqb=${getRawTextForBlock(
+              word.block,
+            )}`}
+            target="_blank"
+            className="bg-violet-100 text-violet-500 hover:bg-violet-200 hover:text-violet-500"
+          >
+            Dictionary
+          </ButtonLink>
         </div>
       </div>
     </li>
