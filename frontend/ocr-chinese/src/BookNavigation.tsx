@@ -28,7 +28,20 @@ const BookNavigation = ({ book, page, setPage }: Props) => {
       <Button onClick={onNext} disabled={book.pages.length - 1 <= page}>
         next
       </Button>
-      <h1>{book.title}</h1>
+      <h1
+        onClick={() => {
+          const p =
+            parseInt(
+              window.prompt(`Skip to page (max ${book.pages.length})`) ?? '0',
+            ) - 1
+          if (p >= 0 && p < book.pages.length) {
+            setPage(p)
+          }
+        }}
+        className="cursor-pointer"
+      >
+        {book.title}
+      </h1>
       <Button onClick={onPrev} disabled={page <= 0}>
         prev
       </Button>
