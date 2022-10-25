@@ -38,9 +38,14 @@ const BookNavigation = ({ book, page, setPage }: Props) => {
             setPage(p)
           }
         }}
-        className="cursor-pointer"
+        className="cursor-pointer text-center"
+        style={{ lineHeight: 0.7 }}
       >
         {book.title}
+        <br />
+        <span style={{ fontSize: '8px' }}>
+          {page + 1} / {book.pages.length}
+        </span>
       </h1>
       <Button onClick={onPrev} disabled={page <= 0}>
         prev
