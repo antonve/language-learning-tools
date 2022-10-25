@@ -1,0 +1,29 @@
+name: build-backend
+on:
+  push:
+    paths:
+      - "cmd/**"
+      - "internal/**"
+      - "go.mod"
+      - "go.sum"
+      - "prod.Dockerfile"
+      - ".github/workflows/build-backend.yaml"
+jobs:
+  publish:
+    name: Publish Image
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Push images
+        run: |
+          # Setup credentials for GitHub packages
+          echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u antonve --password-stdin
+          # Push images
+          IMAGE_NAME=ghcr.io/antonve/language-learning-tools/backend
+          docker build --no-cache -t $IMAGE_NAME:latest -f prod.Dockerfile .
+          docker tag $IMAGE_NAME:latest $IMAGE_NAME:$GITHUB_SHA
+          docker push $IMAGE_NAME
