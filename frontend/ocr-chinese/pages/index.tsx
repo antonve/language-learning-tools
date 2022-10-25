@@ -67,7 +67,7 @@ const Home: NextPage<{}> = () => {
 
   return (
     <div className="w-screen h-screen flex">
-      <div className="flex-grow h-screen flex flex-col">
+      <div className="w-1/2 h-screen flex flex-col overflow-auto">
         <BookPage
           book={book}
           index={page}

@@ -1,4 +1,11 @@
-import { Dispatch, SetStateAction, useEffect, useMemo, useRef } from 'react'
+import {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import {
   arrayBufferToBase64,
   Book,
@@ -23,6 +30,7 @@ const BookPage = ({ book, index, ocr, focusWord, setCanvasData }: Props) => {
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const [fitToScreen, setFitToScreen] = useState(false)
 
   const containerSize = useWindowSize(containerRef.current)
 
@@ -45,10 +53,18 @@ const BookPage = ({ book, index, ocr, focusWord, setCanvasData }: Props) => {
     img.src = imageUrl
 
     img.onload = function () {
-      canvas.width = containerSize.width
-      canvas.height = containerSize.height
+      if (fitToScreen) {
+        canvas.width = containerSize.width
+        canvas.height = containerSize.height
+      } else {
+        canvas.width = img.width
+        canvas.height = img.height
+      }
 
-      let scale = Math.min(canvas.width / img.width, canvas.height / img.height)
+      let scale = fitToScreen
+        ? Math.min(canvas.width / img.width, canvas.height / img.height)
+        : 1
+      console.log(fitToScreen, scale, canvas.width, canvas.height)
       let width = img.width * scale
       let height = img.height * scale
       let x = canvas.width / 2 - width / 2
@@ -102,11 +118,31 @@ const BookPage = ({ book, index, ocr, focusWord, setCanvasData }: Props) => {
     ocr,
     focusWord,
     setCanvasData,
+    fitToScreen,
   ])
 
   return (
-    <div ref={containerRef} className="flex-grow relative">
-      <canvas ref={canvasRef} className="w-full h-full absolute" />
+    <div
+      ref={containerRef}
+      className={`${fitToScreen ? 'flex-grow' : ''} relative`}
+    >
+      <div className="absolute left-0 top-0 bottom-0 right-0 flex z-50">
+        <div className="w-1/5" />
+        <div
+          className={`w-3/5 ${
+            fitToScreen ? 'cursor-zoom-in' : 'cursor-zoom-out'
+          }`}
+          onClick={() => {
+            console.log(fitToScreen)
+            setFitToScreen(!fitToScreen)
+          }}
+        />
+        <div className="w-1/5" />
+      </div>
+      <canvas
+        ref={canvasRef}
+        className={`${fitToScreen ? 'w-full h-full absolute' : ''} z-10`}
+      />
     </div>
   )
 }
