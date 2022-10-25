@@ -14,7 +14,6 @@ interface Props {
 const BookNavigation = ({ book, page, setPage }: Props) => {
   function onNext() {
     setPage(page + 1)
-    console.log('next', page + 1)
   }
 
   function onPrev() {
@@ -26,9 +25,13 @@ const BookNavigation = ({ book, page, setPage }: Props) => {
 
   return (
     <div className="flex space-x-10 justify-center items-center">
-      <Button onClick={onNext}>next</Button>
+      <Button onClick={onNext} disabled={book.pages.length - 1 <= page}>
+        next
+      </Button>
       <h1>{book.title}</h1>
-      <Button onClick={onPrev}>prev</Button>
+      <Button onClick={onPrev} disabled={page <= 0}>
+        prev
+      </Button>
     </div>
   )
 }
