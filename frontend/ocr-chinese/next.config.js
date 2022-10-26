@@ -1,6 +1,8 @@
+const isProd = process.env.NODE_ENV === 'production'
+
 /** @type {import('next').NextConfig} */
 module.exports = {
   reactStrictMode: true,
-  basePath: '/miner/ocr-chinese',
+  assetPrefix: isProd ? 'https://tadoku.app/miner/ocr-chinese' : undefined,
   output: 'standalone',
 }
