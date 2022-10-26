@@ -2,6 +2,7 @@
 module.exports = {
   reactStrictMode: true,
   basePath: "/miner/ocr-chinese",
+  output: 'standalone',
   webpack: (config) => {
     config.module.rules.push({
       test: /\.(epub)$/i,
