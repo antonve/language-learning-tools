@@ -428,6 +428,7 @@ func (api *api) ListPendingCards(c echo.Context) error {
 
 	rows, err := api.queries.ListPendingCards(c.Request().Context(), languageCode)
 	if err != nil {
+		log.Println("could not process request:", err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
@@ -490,6 +491,7 @@ func (api *api) CreatePendingCard(c echo.Context) error {
 		Meta:         req.Meta,
 	})
 	if err != nil {
+		log.Println("could not process request:", err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
@@ -527,6 +529,7 @@ func (api *api) UpdateCard(c echo.Context) error {
 		Meta: req.Meta,
 		ID:   int64(intId),
 	}); err != nil {
+		log.Println("could not process request:", err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
@@ -545,6 +548,7 @@ func (api *api) MarkCardAsExported(c echo.Context) error {
 	}
 
 	if err := api.queries.MarkCardAsExported(c.Request().Context(), int64(intId)); err != nil {
+		log.Println("could not process request:", err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
