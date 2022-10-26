@@ -1,6 +1,9 @@
 import { unzipSync } from 'fflate'
+import getConfig from 'next/config'
 
-const root = 'http://localhost:8080'
+const { publicRuntimeConfig } = getConfig()
+
+const root = publicRuntimeConfig.API_ROOT || 'http://localhost:8080'
 
 export type CardType = 'sentence' | 'vocab'
 
