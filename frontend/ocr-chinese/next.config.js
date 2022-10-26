@@ -6,8 +6,6 @@ module.exports = {
   assetPrefix: isProd ? 'https://tadoku.app/miner/ocr-chinese' : undefined,
   output: 'standalone',
   publicRuntimeConfig: {
-    API_ROOT:
-      process.env.NEXT_PUBLIC_API_ROOT || 'http://localhost:8080',
-  }
-
+    API_ROOT: isProd ? 'https://tadoku.app/miner/api' : 'http://localhost:8080',
+  },
 }
