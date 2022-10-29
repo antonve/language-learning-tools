@@ -8,6 +8,7 @@ import { useWordCollection } from '@app/hooks'
 import AddWordsButton from '@app/components/AddWordsButton'
 import LanguageToggle from '@app/components/LanguageToggle'
 import { useState } from 'react'
+import { availableLanguages } from '@app/domain'
 
 const Home: NextPage = () => {
   const {
@@ -22,30 +23,37 @@ const Home: NextPage = () => {
 
   return (
     <Tab.Group>
-      <Layout navigation={() => (
-        <>
-          <LanguageToggle selectedLanguage='jp' languages={['jp', 'zh']} />
-          {addWords && <AddWordsButton addWords={addWords} />}
-        </>
-      )}>
-        <div className="flex">
-          <div className="w-1/6">
-            <Sidebar
-              activeId={selectedWordId}
-              updateActiveId={setSelectedWordId}
-              words={words}
-              cleanWords={cleanWords}
-            />
-          </div>
-          <div className="w-full rounded-sm">
-            <CardWizardJapanese
-              words={words}
-              id={selectedWordId}
-              updateWord={updateWord}
-              deleteWord={deleteWord}
-            />
-          </div>
-        </div>
+      <Layout
+        navigation={() => (
+          <>
+            <LanguageToggle languages={availableLanguages} />
+            {addWords && <AddWordsButton addWords={addWords} />}
+          </>
+        )}
+      >
+        <Tab.Panels>
+          <Tab.Panel>
+            <div className="flex">
+              <div className="w-1/6">
+                <Sidebar
+                  activeId={selectedWordId}
+                  updateActiveId={setSelectedWordId}
+                  words={words}
+                  cleanWords={cleanWords}
+                />
+              </div>
+              <div className="w-full rounded-sm">
+                <CardWizardJapanese
+                  words={words}
+                  id={selectedWordId}
+                  updateWord={updateWord}
+                  deleteWord={deleteWord}
+                />
+              </div>
+            </div>
+          </Tab.Panel>
+          <Tab.Panel>test</Tab.Panel>
+        </Tab.Panels>
       </Layout>
     </Tab.Group>
   )

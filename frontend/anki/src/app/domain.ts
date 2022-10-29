@@ -3,6 +3,16 @@ export interface Collection {
   selectedId: string | undefined
 }
 
+export const availableLanguages: Language[] = [
+  { code: 'jp', name: 'Japanese' },
+  { code: 'zh', name: 'Mandarin' },
+]
+
+export interface Language {
+  code: string
+  name: string
+}
+
 export type WordCollection = { [key: string]: Word }
 
 export interface Word {
