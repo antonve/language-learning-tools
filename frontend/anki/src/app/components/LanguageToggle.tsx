@@ -7,15 +7,17 @@ interface Props {
 }
 
 const LanguageToggle = ({ languages }: Props) => (
-  <div className="w-full max-w-md px-2 sm:px-0 bg-red-200">
-    <Tab.List className="flex p-1 space-x-1 bg-blue-900/20 rounded-xl">
+  <div className="w-full max-w-md ">
+    <Tab.List className="flex p-1 space-x-1 bg-purple-400 bg-opacity-10 rounded-xl flex">
       {languages.map(lang => (
         <Tab as={Fragment} key={lang.code}>
           {({ selected }) => (
             <button
-              className={
-                selected ? 'bg-blue-500 text-white' : 'bg-white text-black'
-              }
+              className={`w-full rounded-lg py-2.5 text-sm font-medium leading-5 bg-white shadow ${
+                selected
+                  ? 'bg-purple-500 text-white'
+                  : 'bg-white text-purple-500'
+              }`}
             >
               {lang.name}
             </button>
