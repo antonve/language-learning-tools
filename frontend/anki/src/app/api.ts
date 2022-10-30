@@ -6,6 +6,7 @@ import {
   sentenceWithFocusWord,
   Chapter,
 } from '@app/domain'
+import getConfig from 'next/config'
 
 interface JishoResult {
   word: string
@@ -22,7 +23,9 @@ interface Definition {
   meaning: string
 }
 
-const root = 'http://localhost:8080'
+const { publicRuntimeConfig } = getConfig()
+
+const root = publicRuntimeConfig.API_ROOT || 'http://localhost:8080'
 
 export const getChapter = async (
   lang: string,
