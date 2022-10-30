@@ -1,11 +1,7 @@
 import { useEffect } from 'react'
 
 import { Word, Sentence, WordCollection } from '@app/domain'
-import {
-  useSentences,
-  useEnglishDefition,
-  useJapaneseDefition,
-} from '@app/hooks'
+import { useSentences } from '@app/hooks'
 import Button from '@app/components/Button'
 import {
   TextInput,
@@ -16,7 +12,11 @@ import {
 } from '@app/components/Form'
 import SentenceList from '@app/components/SentenceList'
 import { addAnkiNote } from '@app/api'
-import { dictionaries } from '@app/components/ja'
+import {
+  dictionaries,
+  useEnglishDefinition,
+  useJapaneseDefinition,
+} from '@app/components/ja'
 
 const CardWizard = ({
   words,
@@ -31,8 +31,8 @@ const CardWizard = ({
 }) => {
   const word = words?.[id ?? 'none']
 
-  const { definition: english } = useEnglishDefition(word?.value)
-  const { definition: japanese } = useJapaneseDefition(word?.value)
+  const { definition: english } = useEnglishDefinition(word?.value)
+  const { definition: japanese } = useJapaneseDefinition(word?.value)
   const { sentences } = useSentences('jp', word)
 
   useEffect(() => {

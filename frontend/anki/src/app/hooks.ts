@@ -4,18 +4,11 @@ import { v4 as uuidv4 } from 'uuid'
 import {
   Chapter,
   Collection,
-  formatDefinitions,
-  Sentence,
   SentencesResult,
   Word,
   WordCollection,
 } from '@app/domain'
-import {
-  getChapter,
-  getGooDefinition,
-  getJishoDefinition,
-  getSentences,
-} from '@app/api'
+import { getChapter, getSentences } from '@app/api'
 
 export const useSentences = (lang: string, word: Word | undefined) => {
   const [sentences, setSentences] = useState(
@@ -89,97 +82,6 @@ export const useChapter = (
   }, [series, filename])
 
   return chapter
-}
-
-interface EnglishDefinitionResult {
-  word: string
-  definition: string | undefined
-  finished: boolean
-}
-
-export const useEnglishDefition = (word: string | undefined) => {
-  const [definition, setDefinition] = useState(
-    undefined as EnglishDefinitionResult | undefined,
-  )
-
-  useEffect(() => {
-    if (word === undefined) {
-      setDefinition(undefined)
-      return
-    }
-
-    setDefinition({
-      word,
-      definition: undefined,
-      finished: false,
-    })
-
-    const update = async () => {
-      const req = await getJishoDefinition(word).catch(() => ({
-        definitions: [],
-      }))
-      const def = formatDefinitions(req.definitions)
-
-      setDefinition({
-        word,
-        definition: def,
-        finished: true,
-      })
-    }
-
-    update()
-  }, [word])
-
-  return {
-    definition,
-  }
-}
-
-interface JapaneseDefinitionResult {
-  word: string
-  definition: string | undefined
-  reading: string | undefined
-  finished: boolean
-}
-
-export const useJapaneseDefition = (word: string | undefined) => {
-  const [definition, setDefinition] = useState(
-    undefined as JapaneseDefinitionResult | undefined,
-  )
-
-  useEffect(() => {
-    if (word === undefined) {
-      setDefinition(undefined)
-      return
-    }
-
-    setDefinition({
-      word,
-      definition: undefined,
-      reading: undefined,
-      finished: false,
-    })
-
-    const update = async () => {
-      const req = await getGooDefinition(word).catch(() => ({
-        definition: undefined,
-        reading: undefined,
-      }))
-
-      setDefinition({
-        word,
-        definition: req.definition,
-        reading: req.reading,
-        finished: true,
-      })
-    }
-
-    update()
-  }, [word])
-
-  return {
-    definition,
-  }
 }
 
 export const useWordCollection = (languageCode: string) => {

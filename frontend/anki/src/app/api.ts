@@ -8,24 +8,9 @@ import {
 } from '@app/domain'
 import getConfig from 'next/config'
 
-interface JishoResult {
-  word: string
-  definitions: Definition[]
-}
-
-interface GooResult {
-  word: string
-  definition: string
-  reading: string
-}
-
-interface Definition {
-  meaning: string
-}
-
 const { publicRuntimeConfig } = getConfig()
 
-const root = publicRuntimeConfig.API_ROOT || 'http://localhost:8080'
+export const root = publicRuntimeConfig.API_ROOT || 'http://localhost:8080'
 
 export const getChapter = async (
   lang: string,
@@ -37,24 +22,6 @@ export const getChapter = async (
 
   if (response.status !== 200) {
     throw new Error('not found')
-  }
-
-  const body = await response.json()
-
-  return body
-}
-
-export const getJishoDefinition = async (
-  word: string,
-): Promise<JishoResult> => {
-  const url = `${root}/jp/jisho/${encodeURI(word)}`
-  const response = await fetch(url)
-
-  if (response.status !== 200) {
-    return {
-      word,
-      definitions: [],
-    }
   }
 
   const body = await response.json()
@@ -96,23 +63,6 @@ export const getSentences = async (
   return {
     results: sentences,
   }
-}
-
-export const getGooDefinition = async (word: string): Promise<GooResult> => {
-  const url = `${root}/jp/goo/${encodeURI(word)}`
-  const response = await fetch(url)
-
-  if (response.status !== 200) {
-    return {
-      word,
-      definition: '',
-      reading: '',
-    }
-  }
-
-  const body = await response.json()
-
-  return body
 }
 
 const nl2br = (str: string | undefined) => str?.replaceAll('\n', '<br />')

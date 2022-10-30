@@ -1,11 +1,7 @@
 import { useEffect } from 'react'
 
 import { Word, Sentence, WordCollection } from '@app/domain'
-import {
-  useSentences,
-  useEnglishDefition,
-  useJapaneseDefition,
-} from '@app/hooks'
+import { useSentences } from '@app/hooks'
 import Button from '@app/components/Button'
 import {
   TextInput,
@@ -32,7 +28,7 @@ const CardWizard = ({
   const word = words?.[id ?? 'none']
 
   const { definition: english } = useEnglishDefition(word?.value)
-  const { definition: japanese } = useJapaneseDefition(word?.value)
+  const { definition: chinese } = { definition: undefined }
   const { sentences } = useSentences('zh', word)
 
   useEffect(() => {
