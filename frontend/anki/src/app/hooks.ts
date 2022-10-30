@@ -241,7 +241,7 @@ export const useWordCollection = (languageCode: string) => {
             sentence: undefined,
             reading: undefined,
             definitionEnglish: undefined,
-            definitionJapanese: undefined,
+            definitionTargetLanguage: undefined,
             vocabCard: true,
             highlight: value,
           },

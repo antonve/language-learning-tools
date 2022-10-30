@@ -57,7 +57,7 @@ const CardWizard = ({
       japanese === undefined ||
       id === undefined ||
       word === undefined ||
-      word.meta.definitionJapanese !== undefined ||
+      word.meta.definitionTargetLanguage !== undefined ||
       word.meta.reading !== undefined ||
       word.value !== japanese?.word ||
       japanese.finished === false
@@ -66,7 +66,7 @@ const CardWizard = ({
     }
 
     const newWord: Word = { ...word }
-    newWord.meta.definitionJapanese = japanese.definition
+    newWord.meta.definitionTargetLanguage = japanese.definition
     newWord.meta.reading = japanese.reading
     updateWord(newWord, id)
   }, [japanese, id])
@@ -170,11 +170,11 @@ const CardWizard = ({
             <Label htmlFor="def_jp">Definition Japanese</Label>
             <TextArea
               id="def_jp"
-              value={word.meta.definitionJapanese}
+              value={word.meta.definitionTargetLanguage}
               rows={5}
               onChange={(newDefinition: string) => {
                 const newWord: Word = { ...word }
-                newWord.meta.definitionJapanese = newDefinition
+                newWord.meta.definitionTargetLanguage = newDefinition
                 updateWord(newWord, id)
               }}
             />
@@ -250,7 +250,7 @@ const CardWizard = ({
               meta: {
                 reading: word.meta.reading,
                 definitionEnglish: word.meta.definitionEnglish,
-                definitionJapanese: word.meta.definitionJapanese,
+                definitionTargetLanguage: word.meta.definitionTargetLanguage,
                 vocabCard: word.meta.vocabCard ?? false,
                 highlight: word.meta.highlight,
                 sentence: { ...sentence },

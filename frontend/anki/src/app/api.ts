@@ -131,7 +131,7 @@ export const addAnkiNote = async (word: Word): Promise<any> => {
           Focus: word.value,
           Reading: word.meta.reading,
           EnglishDefinition: nl2br(word.meta.definitionEnglish),
-          JapaneseDefinition: nl2br(word.meta.definitionJapanese),
+          JapaneseDefinition: nl2br(word.meta.definitionTargetLanguage),
           VocabOnlyCard: word.meta.vocabCard ? '1' : '',
           Source: sourceForSentence(word.meta.sentence),
         },

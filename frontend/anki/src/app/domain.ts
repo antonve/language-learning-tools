@@ -25,7 +25,7 @@ export interface WordMeta {
   sentence: Sentence | undefined
   reading: string | undefined
   definitionEnglish: string | undefined
-  definitionJapanese: string | undefined
+  definitionTargetLanguage: string | undefined
   vocabCard: boolean
   highlight: string | undefined
 }
