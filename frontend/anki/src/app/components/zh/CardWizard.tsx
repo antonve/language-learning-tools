@@ -33,7 +33,7 @@ const CardWizard = ({
 
   const { definition: english } = useEnglishDefition(word?.value)
   const { definition: japanese } = useJapaneseDefition(word?.value)
-  const { sentences } = useSentences('jp', word)
+  const { sentences } = useSentences('zh', word)
 
   useEffect(() => {
     if (
