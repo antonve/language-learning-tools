@@ -6,6 +6,7 @@ import { useWordCollection } from '@app/hooks'
 import AddWordsButton from '@app/components/AddWordsButton'
 import LanguageToggle from '@app/components/LanguageToggle'
 import { availableLanguages } from '@app/domain'
+import CardWizard from '@app/components/zh/CardWizard'
 
 const ChineseApp: NextPage = () => {
   const language = availableLanguages['zh']
@@ -42,7 +43,14 @@ const ChineseApp: NextPage = () => {
             cleanWords={cleanWords}
           />
         </div>
-        <div className="w-full rounded-sm"></div>
+        <div className="w-full rounded-sm">
+          <CardWizard
+            words={words}
+            id={selectedWordId}
+            updateWord={updateWord}
+            deleteWord={deleteWord}
+          />
+        </div>
       </div>
     </Layout>
   )
