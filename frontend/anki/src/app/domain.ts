@@ -4,7 +4,7 @@ export interface Collection {
 }
 
 export const availableLanguages: Language[] = [
-  { code: 'jp', name: 'Japanese' },
+  { code: 'ja', name: 'Japanese' },
   { code: 'zh', name: 'Mandarin' },
 ]
 
