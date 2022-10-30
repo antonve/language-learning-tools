@@ -182,19 +182,20 @@ export const useJapaneseDefition = (word: string | undefined) => {
   }
 }
 
-export const useWordCollection = () => {
+export const useWordCollection = (languageCode: string) => {
   const [collection, setCollection] = useState({
     words: {},
     selectedId: undefined,
   } as Collection)
 
+  const collectionName = `collection_${languageCode}`
   const setPersistedCollection = (newCollection: Collection) => {
-    localStorage.setItem('collection', JSON.stringify(newCollection))
+    localStorage.setItem(collectionName, JSON.stringify(newCollection))
     setCollection(newCollection)
   }
 
   useEffect(() => {
-    const cachedCollection = localStorage.getItem('collection')
+    const cachedCollection = localStorage.getItem(collectionName)
     if (cachedCollection !== null) {
       const newCollection: Collection = JSON.parse(cachedCollection)
       if (newCollection.selectedId === undefined) {

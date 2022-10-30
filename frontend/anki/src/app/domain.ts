@@ -63,7 +63,10 @@ export const compareSentences = (s1: Sentence, s2: Sentence): boolean =>
   s1.series == s2.series &&
   s1.filename === s2.filename
 
-export const dictionaries: { name: string; url: (word: string) => string }[] = [
+export const dictionariesJapanese: {
+  name: string
+  url: (word: string) => string
+}[] = [
   {
     name: 'ALC',
     url: word => `http://eow.alc.co.jp/search?q=${encodeURI(word)}`,

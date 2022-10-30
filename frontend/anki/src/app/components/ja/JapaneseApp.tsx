@@ -9,6 +9,7 @@ import LanguageToggle from '@app/components/LanguageToggle'
 import { availableLanguages } from '@app/domain'
 
 const JapaneseApp: NextPage = () => {
+  const languageCode = 'ja'
   const {
     words,
     updateWord,
@@ -17,7 +18,7 @@ const JapaneseApp: NextPage = () => {
     cleanWords,
     selectedWordId,
     setSelectedWordId,
-  } = useWordCollection()
+  } = useWordCollection(languageCode)
 
   return (
     <Layout
@@ -25,7 +26,7 @@ const JapaneseApp: NextPage = () => {
         <>
           <LanguageToggle
             languages={availableLanguages}
-            selectedLanguageCode={'ja'}
+            selectedLanguageCode={languageCode}
           />
           {addWords && <AddWordsButton addWords={addWords} />}
         </>

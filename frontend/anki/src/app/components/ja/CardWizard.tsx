@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 
-import { Word, Sentence, WordCollection, dictionaries } from '@app/domain'
+import { Word, Sentence, WordCollection } from '@app/domain'
 import {
   useSentences,
   useEnglishDefition,
@@ -16,6 +16,7 @@ import {
 } from '@app/components/Form'
 import SentenceList from '@app/components/SentenceList'
 import { addAnkiNote } from '@app/api'
+import { dictionaries } from '@app/components/ja'
 
 const CardWizard = ({
   words,
