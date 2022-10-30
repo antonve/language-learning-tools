@@ -7,7 +7,7 @@ import AddWordsButton from '@app/components/AddWordsButton'
 import LanguageToggle from '@app/components/LanguageToggle'
 import { availableLanguages } from '@app/domain'
 
-const Chinese: NextPage = () => {
+const ChineseApp: NextPage = () => {
   const {
     words,
     updateWord,
@@ -45,4 +45,4 @@ const Chinese: NextPage = () => {
   )
 }
 
-export default Chinese
+export default ChineseApp

@@ -2,13 +2,13 @@ import type { NextPage } from 'next'
 
 import Layout from '@app/components/Layout'
 import Sidebar from '@app/components/Sidebar'
-import CardWizardJapanese from '@app/components/CardWizardJapanese'
+import CardWizard from '@app/components/ja/CardWizard'
 import { useWordCollection } from '@app/hooks'
 import AddWordsButton from '@app/components/AddWordsButton'
 import LanguageToggle from '@app/components/LanguageToggle'
 import { availableLanguages } from '@app/domain'
 
-const Japanese: NextPage = () => {
+const JapaneseApp: NextPage = () => {
   const {
     words,
     updateWord,
@@ -41,7 +41,7 @@ const Japanese: NextPage = () => {
           />
         </div>
         <div className="w-full rounded-sm">
-          <CardWizardJapanese
+          <CardWizard
             words={words}
             id={selectedWordId}
             updateWord={updateWord}
@@ -53,4 +53,4 @@ const Japanese: NextPage = () => {
   )
 }
 
-export default Japanese
+export default JapaneseApp

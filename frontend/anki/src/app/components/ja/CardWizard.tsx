@@ -17,7 +17,7 @@ import {
 import SentenceList from '@app/components/SentenceList'
 import { addAnkiNote } from '@app/api'
 
-const CardWizardJapanese = ({
+const CardWizard = ({
   words,
   id,
   updateWord,
@@ -32,7 +32,7 @@ const CardWizardJapanese = ({
 
   const { definition: english } = useEnglishDefition(word?.value)
   const { definition: japanese } = useJapaneseDefition(word?.value)
-  const { sentences } = useSentences("jp", word)
+  const { sentences } = useSentences('jp', word)
 
   useEffect(() => {
     if (
@@ -127,7 +127,7 @@ const CardWizardJapanese = ({
                 const newWord: Word = { ...word }
                 if (newWord.meta.sentence === undefined) {
                   newWord.meta.sentence = {
-                    language: "jp",
+                    language: 'jp',
                     line: '',
                     filename: undefined,
                     series: undefined,
@@ -263,4 +263,4 @@ const CardWizardJapanese = ({
   )
 }
 
-export default CardWizardJapanese
+export default CardWizard

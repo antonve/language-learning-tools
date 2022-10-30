@@ -2,17 +2,17 @@ import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import Error from 'next/error'
 
-import Chinese from '@app/components/Chinese'
-import Japanese from '@app/components/Japanese'
+import ChineseApp from '@app/components/zh/ChineseApp'
+import JapaneseApp from '@app/components/ja/JapaneseApp'
 
 const Home: NextPage = () => {
   const router = useRouter()
 
   switch (router.query.lang) {
     case 'ja':
-      return <Japanese />
+      return <JapaneseApp />
     case 'zh':
-      return <Chinese />
+      return <ChineseApp />
     case undefined: // needed to prevent flash of 404 on initial load
       return null
   }
