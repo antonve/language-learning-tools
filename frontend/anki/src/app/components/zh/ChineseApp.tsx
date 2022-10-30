@@ -8,7 +8,7 @@ import LanguageToggle from '@app/components/LanguageToggle'
 import { availableLanguages } from '@app/domain'
 
 const ChineseApp: NextPage = () => {
-  const languageCode = 'zh'
+  const language = availableLanguages['zh']
   const {
     words,
     updateWord,
@@ -17,17 +17,19 @@ const ChineseApp: NextPage = () => {
     cleanWords,
     selectedWordId,
     setSelectedWordId,
-  } = useWordCollection(languageCode)
+  } = useWordCollection(language.code)
 
   return (
     <Layout
       navigation={() => (
         <>
           <LanguageToggle
-            languages={availableLanguages}
-            selectedLanguageCode={languageCode}
+            languages={Object.values(availableLanguages)}
+            selectedLanguageCode={language.code}
           />
-          {addWords && <AddWordsButton addWords={addWords} />}
+          {addWords && (
+            <AddWordsButton addWords={addWords} language={language} />
+          )}
         </>
       )}
     >

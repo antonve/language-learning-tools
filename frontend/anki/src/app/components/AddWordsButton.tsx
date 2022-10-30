@@ -2,9 +2,11 @@ import { useState } from 'react'
 import Button from '@app/components/Button'
 import Modal from '@app/components/Modal'
 import { TextArea, Label } from '@app/components/Form'
+import { Language } from '@app/domain'
 
 interface Props {
   addWords: (words: string[]) => void
+  language: Language
 }
 
 const AddWordsButton = ({ addWords }: Props) => {
@@ -29,7 +31,13 @@ const AddWordsButton = ({ addWords }: Props) => {
         <form onSubmit={saveWords}>
           <div className="mb-4 w-96">
             <Label htmlFor="words">Words (one per line)</Label>
-            <TextArea id="words" rows={20} value={words} onChange={setWords} autoFocus={true} />
+            <TextArea
+              id="words"
+              rows={20}
+              value={words}
+              onChange={setWords}
+              autoFocus={true}
+            />
           </div>
 
           <div className="flex justify-end gap-x-4">
