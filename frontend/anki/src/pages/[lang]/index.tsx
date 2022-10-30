@@ -1,58 +1,23 @@
 import type { NextPage } from 'next'
+import { useRouter } from 'next/router'
+import Error from 'next/error'
 
-import Layout from '@app/components/Layout'
-import Sidebar from '@app/components/Sidebar'
-import CardWizardJapanese from '@app/components/CardWizardJapanese'
-import { useWordCollection } from '@app/hooks'
-import AddWordsButton from '@app/components/AddWordsButton'
-import LanguageToggle from '@app/components/LanguageToggle'
-import { availableLanguages } from '@app/domain'
-import { useRouter } from 'next/dist/client/router'
+import Chinese from '@app/components/Chinese'
+import Japanese from '@app/components/Japanese'
 
 const Home: NextPage = () => {
-  const {
-    words,
-    updateWord,
-    deleteWord,
-    addWords,
-    cleanWords,
-    selectedWordId,
-    setSelectedWordId,
-  } = useWordCollection()
   const router = useRouter()
 
-  return (
-    <Layout
-      navigation={() => (
-        <>
-          <LanguageToggle
-            languages={availableLanguages}
-            selectedLanguageCode={router.query.lang as string}
-          />
-          {addWords && <AddWordsButton addWords={addWords} />}
-        </>
-      )}
-    >
-      <div className="flex">
-        <div className="w-1/6">
-          <Sidebar
-            activeId={selectedWordId}
-            updateActiveId={setSelectedWordId}
-            words={words}
-            cleanWords={cleanWords}
-          />
-        </div>
-        <div className="w-full rounded-sm">
-          <CardWizardJapanese
-            words={words}
-            id={selectedWordId}
-            updateWord={updateWord}
-            deleteWord={deleteWord}
-          />
-        </div>
-      </div>
-    </Layout>
-  )
+  switch (router.query.lang) {
+    case 'ja':
+      return <Japanese />
+    case 'zh':
+      return <Chinese />
+    case undefined: // needed to prevent flash of 404 on initial load
+      return null
+  }
+
+  return <Error statusCode={404} />
 }
 
 export default Home
