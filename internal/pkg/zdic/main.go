@@ -32,10 +32,12 @@ func (z *zdic) Search(word string) (*Result, error) {
 	}
 
 	readings := z.getReadings(doc)
-	fmt.Println(readings)
-	if readings != nil {
-		res.Pinyin = readings.Pinyin
-		res.Zhuyin = readings.Zhuyin
+	res.Pinyin = readings.Pinyin
+	res.Zhuyin = readings.Zhuyin
+	res.AudioURL = readings.Audio
+
+	if res.AudioURL == "" {
+		res.AudioURL = fmt.Sprintf("https://tts.baidu.com/text2audio?tex=%s&cuid=dict&lan=ZH&ctp=5&pdt=20&vol=9", word)
 	}
 
 	return res, nil
@@ -63,6 +65,11 @@ func (z *zdic) getReadings(doc *html.Node) *Readings {
 		res.Zhuyin = htmlquery.InnerText(zhuyin)
 	}
 
+	audio := htmlquery.FindOne(doc, "//*[@class=\"z_py\"]//*[contains(@class, \"audio_play_button\")][1]")
+	if audio != nil {
+		res.Audio = htmlquery.SelectAttr(audio, "data-src-mp3")
+	}
+
 	// Pattern 2: Compound words
 	nodes := htmlquery.Find(doc, "//*[contains(@class, \"entry_title\")][1]//*[contains(@class, \"dicpy\")]")
 
@@ -80,6 +87,7 @@ func (z *zdic) getReadings(doc *html.Node) *Readings {
 type Readings struct {
 	Pinyin string
 	Zhuyin string
+	Audio  string
 }
 
 type Result struct {
