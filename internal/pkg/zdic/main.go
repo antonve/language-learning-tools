@@ -91,11 +91,9 @@ type Readings struct {
 }
 
 type Result struct {
-	Word             string
-	Pinyin           string
-	Zhuyin           string
-	AudioURL         string
-	HanziSimplified  string
-	HanziTraditional string
-	Definition       string
+	Word       string
+	Pinyin     string
+	Zhuyin     string
+	AudioURL   string
+	Definition string
 }

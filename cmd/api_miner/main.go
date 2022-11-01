@@ -425,9 +425,23 @@ func (api *api) Zdic(c echo.Context) error {
 	b := new(bytes.Buffer)
 	enc := json.NewEncoder(b)
 	enc.SetEscapeHTML(false)
-	enc.Encode(res)
+	enc.Encode(&ZdicResponse{
+		Source:     res.Word,
+		Pinyin:     res.Pinyin,
+		Zhuyin:     res.Zhuyin,
+		AudioURL:   res.AudioURL,
+		Definition: res.Definition,
+	})
 
 	return c.JSONBlob(http.StatusOK, b.Bytes())
+}
+
+type ZdicResponse struct {
+	Source     string `json:"source"`
+	Pinyin     string `json:"pinyin"`
+	Zhuyin     string `json:"zhuyin"`
+	AudioURL   string `json:"audio_url"`
+	Definition string `json:"definition"`
 }
 
 type Card struct {
