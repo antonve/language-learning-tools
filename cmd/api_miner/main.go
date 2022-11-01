@@ -25,6 +25,7 @@ import (
 	"github.com/antonve/language-learning-tools/internal/pkg/ocr"
 	"github.com/antonve/language-learning-tools/internal/pkg/persistedcache"
 	"github.com/antonve/language-learning-tools/internal/pkg/storage/postgres"
+	"github.com/antonve/language-learning-tools/internal/pkg/zdic"
 )
 
 func main() {
@@ -42,6 +43,7 @@ func main() {
 	e.GET("/jp/jisho/:token", api.JishoProxy)
 	e.GET("/jp/goo/:token", api.GooProxy)
 	e.POST("/zh/cedict", api.Cedict)
+	e.GET("/zh/zdic/:token", api.Zdic)
 	e.POST("/ocr", api.OCR)
 
 	e.GET("/pending_cards", api.ListPendingCards)
@@ -71,6 +73,7 @@ type API interface {
 	GooProxy(c echo.Context) error
 	OCR(c echo.Context) error
 	Cedict(c echo.Context) error
+	Zdic(c echo.Context) error
 
 	ListPendingCards(c echo.Context) error
 	CreatePendingCard(c echo.Context) error
@@ -91,11 +94,12 @@ type api struct {
 	jisho    jisho.Jisho
 	goo      goo.Goo
 	ocr      ocr.Client
+	cedict   *cedict.Dict
+	zdic     zdic.Zdic
 
 	jishoCache map[string]*JishoProxyResponse
 	gooCache   map[string]*GooProxyResponse
 	ocrCache   persistedcache.PersistedCache
-	cedict     *cedict.Dict
 }
 
 func NewAPI() API {
@@ -137,6 +141,7 @@ func NewAPI() API {
 		ocr:        ocrClient,
 		ocrCache:   ocrCache,
 		cedict:     cedict.New(),
+		zdic:       zdic.New(),
 		psql:       psql,
 		queries:    postgres.New(psql),
 	}
@@ -406,6 +411,23 @@ type CedictResponse struct {
 	HanziSimplified  string   `json:"hanzi_simplified"`
 	HanziTraditional string   `json:"hanzi_traditional"`
 	Meanings         []string `json:"meanings"`
+}
+
+func (api *api) Zdic(c echo.Context) error {
+	token := c.Param("token")
+
+	res, err := api.zdic.Search(token)
+	if err != nil {
+		fmt.Println(err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	b := new(bytes.Buffer)
+	enc := json.NewEncoder(b)
+	enc.SetEscapeHTML(false)
+	enc.Encode(res)
+
+	return c.JSONBlob(http.StatusOK, b.Bytes())
 }
 
 type Card struct {
