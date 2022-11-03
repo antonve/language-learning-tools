@@ -1,4 +1,10 @@
-import { formatDefinitions } from '@app/domain'
+import {
+  formatDefinitions,
+  nl2br,
+  sentenceWithFocusWord,
+  sourceForSentence,
+  Word,
+} from '@app/domain'
 import { useEffect, useState } from 'react'
 import { getGooDefinition, getJishoDefinition } from './api'
 
@@ -134,3 +140,40 @@ export const useJapaneseDefinition = (word: string | undefined) => {
     definition,
   }
 }
+
+const deckName = '3. Japanese::3. Vocab'
+export const exportRequestForWord = (word: Word) => ({
+  action: 'addNote',
+  version: 6,
+  params: {
+    note: {
+      deckName,
+      modelName: 'ankiminer_jp',
+      fields: {
+        Expression: sentenceWithFocusWord(word),
+        Focus: word.value,
+        Reading: word.meta.reading,
+        EnglishDefinition: nl2br(word.meta.definitionEnglish),
+        JapaneseDefinition: nl2br(word.meta.definitionTargetLanguage),
+        VocabOnlyCard: word.meta.vocabCard ? '1' : '',
+        Source: sourceForSentence(word.meta.sentence),
+      },
+      options: {
+        allowDuplicate: false,
+        duplicateScope: 'deck',
+        duplicateScopeOptions: {
+          deckName,
+          checkChildren: false,
+          checkAllModels: false,
+        },
+      },
+      tags: [
+        'ankiminer',
+        'japanese',
+        'mined',
+        'native',
+        word.meta.sentence?.series,
+      ].filter(t => t !== undefined),
+    },
+  },
+})

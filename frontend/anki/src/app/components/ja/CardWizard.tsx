@@ -14,6 +14,7 @@ import SentenceList from '@app/components/SentenceList'
 import { addAnkiNote } from '@app/api'
 import {
   dictionaries,
+  exportRequestForWord,
   useEnglishDefinition,
   useJapaneseDefinition,
 } from '@app/components/ja'
@@ -77,7 +78,7 @@ const CardWizard = ({
 
   const exportNote = async () => {
     try {
-      await addAnkiNote(word)
+      await addAnkiNote(exportRequestForWord(word))
 
       const ids = Object.entries(words)
         .filter(([_, word]) => !word.done)

@@ -1,4 +1,10 @@
-import { formatDefinitions } from '@app/domain'
+import {
+  formatDefinitions,
+  nl2br,
+  sentenceWithFocusWord,
+  sourceForSentence,
+  Word,
+} from '@app/domain'
 import { useEffect, useState } from 'react'
 import { getCedictDefinition, getZdicDefinition } from './api'
 
@@ -121,3 +127,46 @@ export const useChineseDefinition = (word: string | undefined) => {
     definition,
   }
 }
+
+const deckName = '2. Chinese::Mined'
+export const exportRequestForWord = (word: Word) => ({
+  action: 'addNote',
+  version: 6,
+  params: {
+    note: {
+      deckName,
+      modelName: 'chinese native with focus word',
+      fields: {
+        Expression: sentenceWithFocusWord(word),
+        Focus: word.value,
+        Pinyin: word.meta.reading,
+        Zhuyin: word.meta.zhuyin,
+        EnglishDefinition: nl2br(word.meta.definitionEnglish),
+        ChineseDefinition: nl2br(word.meta.definitionTargetLanguage),
+        VocabOnlyCard: word.meta.vocabCard ? '1' : '',
+        Source: sourceForSentence(word.meta.sentence),
+      },
+      options: {
+        allowDuplicate: false,
+        duplicateScope: 'deck',
+        duplicateScopeOptions: {
+          deckName,
+          checkChildren: false,
+          checkAllModels: false,
+        },
+      },
+      tags: [
+        'ankiminer',
+        'chinese',
+        'mined',
+        'native',
+        word.meta.sentence?.series,
+      ].filter(t => t !== undefined),
+      audio: {
+        filename: `chinese_word_${word.value}.mp3`,
+        url: word.meta.audioUrl,
+        fields: ['Audio'],
+      },
+    },
+  },
+})

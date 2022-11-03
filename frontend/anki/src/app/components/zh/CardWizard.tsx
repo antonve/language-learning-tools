@@ -14,6 +14,7 @@ import SentenceList from '@app/components/SentenceList'
 import { addAnkiNote } from '@app/api'
 import {
   dictionaries,
+  exportRequestForWord,
   useChineseDefinition,
   useEnglishDefinition,
 } from '@app/components/zh'
@@ -70,12 +71,10 @@ const CardWizard = ({
     const newWord: Word = { ...word }
     newWord.meta.definitionTargetLanguage = chinese.definition
     newWord.meta.audioUrl = chinese.audioUrl
-    if (chinese.pinyin && chinese.zhuyin) {
-      newWord.meta.reading = {
-        pinyin: chinese.pinyin,
-        zhuyin: chinese.zhuyin,
-      }
+    if (chinese.pinyin) {
+      newWord.meta.reading = chinese.pinyin
     }
+    newWord.meta.zhuyin = chinese.zhuyin
     updateWord(newWord, id)
   }, [chinese, id])
 
@@ -85,7 +84,7 @@ const CardWizard = ({
 
   const exportNote = async () => {
     try {
-      await addAnkiNote(word)
+      await addAnkiNote(exportRequestForWord(word))
 
       const ids = Object.entries(words)
         .filter(([_, word]) => !word.done)
@@ -167,10 +166,10 @@ const CardWizard = ({
               <Label htmlFor="reading">Pinyin</Label>
               <TextInput
                 id="reading"
-                value={word.meta.reading?.pinyin}
+                value={word.meta.reading}
                 onChange={(newReading: string) => {
                   const newWord: Word = { ...word }
-                  newWord.meta.reading.pinyin = newReading
+                  newWord.meta.reading = newReading
                   updateWord(newWord, id)
                 }}
               />
@@ -179,10 +178,10 @@ const CardWizard = ({
               <Label htmlFor="reading">Zhuyin</Label>
               <TextInput
                 id="reading"
-                value={word.meta.reading?.zhuyin}
+                value={word.meta.zhuyin}
                 onChange={(newReading: string) => {
                   const newWord: Word = { ...word }
-                  newWord.meta.reading.zhuyin = newReading
+                  newWord.meta.zhuyin = newReading
                   updateWord(newWord, id)
                 }}
               />

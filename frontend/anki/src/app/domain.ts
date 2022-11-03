@@ -21,17 +21,13 @@ export interface Word {
   meta: WordMeta
 }
 
-export interface ChineseReading {
-  pinyin?: string
-  zhuyin?: string
-}
-
 export interface WordMeta {
   sentence: Sentence | undefined
-  reading: string | ChineseReading | undefined
+  reading: string | undefined
+  zhuyin?: string | undefined
   definitionEnglish: string | undefined
   definitionTargetLanguage: string | undefined
-  audioUrl: string | undefined
+  audioUrl?: string | undefined
   vocabCard: boolean
   highlight: string | undefined
 }
@@ -92,3 +88,6 @@ export const sentenceWithFocusWord = (word: Word): string => {
   const target = word.meta.highlight ?? word.value
   return word.meta.sentence.line.replaceAll(target, `<b>${target}</b>`)
 }
+
+export const nl2br = (str: string | undefined) =>
+  str?.replaceAll('\n', '<br />')
