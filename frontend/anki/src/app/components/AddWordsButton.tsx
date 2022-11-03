@@ -9,7 +9,7 @@ interface Props {
   language: Language
 }
 
-const AddWordsButton = ({ addWords }: Props) => {
+const AddWordsButton = ({ addWords, language }: Props) => {
   const [isOpen, setIsOpen] = useState(false)
   const [words, setWords] = useState('')
 

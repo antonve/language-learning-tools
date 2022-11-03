@@ -7,6 +7,8 @@ import AddWordsButton from '@app/components/AddWordsButton'
 import LanguageToggle from '@app/components/LanguageToggle'
 import { availableLanguages } from '@app/domain'
 import CardWizard from '@app/components/zh/CardWizard'
+import Button from '../Button'
+import { getPendingCards } from './api'
 
 const ChineseApp: NextPage = () => {
   const language = availableLanguages['zh']
@@ -29,7 +31,16 @@ const ChineseApp: NextPage = () => {
             selectedLanguageCode={language.code}
           />
           {addWords && (
-            <AddWordsButton addWords={addWords} language={language} />
+            <div className="space-x-4">
+              <AddWordsButton addWords={addWords} language={language} />
+              <Button
+                onClick={() => {
+                  getPendingCards().then(c => console.log(JSON.stringify(c)))
+                }}
+              >
+                Import words
+              </Button>
+            </div>
           )}
         </>
       )}
