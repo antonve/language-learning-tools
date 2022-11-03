@@ -18,6 +18,7 @@ import {
   useChineseDefinition,
   useEnglishDefinition,
 } from '@app/components/zh'
+import { markCardAsExported } from './api'
 
 const CardWizard = ({
   words,
@@ -82,7 +83,9 @@ const CardWizard = ({
     return <div className="px-8 py-6 w-1/2">Select a word to add</div>
   }
 
-  const exportNote = async () => {
+  const exportNote = async (e: Event) => {
+    e.preventDefault()
+
     try {
       await addAnkiNote(exportRequestForWord(word))
 
@@ -94,6 +97,10 @@ const CardWizard = ({
       const newWord: Word = { ...word }
       newWord.done = true
       updateWord(newWord, id, ids[nextIndex])
+
+      if (word.meta.externalId) {
+        markCardAsExported(word.meta.externalId)
+      }
     } catch (e) {
       window.alert(e)
     }
@@ -241,6 +248,10 @@ const CardWizard = ({
                 const newWord: Word = { ...word }
                 newWord.done = !word.done
                 updateWord(newWord, id)
+
+                if (word.meta.externalId && newWord.done) {
+                  markCardAsExported(word.meta.externalId)
+                }
               }}
             >
               Mark as {word.done ? 'WIP' : 'Done'}

@@ -41,7 +41,14 @@ const ChineseApp: NextPage = () => {
                     value: c.token,
                     done: false,
                     meta: {
-                      sentence: undefined,
+                      sentence: {
+                        language: 'zh',
+                        series: undefined,
+                        filename: undefined,
+                        chapter: undefined,
+                        line: c.meta.sentence,
+                        original: c.meta.sentence,
+                      },
                       reading: c.meta.pinyin_tones,
                       zhuyin: undefined,
                       definitionEnglish: formatDefinitions(

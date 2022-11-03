@@ -86,3 +86,12 @@ export const getPendingCards = async (): Promise<PendingCardsResponse> => {
 
   return body
 }
+
+export const markCardAsExported = async (id: number): Promise<void> => {
+  const url = `${root}/pending_cards/${id}/mark`
+  const response = await fetch(url, { method: 'post' })
+
+  if (response.status !== 200) {
+    return Promise.reject()
+  }
+}
