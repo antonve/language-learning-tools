@@ -278,11 +278,7 @@ const CardWizard = ({
             const newWord: Word = {
               ...word,
               meta: {
-                reading: word.meta.reading,
-                definitionEnglish: word.meta.definitionEnglish,
-                definitionTargetLanguage: word.meta.definitionTargetLanguage,
-                vocabCard: word.meta.vocabCard ?? false,
-                highlight: word.meta.highlight,
+                ...word.meta,
                 sentence: { ...sentence },
               },
             }
