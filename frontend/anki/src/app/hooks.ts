@@ -160,6 +160,15 @@ export const useWordCollection = (languageCode: string) => {
     setWords({ ...collection.words, ...newCollection })
   }
 
+  const importWords = (words: Word[]) => {
+    const newCollection: WordCollection = words.reduce((collection, word) => {
+      collection[uuidv4()] = word
+      return collection
+    }, {} as WordCollection)
+
+    setWords({ ...collection.words, ...newCollection })
+  }
+
   const deleteWord = (id: string) => {
     const newCollection = { ...collection.words }
     delete newCollection[id]
@@ -195,6 +204,7 @@ export const useWordCollection = (languageCode: string) => {
     words: collection.words,
     updateWord,
     addWords,
+    importWords,
     cleanWords,
     deleteWord,
     selectedWordId: collection.selectedId,

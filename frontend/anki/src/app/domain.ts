@@ -30,6 +30,7 @@ export interface WordMeta {
   audioUrl?: string | undefined
   vocabCard: boolean
   highlight: string | undefined
+  externalId?: number
 }
 
 interface Definition {

@@ -5,7 +5,7 @@ import Sidebar from '@app/components/Sidebar'
 import { useWordCollection } from '@app/hooks'
 import AddWordsButton from '@app/components/AddWordsButton'
 import LanguageToggle from '@app/components/LanguageToggle'
-import { availableLanguages } from '@app/domain'
+import { availableLanguages, formatDefinitions } from '@app/domain'
 import CardWizard from '@app/components/zh/CardWizard'
 import Button from '../Button'
 import { getPendingCards } from './api'
@@ -17,6 +17,7 @@ const ChineseApp: NextPage = () => {
     updateWord,
     deleteWord,
     addWords,
+    importWords,
     cleanWords,
     selectedWordId,
     setSelectedWordId,
@@ -34,8 +35,25 @@ const ChineseApp: NextPage = () => {
             <div className="space-x-4">
               <AddWordsButton addWords={addWords} language={language} />
               <Button
-                onClick={() => {
-                  getPendingCards().then(c => console.log(JSON.stringify(c)))
+                onClick={async () => {
+                  const res = await getPendingCards()
+                  const words = res.cards.map(c => ({
+                    value: c.token,
+                    done: false,
+                    meta: {
+                      sentence: undefined,
+                      reading: c.meta.pinyin_tones,
+                      zhuyin: undefined,
+                      definitionEnglish: formatDefinitions(
+                        c.meta.meanings.map(m => ({ meaning: m })),
+                      ),
+                      definitionTargetLanguage: undefined,
+                      vocabCard: c.meta.card_type === 'vocab',
+                      highlight: c.token,
+                      externalId: c.id,
+                    },
+                  }))
+                  importWords(words)
                 }}
               >
                 Import words
