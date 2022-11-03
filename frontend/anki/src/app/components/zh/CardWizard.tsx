@@ -12,7 +12,11 @@ import {
 } from '@app/components/Form'
 import SentenceList from '@app/components/SentenceList'
 import { addAnkiNote } from '@app/api'
-import { dictionaries } from '@app/components/zh'
+import {
+  dictionaries,
+  useChineseDefinition,
+  useEnglishDefinition,
+} from '@app/components/zh'
 
 const CardWizard = ({
   words,
@@ -27,8 +31,8 @@ const CardWizard = ({
 }) => {
   const word = words?.[id ?? 'none']
 
-  const { definition: english } = useEnglishDefition(word?.value)
-  const { definition: chinese } = { definition: undefined }
+  const { definition: english } = useEnglishDefinition(word?.value)
+  const { definition: chinese } = useChineseDefinition(word?.value)
   const { sentences } = useSentences('zh', word)
 
   useEffect(() => {
@@ -45,27 +49,27 @@ const CardWizard = ({
 
     const newWord: Word = { ...word }
     newWord.meta.definitionEnglish = english.definition
+    newWord.meta.reading = english.pinyin.pretty
     updateWord(newWord, id)
   }, [english, id])
 
   useEffect(() => {
     if (
-      japanese === undefined ||
+      chinese === undefined ||
       id === undefined ||
       word === undefined ||
       word.meta.definitionTargetLanguage !== undefined ||
       word.meta.reading !== undefined ||
-      word.value !== japanese?.word ||
-      japanese.finished === false
+      word.value !== chinese?.word ||
+      chinese.finished === false
     ) {
       return
     }
 
     const newWord: Word = { ...word }
-    newWord.meta.definitionTargetLanguage = japanese.definition
-    newWord.meta.reading = japanese.reading
+    newWord.meta.definitionTargetLanguage = chinese.definition
     updateWord(newWord, id)
-  }, [japanese, id])
+  }, [chinese, id])
 
   if (word === undefined || id === undefined) {
     return <div className="px-8 py-6 w-1/2">Select a word to add</div>
