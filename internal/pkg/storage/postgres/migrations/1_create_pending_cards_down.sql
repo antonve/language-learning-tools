@@ -1,1 +1,1 @@
-drop table pending_cards;
+drop table if exists pending_cards;

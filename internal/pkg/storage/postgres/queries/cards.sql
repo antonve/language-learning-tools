@@ -3,7 +3,6 @@ select
   id,
   language_code,
   token,
-  encode(source_image, 'base64') as source_image,
   meta,
   created_at,
   updated_at
@@ -12,6 +11,11 @@ where
   exported_at is null
   and language_code = sqlc.arg('language_code')
 order by created_at asc;
+
+-- name: GetImageFromPendingCard :one
+select encode(source_image, 'base64') as source_image
+from pending_cards
+where id = sqlc.arg('id');
 
 -- name: CreatePendingCard :one
 insert into pending_cards (

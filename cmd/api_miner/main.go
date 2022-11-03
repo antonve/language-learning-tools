@@ -475,7 +475,6 @@ func (api *api) ListPendingCards(c echo.Context) error {
 			ID:           row.ID,
 			LanguageCode: row.LanguageCode,
 			Token:        row.Token,
-			SourceImage:  row.SourceImage,
 			Meta:         row.Meta,
 		})
 	}

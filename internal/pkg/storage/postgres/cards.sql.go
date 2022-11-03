@@ -45,12 +45,24 @@ func (q *Queries) CreatePendingCard(ctx context.Context, arg CreatePendingCardPa
 	return id, err
 }
 
+const getImageFromPendingCard = `-- name: GetImageFromPendingCard :one
+select encode(source_image, 'base64') as source_image
+from pending_cards
+where id = $1
+`
+
+func (q *Queries) GetImageFromPendingCard(ctx context.Context, id int64) (string, error) {
+	row := q.db.QueryRowContext(ctx, getImageFromPendingCard, id)
+	var source_image string
+	err := row.Scan(&source_image)
+	return source_image, err
+}
+
 const listPendingCards = `-- name: ListPendingCards :many
 select
   id,
   language_code,
   token,
-  encode(source_image, 'base64') as source_image,
   meta,
   created_at,
   updated_at
@@ -65,7 +77,6 @@ type ListPendingCardsRow struct {
 	ID           int64
 	LanguageCode string
 	Token        string
-	SourceImage  string
 	Meta         json.RawMessage
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
@@ -84,7 +95,6 @@ func (q *Queries) ListPendingCards(ctx context.Context, languageCode string) ([]
 			&i.ID,
 			&i.LanguageCode,
 			&i.Token,
-			&i.SourceImage,
 			&i.Meta,
 			&i.CreatedAt,
 			&i.UpdatedAt,
