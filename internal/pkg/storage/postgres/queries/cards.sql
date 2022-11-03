@@ -13,7 +13,7 @@ where
 order by created_at asc;
 
 -- name: GetImageFromPendingCard :one
-select encode(source_image, 'base64') as source_image
+select source_image
 from pending_cards
 where id = sqlc.arg('id');
 

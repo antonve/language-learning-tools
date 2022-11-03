@@ -49,6 +49,7 @@ func main() {
 	e.GET("/pending_cards", api.ListPendingCards)
 	e.POST("/pending_cards", api.CreatePendingCard)
 	e.PUT("/pending_cards/:id", api.UpdateCard)
+	e.GET("/pending_cards/:id/image", api.CardImage)
 	e.POST("/pending_cards/:id/mark", api.MarkCardAsExported)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", api.Config().Port)))
@@ -78,6 +79,7 @@ type API interface {
 	ListPendingCards(c echo.Context) error
 	CreatePendingCard(c echo.Context) error
 	UpdateCard(c echo.Context) error
+	CardImage(c echo.Context) error
 	MarkCardAsExported(c echo.Context) error
 
 	Config() Config
@@ -448,7 +450,7 @@ type Card struct {
 	ID           int64           `json:"id"`
 	LanguageCode string          `json:"language_code"`
 	Token        string          `json:"token"`
-	SourceImage  string          `json:"source_image"`
+	SourceImage  string          `json:"source_image,omitempty"`
 	Meta         json.RawMessage `json:"meta"`
 }
 
@@ -531,6 +533,28 @@ func (api *api) CreatePendingCard(c echo.Context) error {
 	}
 
 	return c.NoContent(http.StatusCreated)
+}
+
+func (api *api) CardImage(c echo.Context) error {
+	id := c.Param("id")
+	if id == "" {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	intId, err := strconv.Atoi(id)
+	if err != nil {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	img, err := api.queries.GetImageFromPendingCard(c.Request().Context(), int64(intId))
+	if err != nil {
+		log.Println("could not process request:", err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	c.Response().Writer.Write(img)
+
+	return c.NoContent(http.StatusOK)
 }
 
 type UpdateCardRequest struct {

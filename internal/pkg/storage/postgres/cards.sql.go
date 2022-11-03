@@ -46,14 +46,14 @@ func (q *Queries) CreatePendingCard(ctx context.Context, arg CreatePendingCardPa
 }
 
 const getImageFromPendingCard = `-- name: GetImageFromPendingCard :one
-select encode(source_image, 'base64') as source_image
+select source_image
 from pending_cards
 where id = $1
 `
 
-func (q *Queries) GetImageFromPendingCard(ctx context.Context, id int64) (string, error) {
+func (q *Queries) GetImageFromPendingCard(ctx context.Context, id int64) ([]byte, error) {
 	row := q.db.QueryRowContext(ctx, getImageFromPendingCard, id)
-	var source_image string
+	var source_image []byte
 	err := row.Scan(&source_image)
 	return source_image, err
 }
