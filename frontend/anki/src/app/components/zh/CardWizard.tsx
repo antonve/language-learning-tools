@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 
 import { Word, Sentence, WordCollection } from '@app/domain'
 import { useSentences } from '@app/hooks'
@@ -49,7 +49,9 @@ const CardWizard = ({
 
     const newWord: Word = { ...word }
     newWord.meta.definitionEnglish = english.definition
-    newWord.meta.reading = english.pinyin.pretty
+    if (word.meta.reading === undefined) {
+      newWord.meta.reading = english.pinyin.pretty
+    }
     updateWord(newWord, id)
   }, [english, id])
 
@@ -59,7 +61,6 @@ const CardWizard = ({
       id === undefined ||
       word === undefined ||
       word.meta.definitionTargetLanguage !== undefined ||
-      word.meta.reading !== undefined ||
       word.value !== chinese?.word ||
       chinese.finished === false
     ) {
@@ -68,6 +69,13 @@ const CardWizard = ({
 
     const newWord: Word = { ...word }
     newWord.meta.definitionTargetLanguage = chinese.definition
+    newWord.meta.audioUrl = chinese.audioUrl
+    if (chinese.pinyin && chinese.zhuyin) {
+      newWord.meta.reading = {
+        pinyin: chinese.pinyin,
+        zhuyin: chinese.zhuyin,
+      }
+    }
     updateWord(newWord, id)
   }, [chinese, id])
 
@@ -154,17 +162,39 @@ const CardWizard = ({
               }}
             />
           </div>
-          <div className="mb-2">
-            <Label htmlFor="reading">Reading</Label>
-            <TextInput
-              id="reading"
-              value={word.meta.reading}
-              onChange={(newReading: string) => {
-                const newWord: Word = { ...word }
-                newWord.meta.reading = newReading
-                updateWord(newWord, id)
-              }}
-            />
+          <div className="flex space-x-2 w-full">
+            <div className="mb-2 flex-grow">
+              <Label htmlFor="reading">Pinyin</Label>
+              <TextInput
+                id="reading"
+                value={word.meta.reading?.pinyin}
+                onChange={(newReading: string) => {
+                  const newWord: Word = { ...word }
+                  newWord.meta.reading.pinyin = newReading
+                  updateWord(newWord, id)
+                }}
+              />
+            </div>
+            <div className="mb-2 flex-grow">
+              <Label htmlFor="reading">Zhuyin</Label>
+              <TextInput
+                id="reading"
+                value={word.meta.reading?.zhuyin}
+                onChange={(newReading: string) => {
+                  const newWord: Word = { ...word }
+                  newWord.meta.reading.zhuyin = newReading
+                  updateWord(newWord, id)
+                }}
+              />
+            </div>
+            {word.meta.audioUrl && (
+              <div className="mb-2">
+                <Label htmlFor="audio">Audio</Label>
+                <div>
+                  <AudioPlayer url={word.meta.audioUrl} />
+                </div>
+              </div>
+            )}
           </div>
           <div className="mb-2">
             <Label htmlFor="def_zh">Definition Chinese</Label>
@@ -261,6 +291,18 @@ const CardWizard = ({
         />
       </div>
     </div>
+  )
+}
+
+const AudioPlayer = ({ url }: { url: string }) => {
+  const audio = useMemo(() => new Audio(url), [url])
+  return (
+    <Button
+      onClick={() => audio.play()}
+      overrides="border bg-gray-300 border-opacity-0 mt-1"
+    >
+      Play
+    </Button>
   )
 }
 

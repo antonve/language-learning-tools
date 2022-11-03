@@ -21,11 +21,17 @@ export interface Word {
   meta: WordMeta
 }
 
+export interface ChineseReading {
+  pinyin?: string
+  zhuyin?: string
+}
+
 export interface WordMeta {
   sentence: Sentence | undefined
-  reading: string | undefined
+  reading: string | ChineseReading | undefined
   definitionEnglish: string | undefined
   definitionTargetLanguage: string | undefined
+  audioUrl: string | undefined
   vocabCard: boolean
   highlight: string | undefined
 }
