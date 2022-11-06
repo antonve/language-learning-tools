@@ -8,8 +8,8 @@ const Layout: FC<Props> = ({ children, navigation }) => (
   <div className="mb-8">
     <div className="flex bg-gray-100">
       <NavLink href="/anki/ja">Anki Miner</NavLink>
-      <NavLink href="/manga-reader">Chinese Manga Reader</NavLink>
-      <NavLink href="/text-reader">Chinese Text Reader</NavLink>
+      <NavLink href="/chinese-manga-reader">Chinese Manga Reader</NavLink>
+      <NavLink href="/chinese-text-reader">Chinese Text Reader</NavLink>
     </div>
     <header
       className={`bg-grey-lightest hero-background p-10 flex justify-between`}

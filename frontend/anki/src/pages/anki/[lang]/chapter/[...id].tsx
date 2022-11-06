@@ -1,6 +1,6 @@
 import type { NextPage } from 'next'
 
-import Layout from '@app/anki/components/Layout'
+import Layout from '@app/Layout'
 import { useChapter } from '@app/anki/hooks'
 import { useRouter } from 'next/dist/client/router'
 

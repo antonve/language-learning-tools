@@ -1,6 +1,6 @@
 import type { NextPage } from 'next'
 
-import Layout from '@app/anki/components/Layout'
+import Layout from '@app/Layout'
 import Sidebar from '@app/anki/components/Sidebar'
 import CardWizard from '@app/anki/components/ja/CardWizard'
 import { useWordCollection } from '@app/anki/hooks'
