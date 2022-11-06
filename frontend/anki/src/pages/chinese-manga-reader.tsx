@@ -13,6 +13,7 @@ import {
   getRawTextForBlock,
 } from '@app/chinesemangareader/domain'
 import Transcript from '@app/chinesemangareader/Transcript'
+import Layout from '@app/Layout'
 
 const Home: NextPage<{}> = () => {
   const [book, setBook] = useState<Book>()
@@ -59,9 +60,11 @@ const Home: NextPage<{}> = () => {
 
   if (!book) {
     return (
-      <div className="w-screen h-screen flex flex-col">
-        <BookImporter setBook={setBook} />
-      </div>
+      <Layout bodyClassName="">
+        <div className="w-screen h-screen flex flex-col">
+          <BookImporter setBook={setBook} />
+        </div>
+      </Layout>
     )
   }
 
