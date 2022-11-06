@@ -7,8 +7,8 @@ import {
   SentencesResult,
   Word,
   WordCollection,
-} from '@app/domain'
-import { getChapter, getSentences } from '@app/api'
+} from '@app/anki/domain'
+import { getChapter, getSentences } from '@app/anki/api'
 
 export const useSentences = (lang: string, word: Word | undefined) => {
   const [sentences, setSentences] = useState(

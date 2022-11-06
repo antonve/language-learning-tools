@@ -1,5 +1,5 @@
 import classNames from 'classnames'
-import { Word, WordCollection } from '@app/domain'
+import { Word, WordCollection } from '@app/anki/domain'
 
 const Sidebar = ({
   activeId,

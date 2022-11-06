@@ -1,24 +1,23 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 
-import { Word, Sentence, WordCollection } from '@app/domain'
-import { useSentences } from '@app/hooks'
-import Button from '@app/components/Button'
+import { Word, Sentence, WordCollection } from '@app/anki/domain'
+import { useSentences } from '@app/anki/hooks'
+import Button from '@app/anki/components/Button'
 import {
   TextInput,
   TextArea,
   Label,
   Checkbox,
   TitleInput,
-} from '@app/components/Form'
-import SentenceList from '@app/components/SentenceList'
-import { addAnkiNote } from '@app/api'
+} from '@app/anki/components/Form'
+import SentenceList from '@app/anki/components/SentenceList'
+import { addAnkiNote } from '@app/anki/api'
 import {
   dictionaries,
   exportRequestForWord,
-  useChineseDefinition,
   useEnglishDefinition,
-} from '@app/components/zh'
-import { markCardAsExported } from './api'
+  useJapaneseDefinition,
+} from '@app/anki/components/ja'
 
 const CardWizard = ({
   words,
@@ -34,8 +33,8 @@ const CardWizard = ({
   const word = words?.[id ?? 'none']
 
   const { definition: english } = useEnglishDefinition(word?.value)
-  const { definition: chinese } = useChineseDefinition(word?.value)
-  const { sentences } = useSentences('zh', word)
+  const { definition: japanese } = useJapaneseDefinition(word?.value)
+  const { sentences } = useSentences('jp', word)
 
   useEffect(() => {
     if (
@@ -51,41 +50,33 @@ const CardWizard = ({
 
     const newWord: Word = { ...word }
     newWord.meta.definitionEnglish = english.definition
-    if (word.meta.reading === undefined) {
-      newWord.meta.reading = english.pinyin.pretty
-    }
     updateWord(newWord, id)
   }, [english, id])
 
   useEffect(() => {
     if (
-      chinese === undefined ||
+      japanese === undefined ||
       id === undefined ||
       word === undefined ||
       word.meta.definitionTargetLanguage !== undefined ||
-      word.value !== chinese?.word ||
-      chinese.finished === false
+      word.meta.reading !== undefined ||
+      word.value !== japanese?.word ||
+      japanese.finished === false
     ) {
       return
     }
 
     const newWord: Word = { ...word }
-    newWord.meta.definitionTargetLanguage = chinese.definition
-    newWord.meta.audioUrl = chinese.audioUrl
-    if (chinese.pinyin) {
-      newWord.meta.reading = chinese.pinyin
-    }
-    newWord.meta.zhuyin = chinese.zhuyin
+    newWord.meta.definitionTargetLanguage = japanese.definition
+    newWord.meta.reading = japanese.reading
     updateWord(newWord, id)
-  }, [chinese, id])
+  }, [japanese, id])
 
   if (word === undefined || id === undefined) {
     return <div className="px-8 py-6 w-1/2">Select a word to add</div>
   }
 
-  const exportNote = async (e: Event) => {
-    e.preventDefault()
-
+  const exportNote = async () => {
     try {
       await addAnkiNote(exportRequestForWord(word))
 
@@ -97,10 +88,6 @@ const CardWizard = ({
       const newWord: Word = { ...word }
       newWord.done = true
       updateWord(newWord, id, ids[nextIndex])
-
-      if (word.meta.externalId) {
-        markCardAsExported(word.meta.externalId)
-      }
     } catch (e) {
       window.alert(e)
     }
@@ -142,7 +129,7 @@ const CardWizard = ({
                 const newWord: Word = { ...word }
                 if (newWord.meta.sentence === undefined) {
                   newWord.meta.sentence = {
-                    language: 'zh',
+                    language: 'jp',
                     line: '',
                     filename: undefined,
                     series: undefined,
@@ -168,44 +155,22 @@ const CardWizard = ({
               }}
             />
           </div>
-          <div className="flex space-x-2 w-full">
-            <div className="mb-2 flex-grow">
-              <Label htmlFor="reading">Pinyin</Label>
-              <TextInput
-                id="reading"
-                value={word.meta.reading}
-                onChange={(newReading: string) => {
-                  const newWord: Word = { ...word }
-                  newWord.meta.reading = newReading
-                  updateWord(newWord, id)
-                }}
-              />
-            </div>
-            <div className="mb-2 flex-grow">
-              <Label htmlFor="reading">Zhuyin</Label>
-              <TextInput
-                id="reading"
-                value={word.meta.zhuyin}
-                onChange={(newReading: string) => {
-                  const newWord: Word = { ...word }
-                  newWord.meta.zhuyin = newReading
-                  updateWord(newWord, id)
-                }}
-              />
-            </div>
-            {word.meta.audioUrl && (
-              <div className="mb-2">
-                <Label htmlFor="audio">Audio</Label>
-                <div>
-                  <AudioPlayer url={word.meta.audioUrl} />
-                </div>
-              </div>
-            )}
+          <div className="mb-2">
+            <Label htmlFor="reading">Reading</Label>
+            <TextInput
+              id="reading"
+              value={word.meta.reading}
+              onChange={(newReading: string) => {
+                const newWord: Word = { ...word }
+                newWord.meta.reading = newReading
+                updateWord(newWord, id)
+              }}
+            />
           </div>
           <div className="mb-2">
-            <Label htmlFor="def_zh">Definition Chinese</Label>
+            <Label htmlFor="def_jp">Definition Japanese</Label>
             <TextArea
-              id="def_zh"
+              id="def_jp"
               value={word.meta.definitionTargetLanguage}
               rows={5}
               onChange={(newDefinition: string) => {
@@ -248,10 +213,6 @@ const CardWizard = ({
                 const newWord: Word = { ...word }
                 newWord.done = !word.done
                 updateWord(newWord, id)
-
-                if (word.meta.externalId && newWord.done) {
-                  markCardAsExported(word.meta.externalId)
-                }
               }}
             >
               Mark as {word.done ? 'WIP' : 'Done'}
@@ -288,7 +249,11 @@ const CardWizard = ({
             const newWord: Word = {
               ...word,
               meta: {
-                ...word.meta,
+                reading: word.meta.reading,
+                definitionEnglish: word.meta.definitionEnglish,
+                definitionTargetLanguage: word.meta.definitionTargetLanguage,
+                vocabCard: word.meta.vocabCard ?? false,
+                highlight: word.meta.highlight,
                 sentence: { ...sentence },
               },
             }
@@ -297,18 +262,6 @@ const CardWizard = ({
         />
       </div>
     </div>
-  )
-}
-
-const AudioPlayer = ({ url }: { url: string }) => {
-  const audio = useMemo(() => new Audio(url), [url])
-  return (
-    <Button
-      onClick={() => audio.play()}
-      overrides="border bg-gray-300 border-opacity-0 mt-1"
-    >
-      Play
-    </Button>
   )
 }
 

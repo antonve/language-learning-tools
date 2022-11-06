@@ -1,13 +1,13 @@
 import type { NextPage } from 'next'
 
-import Layout from '@app/components/Layout'
-import { useChapter } from '@app/hooks'
+import Layout from '@app/anki/components/Layout'
+import { useChapter } from '@app/anki/hooks'
 import { useRouter } from 'next/dist/client/router'
 
 const Chapter: NextPage = () => {
   const router = useRouter()
   const [series, filename] = (router.query?.id ?? []) as string[]
-  const lang = router.query?.lang as string ?? ""
+  const lang = (router.query?.lang as string) ?? ''
 
   const { chapter, finished } = useChapter(lang, series, filename)
 

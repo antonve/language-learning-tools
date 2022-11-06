@@ -2,8 +2,8 @@ import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import Error from 'next/error'
 
-import ChineseApp from '@app/components/zh/ChineseApp'
-import JapaneseApp from '@app/components/ja/JapaneseApp'
+import ChineseApp from '@app/anki/components/zh/ChineseApp'
+import JapaneseApp from '@app/anki/components/ja/JapaneseApp'
 
 const Home: NextPage = () => {
   const router = useRouter()

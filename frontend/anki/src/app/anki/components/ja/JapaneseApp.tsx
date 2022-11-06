@@ -1,12 +1,12 @@
 import type { NextPage } from 'next'
 
-import Layout from '@app/components/Layout'
-import Sidebar from '@app/components/Sidebar'
-import CardWizard from '@app/components/ja/CardWizard'
-import { useWordCollection } from '@app/hooks'
-import AddWordsButton from '@app/components/AddWordsButton'
-import LanguageToggle from '@app/components/LanguageToggle'
-import { availableLanguages } from '@app/domain'
+import Layout from '@app/anki/components/Layout'
+import Sidebar from '@app/anki/components/Sidebar'
+import CardWizard from '@app/anki/components/ja/CardWizard'
+import { useWordCollection } from '@app/anki/hooks'
+import AddWordsButton from '@app/anki/components/AddWordsButton'
+import LanguageToggle from '@app/anki/components/LanguageToggle'
+import { availableLanguages } from '@app/anki/domain'
 
 const JapaneseApp: NextPage = () => {
   const language = availableLanguages['ja']

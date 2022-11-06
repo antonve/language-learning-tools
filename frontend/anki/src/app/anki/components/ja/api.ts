@@ -1,4 +1,4 @@
-import { root } from '@app/api'
+import { root } from '@app/anki/api'
 
 interface JishoResult {
   word: string

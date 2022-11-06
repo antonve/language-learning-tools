@@ -4,7 +4,7 @@ import {
   sentenceWithFocusWord,
   sourceForSentence,
   Word,
-} from '@app/domain'
+} from '@app/anki/domain'
 import { useEffect, useState } from 'react'
 import { getCedictDefinition, getZdicDefinition } from './api'
 
