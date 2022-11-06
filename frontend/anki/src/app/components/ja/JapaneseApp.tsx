@@ -24,6 +24,9 @@ const JapaneseApp: NextPage = () => {
     <Layout
       navigation={() => (
         <>
+          <h1 className="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl">
+            Anki Miner
+          </h1>
           <LanguageToggle
             languages={Object.values(availableLanguages)}
             selectedLanguageCode={language.code}
