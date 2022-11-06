@@ -232,6 +232,7 @@ const CardWizard = ({
                 <a
                   href={d.url(word.value)}
                   target="_blank"
+                  rel="noreferrer"
                   className="font-bold text-sm py-1 px-3 rounded border-2 block border-gray-800 text-gray-800 hover:opacity-50 transition duration-200 ease-in-out"
                 >
                   {d.name}

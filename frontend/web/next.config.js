@@ -4,9 +4,9 @@ const isProd = process.env.NODE_ENV === 'production'
 module.exports = {
   reactStrictMode: true,
   output: 'standalone',
-  assetPrefix: isProd ? 'https://tadoku.app/miner/ocr-chinese' : undefined,
+  assetPrefix: isProd ? 'https://tadoku.app/tools' : undefined,
   publicRuntimeConfig: {
-    API_ROOT: isProd ? 'https://tadoku.app/miner/api' : 'http://localhost:8080',
+    API_ROOT: isProd ? 'https://tadoku.app/tools/api' : 'http://localhost:8080',
   },
   async redirects() {
     return [

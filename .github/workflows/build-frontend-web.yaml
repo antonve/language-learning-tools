@@ -1,16 +1,16 @@
-name: build-frontend-ocr-chinese
+name: build-frontend-web
 on:
   push:
     paths:
-      - "frontend/ocr-chinese/**"
-      - ".github/workflows/build-frontend-ocr-chinese.yaml"
+      - "frontend/web/**"
+      - ".github/workflows/build-frontend-web.yaml"
 jobs:
   build:
     name: Build ocr-chinese
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: frontend/ocr-chinese
+        working-directory: frontend/web
 
     steps:
       - name: Checkout repository
@@ -41,7 +41,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     defaults:
       run:
-        working-directory: frontend/ocr-chinese
+        working-directory: frontend/web
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -51,7 +51,7 @@ jobs:
           # Setup credentials for GitHub packages
           echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u antonve --password-stdin
           # Push images
-          IMAGE_NAME=ghcr.io/antonve/language-learning-tools/frontend-ocr-chinese
+          IMAGE_NAME=ghcr.io/antonve/language-learning-tools/frontend-web
           docker build --no-cache -t $IMAGE_NAME:latest .
           docker tag $IMAGE_NAME:latest $IMAGE_NAME:$GITHUB_SHA
           docker push $IMAGE_NAME
