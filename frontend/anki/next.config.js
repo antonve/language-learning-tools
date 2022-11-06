@@ -9,8 +9,8 @@ module.exports = {
     return [
       {
         source: '/',
-        destination: '/ja',
-        permanent: true,
+        destination: '/anki/ja',
+        permanent: false,
       }
     ]
   }

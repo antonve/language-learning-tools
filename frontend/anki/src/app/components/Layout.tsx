@@ -7,9 +7,9 @@ interface Props {
 const Layout: FC<Props> = ({ children, navigation }) => (
   <div className="mb-8">
     <div className="flex bg-gray-100">
-      <NavLink href="/anki">Anki Miner</NavLink>
-      <NavLink href="/manga-reader">Manga Reader</NavLink>
-      <NavLink href="/text-reader">Text Reader</NavLink>
+      <NavLink href="/anki/jp">Anki Miner</NavLink>
+      <NavLink href="/manga-reader">Chinese Manga Reader</NavLink>
+      <NavLink href="/text-reader">Chinese Text Reader</NavLink>
     </div>
     <header
       className={`bg-grey-lightest hero-background p-10 flex justify-between`}
