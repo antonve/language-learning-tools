@@ -27,6 +27,17 @@ services:
       POSTGRES_DB: mining_tools
     logging:
       driver: none
+  migrate:
+    build: ./internal/pkg/storage/postgres/migrations
+    depends_on:
+      - postgres
+    command: ["up"]
+    environment:
+      DATABASE_URL: postgres://root:hunter2@postgres:5432/mining_tools?sslmode=disable
+      MIGRATIONS_DIR: /migrations
+      WAIT_HOSTS: postgres:5432
+    volumes:
+      - ./internal/pkg/storage/postgres/migrations:/migrations
   pgweb:
     container_name: pgweb
     image: sosedoff/pgweb
