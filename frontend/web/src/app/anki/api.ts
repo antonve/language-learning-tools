@@ -68,3 +68,45 @@ export const addAnkiNote = async (request: any): Promise<any> => {
 
   return body
 }
+
+export interface PendingCardsResponse {
+  cards: {
+    id: number
+    token: string
+    meta: {
+      sentence: string
+      card_type: string
+      hanzi_traditional: string | undefined
+      hanzi_simplified: string | undefined
+      pinyin: string | undefined
+      pinyin_tones: string | undefined
+      meanings: string[]
+    }
+  }[]
+}
+
+export const getPendingCards = async (
+  languageCode: string,
+): Promise<PendingCardsResponse> => {
+  const url = `${root}/pending_cards?language_code=${languageCode}`
+  const response = await fetch(url)
+
+  if (response.status !== 200) {
+    return {
+      cards: [],
+    }
+  }
+
+  const body = await response.json()
+
+  return body
+}
+
+export const markCardAsExported = async (id: number): Promise<void> => {
+  const url = `${root}/pending_cards/${id}/mark`
+  const response = await fetch(url, { method: 'post' })
+
+  if (response.status !== 200) {
+    return Promise.reject()
+  }
+}

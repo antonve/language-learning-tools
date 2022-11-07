@@ -8,7 +8,7 @@ import LanguageToggle from '@app/anki/components/LanguageToggle'
 import { availableLanguages, formatDefinitions } from '@app/anki/domain'
 import CardWizard from '@app/anki/components/zh/CardWizard'
 import Button from '../Button'
-import { getPendingCards } from './api'
+import { getPendingCards } from '@app/anki/api'
 
 const ChineseApp: NextPage = () => {
   const language = availableLanguages['zh']
@@ -27,7 +27,7 @@ const ChineseApp: NextPage = () => {
     <Layout
       navigation={() => (
         <>
-          <h1 className="2text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl">
+          <h1 className="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl">
             Anki Miner
           </h1>
           <LanguageToggle
@@ -39,7 +39,7 @@ const ChineseApp: NextPage = () => {
               <AddWordsButton addWords={addWords} language={language} />
               <Button
                 onClick={async () => {
-                  const res = await getPendingCards()
+                  const res = await getPendingCards('zho')
                   const words = res.cards.map(c => ({
                     value: c.token,
                     done: false,
