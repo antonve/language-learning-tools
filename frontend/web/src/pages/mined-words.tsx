@@ -2,6 +2,7 @@ import type { NextPage } from 'next'
 import { useEffect, useState } from 'react'
 import Layout from '@app/Layout'
 import {
+  getPendingCardImageUrl,
   getPendingCards,
   markCardAsExported,
   PendingCardsResponse,
@@ -54,12 +55,12 @@ const MinedWords: NextPage<{}> = () => {
         </h1>
       )}
     >
-      <ul>
+      <ul className="space-y-8">
         {words.map(w => (
           <li key={w.id} className="flex">
-            <div className="w-96 pr-8 flex flex-col justify-between">
+            <div className="pr-8 flex flex-col justify-between">
               <h2 className="font-bold text-2xl">{w.token}</h2>
-              <div className="flex space-x-4">
+              <div className="flex space-x-2">
                 <Button
                   primary
                   onClick={saveWord(w.id)}
@@ -68,6 +69,14 @@ const MinedWords: NextPage<{}> = () => {
                   Save
                 </Button>
                 <Button onClick={deleteWord(w.id)}>Delete</Button>
+                <a
+                  href={getPendingCardImageUrl(w.id)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-bold py-2 px-4 rounded border-2 border-black hover:opacity-50 transition duration-200 ease-in-out"
+                >
+                  Image
+                </a>
               </div>
             </div>
             <TextArea

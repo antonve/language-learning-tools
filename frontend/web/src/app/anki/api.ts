@@ -130,3 +130,6 @@ export const updatePendingCard = async (
 
   return Promise.resolve()
 }
+
+export const getPendingCardImageUrl = (id: number) =>
+  `${root}/pending_cards/${id}/image`
