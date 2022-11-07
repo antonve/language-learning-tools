@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import Layout from '@app/Layout'
 import {
   getPendingCards,
+  markCardAsExported,
   PendingCardsResponse,
   updatePendingCard,
 } from '@app/anki/api'
@@ -27,19 +28,22 @@ const MinedWords: NextPage<{}> = () => {
     setMetaCache({ ...metaCache, [id]: meta })
   }
 
-  const saveWord = (id: number) => () => {
+  const saveWord = (id: number) => async () => {
     const meta = metaCache[id]
     if (!meta) {
       return
     }
     try {
-      updatePendingCard(id, JSON.parse(meta)).then(() => {
-        fetchCards()
-      })
+      await updatePendingCard(id, JSON.parse(meta))
+      fetchCards()
     } catch {
       alert('JSON is not valid')
-      return
     }
+  }
+
+  const deleteWord = (id: number) => async () => {
+    await markCardAsExported(id)
+    fetchCards()
   }
 
   return (
@@ -63,7 +67,7 @@ const MinedWords: NextPage<{}> = () => {
                 >
                   Save
                 </Button>
-                <Button>Delete</Button>
+                <Button onClick={deleteWord(w.id)}>Delete</Button>
               </div>
             </div>
             <TextArea

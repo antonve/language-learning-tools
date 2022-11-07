@@ -106,9 +106,11 @@ export const markCardAsExported = async (id: number): Promise<void> => {
   const url = `${root}/pending_cards/${id}/mark`
   const response = await fetch(url, { method: 'post' })
 
-  if (response.status !== 200) {
+  if (response.status !== 201) {
     return Promise.reject()
   }
+
+  return Promise.resolve()
 }
 
 export const updatePendingCard = async (
@@ -125,4 +127,6 @@ export const updatePendingCard = async (
   if (response.status !== 200) {
     return Promise.reject()
   }
+
+  return Promise.resolve()
 }
