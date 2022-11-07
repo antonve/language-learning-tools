@@ -4,11 +4,19 @@ import classNames from 'classnames'
 interface Props {
   onClick?: () => void
   primary?: boolean
+  disabled?: boolean
   type?: 'button' | 'submit' | 'reset'
   overrides?: string
 }
 
-const Button: FC<Props> = ({ children, onClick, primary, type, overrides }) => (
+const Button: FC<Props> = ({
+  children,
+  onClick,
+  primary,
+  type,
+  overrides,
+  disabled,
+}) => (
   <button
     type={type ?? 'button'}
     className={classNames(
@@ -17,10 +25,12 @@ const Button: FC<Props> = ({ children, onClick, primary, type, overrides }) => (
         'text-white bg-purple-500 hover:bg-purple-700 border-transparent':
           !!primary,
         'border-gray-800 text-gray-800': !primary,
+        'opacity-50': disabled,
       },
       overrides,
     )}
     onClick={onClick}
+    disabled={disabled}
   >
     {children}
   </button>

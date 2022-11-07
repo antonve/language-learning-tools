@@ -110,3 +110,19 @@ export const markCardAsExported = async (id: number): Promise<void> => {
     return Promise.reject()
   }
 }
+
+export const updatePendingCard = async (
+  id: number,
+  meta: Object,
+): Promise<void> => {
+  const url = `${root}/pending_cards/${id}`
+
+  const response = await fetch(url, {
+    method: 'put',
+    body: JSON.stringify({ meta }),
+  })
+
+  if (response.status !== 200) {
+    return Promise.reject()
+  }
+}
