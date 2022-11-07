@@ -13,6 +13,7 @@ const Layout: FC<Props> = ({
   <div>
     <div className="flex bg-gray-100 absolute">
       <NavLink href="/anki/ja">Anki Miner</NavLink>
+      <NavLink href="/mined-words">Mined Words</NavLink>
       <NavLink href="/chinese-manga-reader">Chinese Manga Reader</NavLink>
       <NavLink href="/chinese-text-reader">Chinese Text Reader</NavLink>
     </div>

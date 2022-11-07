@@ -15,7 +15,7 @@ import {
 import Transcript from '@app/chinesemangareader/Transcript'
 import Layout from '@app/Layout'
 
-const Home: NextPage<{}> = () => {
+const ChineseMangaReader: NextPage<{}> = () => {
   const [book, setBook] = useState<Book>()
   const [page, setPage] = useState(0)
   const [canvasData, setCanvasData] = useState<string>('')
@@ -125,4 +125,4 @@ const Home: NextPage<{}> = () => {
   )
 }
 
-export default Home
+export default ChineseMangaReader
