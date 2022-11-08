@@ -3,6 +3,7 @@ import { textAnalyse } from '@app/chinesetextreader/api'
 import { useEffect, useState } from 'react'
 import { Button } from '@app/chinesemangareader/Components'
 import SentenceView from './SentenceView'
+import { useKeyPress } from '@app/chinesemangareader/hooks'
 
 interface Props {
   text: string
@@ -11,6 +12,20 @@ interface Props {
 const Reader: NextPage<Props> = ({ text }) => {
   const [analyse, setAnalyse] = useState<undefined | any>()
   const [lineIndex, setLineIndex] = useState<number>(0)
+
+  const onNextSentence = () => {
+    if (lineIndex < analyse.lines.length - 1) {
+      setLineIndex(lineIndex + 1)
+    }
+  }
+  const onPrevSentence = () => {
+    if (lineIndex >= 1) {
+      setLineIndex(lineIndex - 1)
+    }
+  }
+
+  useKeyPress('ArrowLeft', onPrevSentence)
+  useKeyPress('ArrowRight', onNextSentence)
 
   useEffect(() => {
     textAnalyse(text).then(res => setAnalyse(res))
@@ -23,14 +38,11 @@ const Reader: NextPage<Props> = ({ text }) => {
   return (
     <div>
       <div className="w-72 mx-auto flex justify-between">
-        <Button
-          onClick={() => setLineIndex(lineIndex - 1)}
-          disabled={lineIndex <= 0}
-        >
+        <Button onClick={onPrevSentence} disabled={lineIndex <= 0}>
           &larr; Previous line
         </Button>
         <Button
-          onClick={() => setLineIndex(lineIndex + 1)}
+          onClick={onNextSentence}
           disabled={lineIndex >= analyse.lines.length - 1}
         >
           Next line &rarr;
