@@ -639,11 +639,11 @@ type ChineseTextAnalyseDictionaryEntry struct {
 }
 
 type ChineseTextAnalyseToken struct {
-	Traditional     string                             `json:"hanzi_traditional"`
-	Simplified      string                             `json:"hanzi_simplified"`
-	Start           int                                `json:"start"`
-	End             int                                `json:"end"`
-	DictionaryEntry *ChineseTextAnalyseDictionaryEntry `json:"dictionary_entry"`
+	Traditional       string                              `json:"hanzi_traditional"`
+	Simplified        string                              `json:"hanzi_simplified"`
+	Start             int                                 `json:"start"`
+	End               int                                 `json:"end"`
+	DictionaryEntries []ChineseTextAnalyseDictionaryEntry `json:"dictionary_entries"`
 }
 
 type ChineseTextAnalyseResponse struct {
@@ -680,17 +680,21 @@ func (api *api) ChineseTextAnalyse(c echo.Context) error {
 
 		for j, w := range words {
 			tokens[j] = ChineseTextAnalyseToken{
-				Traditional: line[w.Start:w.End],
-				Simplified:  w.Str,
-				Start:       w.Start,
-				End:         w.End,
+				Traditional:       line[w.Start:w.End],
+				Simplified:        w.Str,
+				Start:             w.Start,
+				End:               w.End,
+				DictionaryEntries: []ChineseTextAnalyseDictionaryEntry{},
 			}
 
-			if lookup := api.cedict.GetByHanzi(w.Str); lookup != nil && lookup.Pinyin != "" {
-				tokens[j].DictionaryEntry = &ChineseTextAnalyseDictionaryEntry{
-					Pinyin:      lookup.Pinyin,
-					PinyinTones: cedict.PinyinTones(lookup.Pinyin),
-					Meanings:    lookup.Meanings,
+			lookups := api.cedict.GetAllByHanzi(w.Str)
+			for _, lookup := range lookups {
+				if lookup.Pinyin != "" {
+					tokens[j].DictionaryEntries = append(tokens[j].DictionaryEntries, ChineseTextAnalyseDictionaryEntry{
+						Pinyin:      lookup.Pinyin,
+						PinyinTones: cedict.PinyinTones(lookup.Pinyin),
+						Meanings:    lookup.Meanings,
+					})
 				}
 			}
 		}
