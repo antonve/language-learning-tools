@@ -680,7 +680,7 @@ func (api *api) ChineseTextAnalyse(c echo.Context) error {
 
 		for j, w := range words {
 			tokens[j] = ChineseTextAnalyseToken{
-				Traditional: req.Text[w.Start:w.End],
+				Traditional: line[w.Start:w.End],
 				Simplified:  w.Str,
 				Start:       w.Start,
 				End:         w.End,
