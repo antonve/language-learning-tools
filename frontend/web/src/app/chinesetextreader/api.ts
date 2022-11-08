@@ -1,6 +1,28 @@
 import { root } from '@app/anki/api'
 
-export const textAnalyse = async (text: string): Promise<any> => {
+interface TextAnalyseResponse {
+  lines: {
+    simplified: string
+    traditional: string
+    tokens: {
+      hanzi_traditional: string
+      hanzi_simplified: string
+      start: number
+      end: number
+      dictionary_entry:
+        | {
+            pinyin_tones: string
+            pinyin: string
+            meanings: string[]
+          }
+        | undefined
+    }[]
+  }[]
+}
+
+export const textAnalyse = async (
+  text: string,
+): Promise<TextAnalyseResponse> => {
   const url = `${root}/zh/text-analyse`
   const response = await fetch(url, {
     method: 'POST',
