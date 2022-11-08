@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jcramb/cedict"
@@ -387,9 +388,10 @@ func (api *api) Cedict(c echo.Context) error {
 			continue
 		}
 
+		fmt.Println(token)
 		pinyin := api.cedict.HanziToPinyin(token)
-		pinyinTones := cedict.PinyinTones(pinyin)
 		meaning := api.cedict.GetByHanzi(token)
+		pinyinTones := cedict.PinyinTones(meaning.Pinyin)
 
 		res[token] = &CedictResponse{
 			Source:      token,
@@ -416,7 +418,7 @@ type CedictResponse struct {
 	Source           string   `json:"source"`
 	PinyinTones      string   `json:"pinyin_tones"`
 	Pinyin           string   `json:"pinyin"`
-	HanziSimplified  string   `json:"hanzi_simplified"`
+	HanziSimplified  string   `json:"hanzi_simplified,omit"`
 	HanziTraditional string   `json:"hanzi_traditional"`
 	Meanings         []string `json:"meanings"`
 }
@@ -624,6 +626,30 @@ type ChineseTextAnalyseRequest struct {
 	Text string `json:"text"`
 }
 
+type ChineseTextAnalyseLine struct {
+	Simplified  string                    `json:"simplified"`
+	Traditional string                    `json:"traditional"`
+	Tokens      []ChineseTextAnalyseToken `json:"tokens"`
+}
+
+type ChineseTextAnalyseDictionaryEntry struct {
+	PinyinTones string   `json:"pinyin_tones"`
+	Pinyin      string   `json:"pinyin"`
+	Meanings    []string `json:"meanings"`
+}
+
+type ChineseTextAnalyseToken struct {
+	Traditional     string                             `json:"hanzi_traditional"`
+	Simplified      string                             `json:"hanzi_simplified"`
+	Start           int                                `json:"start"`
+	End             int                                `json:"end"`
+	DictionaryEntry *ChineseTextAnalyseDictionaryEntry `json:"dictionary_entry"`
+}
+
+type ChineseTextAnalyseResponse struct {
+	Lines []ChineseTextAnalyseLine `json:"lines"`
+}
+
 func (api *api) ChineseTextAnalyse(c echo.Context) error {
 	body, err := io.ReadAll(c.Request().Body)
 	if err != nil {
@@ -637,9 +663,44 @@ func (api *api) ChineseTextAnalyse(c echo.Context) error {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-	simplified := gojianfan.T2S(req.Text)
+	lines := strings.FieldsFunc(req.Text, func(c rune) bool {
+		return c == '\n'
+	})
 
-	words := api.jieba.Tokenize(simplified, gojieba.DefaultMode, false)
+	res := &ChineseTextAnalyseResponse{
+		Lines: make([]ChineseTextAnalyseLine, len(lines)),
+	}
 
-	return c.JSON(http.StatusOK, words)
+	useHMM := true
+
+	for i, line := range lines {
+		simplified := gojianfan.T2S(line)
+		words := api.jieba.Tokenize(simplified, gojieba.DefaultMode, useHMM)
+		tokens := make([]ChineseTextAnalyseToken, len(words))
+
+		for j, w := range words {
+			tokens[j] = ChineseTextAnalyseToken{
+				Traditional: req.Text[w.Start:w.End],
+				Simplified:  w.Str,
+				Start:       w.Start,
+				End:         w.End,
+			}
+
+			if lookup := api.cedict.GetByHanzi(w.Str); lookup != nil && lookup.Pinyin != "" {
+				tokens[j].DictionaryEntry = &ChineseTextAnalyseDictionaryEntry{
+					Pinyin:      lookup.Pinyin,
+					PinyinTones: cedict.PinyinTones(lookup.Pinyin),
+					Meanings:    lookup.Meanings,
+				}
+			}
+		}
+
+		res.Lines[i] = ChineseTextAnalyseLine{
+			Simplified:  simplified,
+			Traditional: line,
+			Tokens:      tokens,
+		}
+
+	}
+	return c.JSON(http.StatusOK, res)
 }
