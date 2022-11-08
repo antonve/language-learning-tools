@@ -7,11 +7,16 @@ require (
 	github.com/DavidHuie/gomigrate v0.0.0-20190826182718-4adc4b3de142
 	github.com/antchfx/htmlquery v1.2.4
 	github.com/creasty/configo v0.0.0-20170711121124-288b7e8980d2
-	github.com/jcramb/cedict v1.0.0
+	github.com/jackc/pgx/v4 v4.17.2
+	github.com/jcramb/cedict v1.0.1-0.20211027215036-34cc90611eaa
 	github.com/kapmahc/epub v0.1.1
+	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/labstack/echo/v4 v4.6.1
 	github.com/lib/pq v1.10.3
 	github.com/pkg/errors v0.9.1
+	github.com/siongui/gojianfan v0.0.0-20210926212422-2f175ac615de
+	github.com/yanyiwu/gojieba v1.2.0
+	golang.org/x/net v0.0.0-20221017152216-f25eb7ecb193
 	golang.org/x/sync v0.0.0-20220929204114-8fcdb60fdcc0
 )
 
@@ -35,21 +40,16 @@ require (
 	github.com/jackc/pgproto3/v2 v2.3.1 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
 	github.com/jackc/pgtype v1.12.0 // indirect
-	github.com/jackc/pgx/v4 v4.17.2 // indirect
 	github.com/joho/godotenv v1.4.0 // indirect
-	github.com/kelseyhightower/envconfig v1.4.0 // indirect
 	github.com/labstack/gommon v0.3.0 // indirect
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/mattn/go-sqlite3 v1.14.15 // indirect
 	github.com/mattn/go-zglob v0.0.3 // indirect
-	github.com/siongui/gojianfan v0.0.0-20210926212422-2f175ac615de // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.1 // indirect
-	github.com/yanyiwu/gojieba v1.2.0 // indirect
 	go.opencensus.io v0.23.0 // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
-	golang.org/x/net v0.0.0-20221017152216-f25eb7ecb193 // indirect
 	golang.org/x/oauth2 v0.0.0-20221014153046-6fdb5e3db783 // indirect
 	golang.org/x/sys v0.1.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
