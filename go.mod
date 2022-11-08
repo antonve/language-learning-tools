@@ -61,3 +61,5 @@ require (
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/yaml.v2 v2.2.3 // indirect
 )
+
+replace github.com/jcramb/cedict => github.com/antonve/cedict v0.0.0-20221108132040-8e5fd5ae286c
