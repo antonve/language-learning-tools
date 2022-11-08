@@ -18,6 +18,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
+	"github.com/siongui/gojianfan"
+	"github.com/yanyiwu/gojieba"
 
 	"github.com/antonve/language-learning-tools/internal/pkg/corpus"
 	"github.com/antonve/language-learning-tools/internal/pkg/goo"
@@ -45,6 +47,7 @@ func main() {
 	e.POST("/zh/cedict", api.Cedict)
 	e.GET("/zh/zdic/:token", api.Zdic)
 	e.POST("/ocr", api.OCR)
+	e.POST("/zh/text-analyse", api.ChineseTextAnalyse)
 
 	e.GET("/pending_cards", api.ListPendingCards)
 	e.POST("/pending_cards", api.CreatePendingCard)
@@ -75,6 +78,7 @@ type API interface {
 	OCR(c echo.Context) error
 	Cedict(c echo.Context) error
 	Zdic(c echo.Context) error
+	ChineseTextAnalyse(e echo.Context) error
 
 	ListPendingCards(c echo.Context) error
 	CreatePendingCard(c echo.Context) error
@@ -98,6 +102,7 @@ type api struct {
 	ocr      ocr.Client
 	cedict   *cedict.Dict
 	zdic     zdic.Zdic
+	jieba    *gojieba.Jieba
 
 	jishoCache map[string]*JishoProxyResponse
 	gooCache   map[string]*GooProxyResponse
@@ -146,6 +151,7 @@ func NewAPI() API {
 		zdic:       zdic.New(),
 		psql:       psql,
 		queries:    postgres.New(psql),
+		jieba:      gojieba.NewJieba(),
 	}
 }
 
@@ -612,4 +618,28 @@ func (api *api) MarkCardAsExported(c echo.Context) error {
 	}
 
 	return c.NoContent(http.StatusCreated)
+}
+
+type ChineseTextAnalyseRequest struct {
+	Text string `json:"text"`
+}
+
+func (api *api) ChineseTextAnalyse(c echo.Context) error {
+	body, err := io.ReadAll(c.Request().Body)
+	if err != nil {
+		log.Println("could not process request:", err)
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	req := &ChineseTextAnalyseRequest{}
+	if err := json.Unmarshal(body, req); err != nil {
+		log.Println("could not process request:", err)
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	simplified := gojianfan.T2S(req.Text)
+
+	words := api.jieba.Tokenize(simplified, gojieba.DefaultMode, false)
+
+	return c.JSON(http.StatusOK, words)
 }
