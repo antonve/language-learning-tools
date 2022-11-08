@@ -2,6 +2,7 @@ import type { NextPage } from 'next'
 import { textAnalyse } from '@app/chinesetextreader/api'
 import { useEffect, useState } from 'react'
 import { Button } from '@app/chinesemangareader/Components'
+import SentenceView from './SentenceView'
 
 interface Props {
   text: string
@@ -35,9 +36,7 @@ const Reader: NextPage<Props> = ({ text }) => {
           Next line &rarr;
         </Button>
       </div>
-      <p className="text-center text-4xl m-8">
-        {analyse.lines[lineIndex].traditional}
-      </p>
+      <SentenceView sentence={analyse.lines[lineIndex]} />
     </div>
   )
 }

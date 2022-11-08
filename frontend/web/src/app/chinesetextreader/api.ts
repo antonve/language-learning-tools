@@ -1,23 +1,27 @@
 import { root } from '@app/anki/api'
 
-interface TextAnalyseResponse {
-  lines: {
-    simplified: string
-    traditional: string
-    tokens: {
-      hanzi_traditional: string
-      hanzi_simplified: string
-      start: number
-      end: number
-      dictionary_entry:
-        | {
-            pinyin_tones: string
-            pinyin: string
-            meanings: string[]
-          }
-        | undefined
-    }[]
-  }[]
+export interface TextAnalyseToken {
+  hanzi_traditional: string
+  hanzi_simplified: string
+  start: number
+  end: number
+  dictionary_entry:
+    | {
+        pinyin_tones: string
+        pinyin: string
+        meanings: string[]
+      }
+    | undefined
+}
+
+export interface TextAnalyseLine {
+  simplified: string
+  traditional: string
+  tokens: TextAnalyseToken[]
+}
+
+export interface TextAnalyseResponse {
+  lines: TextAnalyseLine[]
 }
 
 export const textAnalyse = async (

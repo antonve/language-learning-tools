@@ -162,9 +162,10 @@ export const fetchCedict = async (words: Word[]): Promise<CedictResponse> => {
 
 const zip = <T>(a: T[], b: T[]) => a.map((k, i) => [k, b[i]])
 
-export const getReadingPairs = (
-  entry: CedictEntry,
-): { reading: string; tone: number }[] => {
+export const getReadingPairs = (entry: {
+  pinyin_tones: string
+  pinyin: string
+}): { reading: string; tone: number }[] => {
   const pairs = zip(entry.pinyin_tones.split(' '), entry.pinyin.split(' '))
 
   return pairs.map(([reading, tone]) => {
