@@ -21,17 +21,23 @@ const Reader: NextPage<Props> = ({ text }) => {
 
   return (
     <div>
-      <p className="text-center text-4xl m-8">
-        {analyse.lines[lineIndex].traditional}
-      </p>
       <div className="w-72 mx-auto flex justify-between">
-        <Button onClick={() => setLineIndex(lineIndex - 1)}>
+        <Button
+          onClick={() => setLineIndex(lineIndex - 1)}
+          disabled={lineIndex <= 0}
+        >
           &larr; Previous line
         </Button>
-        <Button onClick={() => setLineIndex(lineIndex + 1)}>
+        <Button
+          onClick={() => setLineIndex(lineIndex + 1)}
+          disabled={lineIndex >= analyse.lines.length - 1}
+        >
           Next line &rarr;
         </Button>
       </div>
+      <p className="text-center text-4xl m-8">
+        {analyse.lines[lineIndex].traditional}
+      </p>
     </div>
   )
 }
