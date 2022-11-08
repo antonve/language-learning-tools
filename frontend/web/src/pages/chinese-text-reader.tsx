@@ -3,8 +3,9 @@ import { useState } from 'react'
 import Layout from '@app/Layout'
 import Button from '@app/anki/components/Button'
 import TextInput from '@app/chinesetextreader/TextInput'
+import Reader from '@app/chinesetextreader/Reader'
 
-const Reader: NextPage<{}> = () => {
+const TextReader: NextPage<{}> = () => {
   const [text, setText] = useState<string | undefined>()
 
   if (!text) {
@@ -34,9 +35,9 @@ const Reader: NextPage<{}> = () => {
         </>
       )}
     >
-      {text}
+      <Reader text={text} />
     </Layout>
   )
 }
 
-export default Reader
+export default TextReader
