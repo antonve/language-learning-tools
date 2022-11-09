@@ -18,7 +18,7 @@ const Layout: FC<Props> = ({
       {
         'dark bg-gray-800 text-gray-200': darkMode,
       },
-      'min-h-screen',
+      'min-h-screen flex flex-col',
     )}
   >
     <div className="flex bg-gray-100 absolute dark:bg-gray-900">

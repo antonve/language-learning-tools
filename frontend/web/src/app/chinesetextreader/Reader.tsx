@@ -39,23 +39,26 @@ const Reader: NextPage<Props> = ({ text }) => {
   }
 
   return (
-    <div>
-      <div className="w-72 mx-auto flex justify-between">
-        <Button onClick={onPrevSentence} disabled={lineIndex <= 0}>
-          &larr; Previous line
-        </Button>
-        <Button
-          onClick={onNextSentence}
-          disabled={lineIndex >= analyse.lines.length - 1}
-        >
-          Next line &rarr;
-        </Button>
-      </div>
+    <div className="flex justify-between space-x-10 flex-grow">
+      <Button
+        onClick={onPrevSentence}
+        disabled={lineIndex <= 0}
+        overrides={`dark:border-none dark:bg-gray-900 w-32 text-4xl`}
+      >
+        &larr;
+      </Button>
       <SentenceView
         sentence={analyse.lines[lineIndex]}
         focusWord={focusWord}
         setFocusWord={setFocusWord}
       />
+      <Button
+        onClick={onNextSentence}
+        disabled={lineIndex >= analyse.lines.length - 1}
+        overrides={`dark:border-none dark:bg-gray-900 w-32 text-4xl`}
+      >
+        &rarr;
+      </Button>
     </div>
   )
 }

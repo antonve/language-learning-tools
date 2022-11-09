@@ -80,7 +80,7 @@ const FocusWordPanel = ({
         </ButtonLink>
       </div>
 
-      <div className="divide-y-2 divide-yellow-400 divide-opacity-30 space-y-5">
+      <div className="divide-y-2 divide-yellow-400 divide-opacity-30 space-y-5 dark:divide-gray-800">
         {word.dictionary_entries.map(d => (
           <div className="flex pt-5" key={JSON.stringify(d)}>
             <Reading entry={d} />
