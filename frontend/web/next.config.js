@@ -12,7 +12,7 @@ module.exports = {
     return [
       {
         source: '/',
-        destination: '/anki/ja',
+        destination: isProd ? '/tools/anki/ja' : '/anki/ja',
         permanent: false,
       }
     ]
