@@ -18,7 +18,7 @@ import {
   useChineseDefinition,
   useEnglishDefinition,
 } from '@app/anki/components/zh'
-import { markCardAsExported } from './api'
+import { markCardAsExported } from '@app/anki/api'
 
 const CardWizard = ({
   words,
