@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
-import { textAnalyse } from '@app/chinesetextreader/api'
+import { textAnalyse, TextAnalyseToken } from '@app/chinesetextreader/api'
 import { useEffect, useState } from 'react'
-import { Button } from '@app/chinesemangareader/Components'
+import Button from '@app/anki/components/Button'
 import SentenceView from './SentenceView'
 import { useKeyPress } from '@app/chinesemangareader/hooks'
 
@@ -12,15 +12,18 @@ interface Props {
 const Reader: NextPage<Props> = ({ text }) => {
   const [analyse, setAnalyse] = useState<undefined | any>()
   const [lineIndex, setLineIndex] = useState<number>(0)
+  const [focusWord, setFocusWord] = useState<TextAnalyseToken | undefined>()
 
   const onNextSentence = () => {
     if (lineIndex < analyse.lines.length - 1) {
       setLineIndex(lineIndex + 1)
+      setFocusWord(undefined)
     }
   }
   const onPrevSentence = () => {
     if (lineIndex >= 1) {
       setLineIndex(lineIndex - 1)
+      setFocusWord(undefined)
     }
   }
 
@@ -48,7 +51,11 @@ const Reader: NextPage<Props> = ({ text }) => {
           Next line &rarr;
         </Button>
       </div>
-      <SentenceView sentence={analyse.lines[lineIndex]} />
+      <SentenceView
+        sentence={analyse.lines[lineIndex]}
+        focusWord={focusWord}
+        setFocusWord={setFocusWord}
+      />
     </div>
   )
 }

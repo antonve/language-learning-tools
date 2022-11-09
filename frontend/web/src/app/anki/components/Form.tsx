@@ -67,7 +67,7 @@ export const TextArea: FC<{
 }> = ({ value, onChange, id, rows, autoFocus }) => (
   <textarea
     className={
-      'mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50'
+      'mt-1 block w-full rounded border-gray-300 shadow-sm focus:border-purple-300 focus:ring focus:ring-purple-200 focus:ring-opacity-50 dark:bg-gray-900 dark:border-gray-700 dark:focus:ring-purple-400'
     }
     id={id}
     value={value ?? ''}

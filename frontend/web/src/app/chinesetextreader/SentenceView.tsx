@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from 'react'
+import { Dispatch, SetStateAction } from 'react'
 import {
   TextAnalyseDictionaryEntry,
   TextAnalyseLine,
@@ -13,32 +13,30 @@ import { Button, ButtonLink } from '@app/chinesemangareader/Components'
 
 interface Props {
   sentence: TextAnalyseLine
+  focusWord: TextAnalyseToken | undefined
+  setFocusWord: Dispatch<SetStateAction<TextAnalyseToken | undefined>>
 }
 
-const SentenceView = ({ sentence }: Props) => {
-  const [focusWord, setFocusWord] = useState<TextAnalyseToken | undefined>()
-
-  return (
-    <div>
-      <SentenceTranscript
-        focusWord={focusWord}
-        sentence={sentence}
-        toggle={(word: TextAnalyseToken) => {
-          if (focusWord?.start === word.start && focusWord?.end === word.end) {
-            setFocusWord(undefined)
-          } else {
-            setFocusWord(word)
-          }
-        }}
-      />
-      <FocusWordPanel
-        word={focusWord}
-        exportWord={async (cardType: CardType) => {}}
-        setFocusWord={setFocusWord}
-      />
-    </div>
-  )
-}
+const SentenceView = ({ sentence, focusWord, setFocusWord }: Props) => (
+  <div>
+    <SentenceTranscript
+      focusWord={focusWord}
+      sentence={sentence}
+      toggle={(word: TextAnalyseToken) => {
+        if (focusWord?.start === word.start && focusWord?.end === word.end) {
+          setFocusWord(undefined)
+        } else {
+          setFocusWord(word)
+        }
+      }}
+    />
+    <FocusWordPanel
+      word={focusWord}
+      exportWord={async (cardType: CardType) => {}}
+      setFocusWord={setFocusWord}
+    />
+  </div>
+)
 
 export default SentenceView
 
@@ -64,7 +62,7 @@ const FocusWordPanel = ({
   }
 
   return (
-    <div className="border-2 border-opacity-30 border-yellow-400 bg-yellow-50 p-4">
+    <div className="border-2 border-opacity-30 border-yellow-400 bg-yellow-50 p-4 dark:bg-gray-900 dark:border-gray-900">
       <div className="flex space-between mb-4 justify-between">
         <h2 className="text-4xl">{word.hanzi_traditional}</h2>
         {word.hanzi_simplified != word.hanzi_traditional ? (
@@ -76,7 +74,7 @@ const FocusWordPanel = ({
         <ButtonLink
           href={`https://www.mdbg.net/chinese/dictionary?page=worddict&wdrst=1&wdqb=${word.hanzi_traditional}`}
           target="_blank"
-          className="bg-violet-100 text-violet-500 hover:bg-violet-200 hover:text-violet-500"
+          className="bg-violet-100 text-violet-500 hover:bg-violet-200 hover:text-violet-50 dark:bg-violet-900 dark:text-violet-300 dark:hover:bg-violet-700 dark:hover:text-violet-100"
         >
           Dictionary
         </ButtonLink>
@@ -101,7 +99,7 @@ const FocusWordPanel = ({
                       window.alert('could not export word: ' + reason),
                     )
                 }
-                className="bg-green-100 text-green-500 hover:bg-green-200 hover:text-green-500"
+                className="bg-green-100 text-green-500 hover:bg-green-200 hover:text-green-500 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-green-100"
               >
                 Export sentence
               </Button>
@@ -113,7 +111,7 @@ const FocusWordPanel = ({
                       window.alert('could not export word: ' + reason),
                     )
                 }
-                className="bg-blue-100 text-blue-500 hover:bg-blue-200 hover:text-blue-500"
+                className="bg-blue-100 text-blue-500 hover:bg-blue-200 hover:text-blue-500 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-700 dark:hover:text-blue-100"
               >
                 Export vocab
               </Button>
@@ -153,10 +151,12 @@ const SentenceTranscript = ({
       <ruby
         className={`group ${
           w.start == focusWord?.start && w.end == focusWord?.end
-            ? 'bg-yellow-100'
+            ? 'bg-yellow-100 dark:bg-pink-300 dark:bg-opacity-20'
             : ''
         } ${
-          !!w.dictionary_entries ? 'hover:bg-yellow-100 cursor-pointer' : ''
+          !!w.dictionary_entries
+            ? 'hover:bg-yellow-100 dark:hover:bg-green-800 cursor-pointer'
+            : ''
         }`}
         key={i}
         onClick={() => {

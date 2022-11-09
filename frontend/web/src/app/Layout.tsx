@@ -1,26 +1,34 @@
-import { FC } from 'react'
+import classnames from 'classnames'
+import { FC, ReactNode } from 'react'
 
 interface Props {
   navigation?: () => any
   bodyClassName?: string
+  darkMode?: boolean
 }
 
 const Layout: FC<Props> = ({
   children,
   navigation,
   bodyClassName = 'px-10',
+  darkMode = false,
 }) => (
-  <div>
-    <div className="flex bg-gray-100 absolute">
+  <div
+    className={classnames(
+      {
+        'dark bg-gray-800 text-gray-200': darkMode,
+      },
+      'min-h-screen',
+    )}
+  >
+    <div className="flex bg-gray-100 absolute dark:bg-gray-900">
       <NavLink href="/anki/ja">Anki Miner</NavLink>
       <NavLink href="/mined-words">Mined Words</NavLink>
       <NavLink href="/chinese-manga-reader">Chinese Manga Reader</NavLink>
       <NavLink href="/chinese-text-reader">Chinese Text Reader</NavLink>
     </div>
     {navigation && (
-      <header
-        className={`bg-grey-lightest hero-background p-10 flex justify-between`}
-      >
+      <header className={`hero-background p-10 flex justify-between`}>
         {navigation()}
       </header>
     )}
@@ -41,6 +49,12 @@ const NavLink = ({
   >
     {children}
   </a>
+)
+
+export const PageTitle = ({ children }: { children?: ReactNode }) => (
+  <h1 className="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl dark:text-gray-100">
+    {children}
+  </h1>
 )
 
 export default Layout

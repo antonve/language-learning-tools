@@ -179,10 +179,10 @@ export const getReadingPairs = (entry: {
 }
 
 const toneColors: { [key: number]: string } = {
-  1: 'text-red-500',
-  2: 'text-orange-500',
-  3: 'text-green-500',
-  4: 'text-blue-500',
+  1: 'text-red-500 dark:text-red-600',
+  2: 'text-orange-500 dark:text-orange-400',
+  3: 'text-green-500 dark:text-green-300',
+  4: 'text-blue-500 dark:text-blue-400',
 }
 
 export const toneToColor = (tone: number) => {
