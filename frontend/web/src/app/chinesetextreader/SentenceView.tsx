@@ -1,5 +1,9 @@
 import { Dispatch, SetStateAction, useState } from 'react'
-import { TextAnalyseLine, TextAnalyseToken } from '@app/chinesetextreader/api'
+import {
+  TextAnalyseDictionaryEntry,
+  TextAnalyseLine,
+  TextAnalyseToken,
+} from '@app/chinesetextreader/api'
 import {
   CardType,
   getReadingPairs,
@@ -51,7 +55,7 @@ const FocusWordPanel = ({
     return null
   }
 
-  if (!word.dictionary_entry) {
+  if (!word.dictionary_entries) {
     return (
       <div className="border-2 border-opacity-30 border-yellow-400 p-4">
         No dictionary results
@@ -61,70 +65,71 @@ const FocusWordPanel = ({
 
   return (
     <div className="border-2 border-opacity-30 border-yellow-400 bg-yellow-50 p-4">
-      <div className="flex space-between text-4xl mb-4 justify-between">
-        <h2>{word.hanzi_traditional}</h2>
-        <Reading entry={word.dictionary_entry} />
+      <div className="flex space-between mb-4 justify-between">
+        <h2 className="text-4xl">{word.hanzi_traditional}</h2>
         {word.hanzi_simplified != word.hanzi_traditional ? (
-          <span title="simplified">{word.hanzi_simplified}</span>
+          <span title="simplified" className="text-4xl">
+            {word.hanzi_simplified}
+          </span>
         ) : null}
+
+        <ButtonLink
+          href={`https://www.mdbg.net/chinese/dictionary?page=worddict&wdrst=1&wdqb=${word.hanzi_traditional}`}
+          target="_blank"
+          className="bg-violet-100 text-violet-500 hover:bg-violet-200 hover:text-violet-500"
+        >
+          Dictionary
+        </ButtonLink>
       </div>
-      <ol className="list-decimal pl-5 flex-grow">
-        {word.dictionary_entry.meanings.map((m, i) => (
-          <li key={i}>{m}</li>
+
+      <div className="divide-y-2 divide-yellow-400 divide-opacity-30 space-y-5">
+        {word.dictionary_entries.map(d => (
+          <div className="flex pt-5" key={JSON.stringify(d)}>
+            <Reading entry={d} />
+            <ol className="list-decimal pl-5 flex-grow">
+              {d.meanings.map((m, i) => (
+                <li key={i}>{m}</li>
+              ))}
+            </ol>
+
+            <div className="flex flex-row space-x-4">
+              <Button
+                onClick={() =>
+                  exportWord('sentence')
+                    .then(() => setFocusWord(undefined))
+                    .catch(reason =>
+                      window.alert('could not export word: ' + reason),
+                    )
+                }
+                className="bg-green-100 text-green-500 hover:bg-green-200 hover:text-green-500"
+              >
+                Export sentence
+              </Button>
+              <Button
+                onClick={() =>
+                  exportWord('vocab')
+                    .then(() => setFocusWord(undefined))
+                    .catch(reason =>
+                      window.alert('could not export word: ' + reason),
+                    )
+                }
+                className="bg-blue-100 text-blue-500 hover:bg-blue-200 hover:text-blue-500"
+              >
+                Export vocab
+              </Button>
+            </div>
+          </div>
         ))}
-      </ol>
-      <div className="flex">
-        <div className="flex flex-row space-x-4 mt-4">
-          <Button
-            onClick={() =>
-              exportWord('sentence')
-                .then(() => setFocusWord(undefined))
-                .catch(reason =>
-                  window.alert('could not export word: ' + reason),
-                )
-            }
-            className="bg-green-100 text-green-500 hover:bg-green-200 hover:text-green-500"
-          >
-            Export sentence
-          </Button>
-          <Button
-            onClick={() =>
-              exportWord('vocab')
-                .then(() => setFocusWord(undefined))
-                .catch(reason =>
-                  window.alert('could not export word: ' + reason),
-                )
-            }
-            className="bg-blue-100 text-blue-500 hover:bg-blue-200 hover:text-blue-500"
-          >
-            Export vocab
-          </Button>
-          <ButtonLink
-            href={`https://www.mdbg.net/chinese/dictionary?page=worddict&wdrst=1&wdqb=${word.hanzi_traditional}`}
-            target="_blank"
-            className="bg-violet-100 text-violet-500 hover:bg-violet-200 hover:text-violet-500"
-          >
-            Dictionary
-          </ButtonLink>
-        </div>
       </div>
     </div>
   )
 }
 
-const Reading = ({
-  entry,
-}: {
-  entry: TextAnalyseToken['dictionary_entry']
-}) => {
-  if (!entry) {
-    return null
-  }
-
+const Reading = ({ entry }: { entry: TextAnalyseDictionaryEntry }) => {
   const pairs = getReadingPairs(entry)
 
   return (
-    <span>
+    <span className="text-4xl min-w-48 pr-10">
       {pairs.map((p, i) => (
         <span key={i} className={toneToColor(p.tone)}>
           {p.reading}
@@ -150,10 +155,12 @@ const SentenceTranscript = ({
           w.start == focusWord?.start && w.end == focusWord?.end
             ? 'bg-yellow-100'
             : ''
-        } ${!!w.dictionary_entry ? 'hover:bg-yellow-100 cursor-pointer' : ''}`}
+        } ${
+          !!w.dictionary_entries ? 'hover:bg-yellow-100 cursor-pointer' : ''
+        }`}
         key={i}
         onClick={() => {
-          if (w.dictionary_entry) {
+          if (w.dictionary_entries) {
             toggle(w)
           }
         }}
@@ -165,24 +172,24 @@ const SentenceTranscript = ({
 )
 
 const RubyText = ({ word }: { word: TextAnalyseToken }) => {
-  if (!word.dictionary_entry) {
+  if (word.dictionary_entries.length == 0) {
     return null
   }
 
   if (
     word.hanzi_traditional.toLowerCase() ===
-    word.dictionary_entry.pinyin_tones.toLowerCase()
+    word.dictionary_entries[0].pinyin_tones.toLowerCase()
   ) {
     return null
   }
 
-  if (word.dictionary_entry.pinyin_tones.includes('\uFFFD')) {
+  if (word.dictionary_entries[0].pinyin_tones.includes('\uFFFD')) {
     return null
   }
 
   return (
     <rt className="opacity-0 group-hover:opacity-80 text-xs my-8">
-      {word.dictionary_entry.pinyin_tones.toLowerCase()}
+      {word.dictionary_entries[0].pinyin_tones.toLowerCase()}
     </rt>
   )
 }

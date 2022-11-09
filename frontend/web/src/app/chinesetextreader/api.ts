@@ -5,13 +5,13 @@ export interface TextAnalyseToken {
   hanzi_simplified: string
   start: number
   end: number
-  dictionary_entry:
-    | {
-        pinyin_tones: string
-        pinyin: string
-        meanings: string[]
-      }
-    | undefined
+  dictionary_entries: TextAnalyseDictionaryEntry[]
+}
+
+export interface TextAnalyseDictionaryEntry {
+  pinyin_tones: string
+  pinyin: string
+  meanings: string[]
 }
 
 export interface TextAnalyseLine {
