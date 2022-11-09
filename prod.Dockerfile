@@ -1,8 +1,8 @@
-FROM golang:1.19-alpine as build
+FROM golang:1.19 as build
 WORKDIR /base
 COPY . .
 RUN go mod download
-RUN GOOS=linux go install -v ./...
+RUN CGO_ENABLED=1 GOOS=linux go install -v ./...
 
 # # Create production container
 FROM alpine:3.7
