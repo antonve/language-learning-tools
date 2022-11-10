@@ -1,3 +1,4 @@
+import { CedictResult } from '@app/anki/components/zh/api'
 import { unzipSync } from 'fflate'
 import getConfig from 'next/config'
 
@@ -52,7 +53,7 @@ export interface Word {
 export interface FocusWord {
   word: Word
   block: OcrBlock
-  cedict: CedictEntry | undefined
+  cedict: CedictResult | undefined
 }
 
 export interface Sentence {
@@ -123,33 +124,6 @@ const getTextForParagraph = (p: OcrParagraph): Sentence => {
 export const fetchOcr = async (image: Uint8Array): Promise<OcrResult> => {
   const url = `${root}/ocr`
   const response = await fetch(url, { method: 'POST', body: image })
-
-  if (response.status !== 200) {
-    throw new Error('not found')
-  }
-
-  const body = await response.json()
-
-  return body
-}
-
-export type CedictResponse = { [key: string]: CedictEntry }
-
-export interface CedictEntry {
-  source: string
-  pinyin_tones: string
-  pinyin: string
-  hanzi_simplified: string
-  hanzi_traditional: string
-  meanings: string[]
-}
-
-export const fetchCedict = async (words: Word[]): Promise<CedictResponse> => {
-  const url = `${root}/zh/cedict`
-  const response = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify({ words: words.map(w => w.text) }),
-  })
 
   if (response.status !== 200) {
     throw new Error('not found')

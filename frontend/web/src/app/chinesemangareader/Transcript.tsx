@@ -1,3 +1,9 @@
+import {
+  CedictResult,
+  CedictResultCollection,
+  CedictResultEntry,
+  getCedictDefinitions,
+} from '@app/anki/components/zh/api'
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { Button, ButtonLink } from './Components'
 import {
@@ -5,16 +11,12 @@ import {
   OcrResult,
   OcrBlock,
   Sentence,
-  CedictResponse,
-  fetchCedict,
-  CedictEntry,
   Word,
   FocusWord,
   getReadingPairs,
   toneToColor,
   CardType,
   getWordsFromOcrResult,
-  getRawTextForBlock,
 } from './domain'
 
 interface Props {
@@ -25,13 +27,15 @@ interface Props {
 }
 
 const Transcript = ({ ocr, focusWord, setFocusWord, exportWord }: Props) => {
-  const [cedict, setCedict] = useState<CedictResponse>({})
+  const [cedict, setCedict] = useState<CedictResultCollection>({})
 
   useEffect(() => {
     if (ocr) {
-      fetchCedict(getWordsFromOcrResult(ocr)).then(res => {
-        setCedict(res)
-      })
+      getCedictDefinitions(getWordsFromOcrResult(ocr).map(o => o.text)).then(
+        res => {
+          setCedict(res)
+        },
+      )
     }
   }, [ocr])
 
@@ -72,11 +76,11 @@ const BlockTranscript = ({
   focusWord: FocusWord | undefined
   setFocusWord: Dispatch<SetStateAction<FocusWord | undefined>>
   exportWord: (cardType: CardType) => Promise<void>
-  cedict: CedictResponse
+  cedict: CedictResultCollection
 }) => {
   const sentences = getTextForBlock(block)
 
-  const toggleSentence = (word: Word, cedict: CedictEntry) => {
+  const toggleSentence = (word: Word, cedict: CedictResult) => {
     if (word.text == focusWord?.word.text) {
       setFocusWord(undefined)
     } else {
@@ -130,62 +134,65 @@ const FocusWordPanel = ({
     )
   }
 
+  const dict = word.cedict
+
   return (
     <li className="border-2 border-opacity-30 border-yellow-400 bg-yellow-50 p-4">
       <div className="flex space-between text-4xl mb-4 justify-between">
         <h2>{word.word.text}</h2>
-        <Reading entry={word.cedict} />
-        {word.cedict.hanzi_simplified != word.word.text ? (
-          <span title="simplified">{word.cedict.hanzi_simplified}</span>
-        ) : null}
+        <ButtonLink
+          href={`https://www.mdbg.net/chinese/dictionary?page=worddict&wdrst=1&wdqb=${word.word.text}`}
+          target="_blank"
+          className="bg-violet-100 text-violet-500 hover:bg-violet-200 hover:text-violet-50 dark:bg-violet-900 dark:text-violet-300 dark:hover:bg-violet-700 dark:hover:text-violet-100"
+        >
+          Dictionary
+        </ButtonLink>
       </div>
-      <ol className="list-decimal pl-5 flex-grow">
-        {word.cedict.meanings.map((m, i) => (
-          <li key={i}>{m}</li>
+
+      <div className="divide-y-2 divide-yellow-400 divide-opacity-30 space-y-5 dark:divide-gray-800">
+        {dict.results.map(d => (
+          <div className="flex pt-5" key={JSON.stringify(d)}>
+            <Reading entry={d} />
+            <ol className="list-decimal pl-5 flex-grow">
+              {d.meanings.map((m, i) => (
+                <li key={i}>{m}</li>
+              ))}
+            </ol>
+
+            <div className="flex flex-row space-x-4">
+              <Button
+                onClick={() =>
+                  exportWord('sentence')
+                    .then(() => setFocusWord(undefined))
+                    .catch(reason =>
+                      window.alert('could not export word: ' + reason),
+                    )
+                }
+                className="bg-green-100 text-green-500 hover:bg-green-200 hover:text-green-500 dark:bg-green-900 dark:text-green-300 dark:hover:bg-green-700 dark:hover:text-green-100"
+              >
+                Export sentence
+              </Button>
+              <Button
+                onClick={() =>
+                  exportWord('vocab')
+                    .then(() => setFocusWord(undefined))
+                    .catch(reason =>
+                      window.alert('could not export word: ' + reason),
+                    )
+                }
+                className="bg-blue-100 text-blue-500 hover:bg-blue-200 hover:text-blue-500 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-700 dark:hover:text-blue-100"
+              >
+                Export vocab
+              </Button>
+            </div>
+          </div>
         ))}
-      </ol>
-      <div className="flex">
-        <div className="flex flex-row space-x-4 mt-4">
-          <Button
-            onClick={() =>
-              exportWord('sentence')
-                .then(() => setFocusWord(undefined))
-                .catch(reason =>
-                  window.alert('could not export word: ' + reason),
-                )
-            }
-            className="bg-green-100 text-green-500 hover:bg-green-200 hover:text-green-500"
-          >
-            Export sentence
-          </Button>
-          <Button
-            onClick={() =>
-              exportWord('vocab')
-                .then(() => setFocusWord(undefined))
-                .catch(reason =>
-                  window.alert('could not export word: ' + reason),
-                )
-            }
-            className="bg-blue-100 text-blue-500 hover:bg-blue-200 hover:text-blue-500"
-          >
-            Export vocab
-          </Button>
-          <ButtonLink
-            href={`https://www.mdbg.net/chinese/dictionary?page=worddict&wdrst=1&wdqb=${getRawTextForBlock(
-              word.block,
-            )}`}
-            target="_blank"
-            className="bg-violet-100 text-violet-500 hover:bg-violet-200 hover:text-violet-500"
-          >
-            Dictionary
-          </ButtonLink>
-        </div>
       </div>
     </li>
   )
 }
 
-const Reading = ({ entry }: { entry: CedictEntry }) => {
+const Reading = ({ entry }: { entry: CedictResultEntry }) => {
   const pairs = getReadingPairs(entry)
 
   return (
@@ -206,9 +213,9 @@ const SentenceTranscript = ({
   cedict,
 }: {
   sentence: Sentence
-  toggle: (word: Word, cedict: CedictEntry) => void
+  toggle: (word: Word, cedict: CedictResult) => void
   focusWord: FocusWord | undefined
-  cedict: CedictResponse
+  cedict: CedictResultCollection
 }) => (
   <span>
     {sentence.words.map((w, i) => (
@@ -233,24 +240,27 @@ const RubyText = ({
   cedict,
   word,
 }: {
-  cedict: CedictEntry | undefined
+  cedict: CedictResult | undefined
   word: Word
 }) => {
-  if (!cedict) {
+  if (!cedict || cedict.results.length == 0) {
     return null
   }
 
-  if (word.text.toLowerCase() === cedict.pinyin_tones.toLowerCase()) {
-    return null
-  }
+  // if (
+  //   word.hanzi_traditional.toLowerCase() ===
+  //   word.dictionary_entries[0].pinyin_tones.toLowerCase()
+  // ) {
+  //   return null
+  // }
 
-  if (cedict.pinyin_tones.includes('\uFFFD')) {
-    return null
-  }
+  // if (word.dictionary_entries[0].pinyin_tones.includes('\uFFFD')) {
+  //   return null
+  // }
 
   return (
     <rt className="opacity-0 group-hover:opacity-80 text-xs my-8">
-      {cedict.pinyin_tones.toLowerCase()}
+      {cedict.results[0].pinyin_tones.toLowerCase()}
     </rt>
   )
 }
