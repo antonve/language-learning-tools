@@ -53,20 +53,22 @@ export const useEnglishDefinition = (word: string | undefined) => {
 
     const update = async () => {
       const req = await getCedictDefinition(word)
-      const defs = req.meanings.map(m => ({
-        meaning: m,
-      }))
+      const defs = req.results.flatMap(r =>
+        r.meanings.map(m => ({
+          meaning: m,
+        })),
+      )
       const def = formatDefinitions(defs)
 
       setDefinition({
         word,
         pinyin: {
-          raw: req.pinyin,
-          pretty: req.pinyin_tones,
+          raw: req.results.map(r => r.pinyin).join(', '),
+          pretty: req.results.map(r => r.pinyin_tones).join(', '),
         },
         hanzi: {
-          simplified: req.hanzi_simplified,
-          traditional: req.hanzi_traditional,
+          simplified: req.results.map(r => r.hanzi_simplified).join(', '),
+          traditional: req.results.map(r => r.hanzi_traditional).join(', '),
         },
         definition: def,
         finished: true,
