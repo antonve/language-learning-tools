@@ -1,15 +1,17 @@
-import { Dispatch, SetStateAction } from 'react'
-import {
-  TextAnalyseDictionaryEntry,
-  TextAnalyseLine,
-  TextAnalyseToken,
-} from '@app/chinesetextreader/api'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { TextAnalyseLine, TextAnalyseToken } from '@app/chinesetextreader/api'
 import {
   CardType,
   getReadingPairs,
   toneToColor,
 } from '@app/chinesemangareader/domain'
 import { Button, ButtonLink } from '@app/chinesemangareader/Components'
+import {
+  CedictResult,
+  CedictResultCollection,
+  CedictResultEntry,
+  getCedictDefinitions,
+} from '@app/anki/components/zh/api'
 
 interface Props {
   sentence: TextAnalyseLine
@@ -17,26 +19,38 @@ interface Props {
   setFocusWord: Dispatch<SetStateAction<TextAnalyseToken | undefined>>
 }
 
-const SentenceView = ({ sentence, focusWord, setFocusWord }: Props) => (
-  <div>
-    <SentenceTranscript
-      focusWord={focusWord}
-      sentence={sentence}
-      toggle={(word: TextAnalyseToken) => {
-        if (focusWord?.start === word.start && focusWord?.end === word.end) {
-          setFocusWord(undefined)
-        } else {
-          setFocusWord(word)
-        }
-      }}
-    />
-    <FocusWordPanel
-      word={focusWord}
-      exportWord={async (cardType: CardType) => {}}
-      setFocusWord={setFocusWord}
-    />
-  </div>
-)
+const SentenceView = ({ sentence, focusWord, setFocusWord }: Props) => {
+  const [defs, setDefs] = useState<CedictResultCollection>({})
+
+  useEffect(() => {
+    getCedictDefinitions(sentence.tokens.map(t => t.hanzi_traditional)).then(
+      res => setDefs(res),
+    )
+  }, [sentence])
+
+  return (
+    <div>
+      <SentenceTranscript
+        focusWord={focusWord}
+        sentence={sentence}
+        toggle={(word: TextAnalyseToken) => {
+          if (focusWord?.start === word.start && focusWord?.end === word.end) {
+            setFocusWord(undefined)
+          } else {
+            setFocusWord(word)
+          }
+        }}
+        defs={defs}
+      />
+      <FocusWordPanel
+        word={focusWord}
+        exportWord={async (cardType: CardType) => {}}
+        setFocusWord={setFocusWord}
+        defs={defs}
+      />
+    </div>
+  )
+}
 
 export default SentenceView
 
@@ -44,16 +58,20 @@ const FocusWordPanel = ({
   word,
   exportWord,
   setFocusWord,
+  defs,
 }: {
   word: TextAnalyseToken | undefined
   exportWord: (cardType: CardType) => Promise<void>
   setFocusWord: Dispatch<SetStateAction<TextAnalyseToken | undefined>>
+  defs: CedictResultCollection
 }) => {
   if (!word) {
     return null
   }
 
-  if (!word.dictionary_entries) {
+  const dict = defs[word.hanzi_traditional]
+
+  if (!dict) {
     return (
       <div className="border-2 border-opacity-30 border-yellow-400 p-4">
         No dictionary results
@@ -81,7 +99,7 @@ const FocusWordPanel = ({
       </div>
 
       <div className="divide-y-2 divide-yellow-400 divide-opacity-30 space-y-5 dark:divide-gray-800">
-        {word.dictionary_entries.map(d => (
+        {dict.results.map(d => (
           <div className="flex pt-5" key={JSON.stringify(d)}>
             <Reading entry={d} />
             <ol className="list-decimal pl-5 flex-grow">
@@ -123,7 +141,7 @@ const FocusWordPanel = ({
   )
 }
 
-const Reading = ({ entry }: { entry: TextAnalyseDictionaryEntry }) => {
+const Reading = ({ entry }: { entry: CedictResultEntry }) => {
   const pairs = getReadingPairs(entry)
 
   return (
@@ -141,10 +159,12 @@ const SentenceTranscript = ({
   sentence,
   toggle,
   focusWord,
+  defs,
 }: {
   sentence: TextAnalyseLine
   toggle: (word: TextAnalyseToken) => void
   focusWord: TextAnalyseToken | undefined
+  defs: CedictResultCollection
 }) => (
   <p className="text-center text-4xl m-8">
     {sentence.tokens.map((w, i) => (
@@ -154,42 +174,53 @@ const SentenceTranscript = ({
             ? 'bg-yellow-100 dark:bg-pink-300 dark:bg-opacity-20'
             : ''
         } ${
-          !!w.dictionary_entries
+          defs[w.hanzi_traditional] &&
+          defs[w.hanzi_traditional].results.length >= 1
             ? 'hover:bg-yellow-100 dark:hover:bg-green-800 cursor-pointer'
             : ''
         }`}
         key={i}
         onClick={() => {
-          if (w.dictionary_entries) {
+          if (
+            defs[w.hanzi_traditional] &&
+            defs[w.hanzi_traditional].results.length >= 1
+          ) {
             toggle(w)
           }
         }}
       >
-        {w.hanzi_traditional} <RubyText word={w} />
+        {w.hanzi_traditional}{' '}
+        <RubyText word={w} def={defs[w.hanzi_traditional]} />
       </ruby>
     ))}
   </p>
 )
 
-const RubyText = ({ word }: { word: TextAnalyseToken }) => {
-  if (word.dictionary_entries.length == 0) {
+const RubyText = ({
+  word,
+  def,
+}: {
+  word: TextAnalyseToken
+  def: CedictResult | undefined
+}) => {
+  if (!def || def.results.length == 0) {
     return null
   }
 
-  if (
-    word.hanzi_traditional.toLowerCase() ===
-    word.dictionary_entries[0].pinyin_tones.toLowerCase()
-  ) {
-    return null
-  }
+  // if (
+  //   word.hanzi_traditional.toLowerCase() ===
+  //   word.dictionary_entries[0].pinyin_tones.toLowerCase()
+  // ) {
+  //   return null
+  // }
 
-  if (word.dictionary_entries[0].pinyin_tones.includes('\uFFFD')) {
-    return null
-  }
+  // if (word.dictionary_entries[0].pinyin_tones.includes('\uFFFD')) {
+  //   return null
+  // }
 
   return (
     <rt className="opacity-0 group-hover:opacity-80 text-xs my-8">
-      {word.dictionary_entries[0].pinyin_tones.toLowerCase()}
+      {def.results[0].pinyin_tones.toLowerCase()}
     </rt>
   )
 }

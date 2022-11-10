@@ -2,12 +2,18 @@ import { root } from '@app/anki/api'
 
 export interface CedictResult {
   source: string
-  pinyin_tones?: string
-  pinyin?: string
-  hanzi_simplified?: string
-  hanzi_traditional?: string
+  results: CedictResultEntry[]
+}
+
+export interface CedictResultEntry {
+  pinyin_tones: string
+  pinyin: string
+  hanzi_simplified: string
+  hanzi_traditional: string
   meanings: string[]
 }
+
+export type CedictResultCollection = { [key: string]: CedictResult }
 
 export interface ZdicResult {
   source: string
@@ -31,13 +37,32 @@ export const getCedictDefinition = async (
   if (response.status !== 200) {
     return {
       source: word,
-      meanings: [],
+      results: [],
     }
   }
 
   const body = await response.json()
 
   return body[word]
+}
+
+export const getCedictDefinitions = async (
+  words: string[],
+): Promise<CedictResultCollection> => {
+  const url = `${root}/zh/cedict`
+  const response = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify({
+      words: words,
+    }),
+  })
+
+  if (response.status !== 200) {
+    return {}
+  }
+
+  const body = await response.json()
+  return body
 }
 
 export const getZdicDefinition = async (word: string): Promise<ZdicResult> => {

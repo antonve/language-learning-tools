@@ -418,7 +418,7 @@ type CedictRequest struct {
 type CedictResultResponse struct {
 	PinyinTones      string   `json:"pinyin_tones"`
 	Pinyin           string   `json:"pinyin"`
-	HanziSimplified  string   `json:"hanzi_simplified,omit"`
+	HanziSimplified  string   `json:"hanzi_simplified"`
 	HanziTraditional string   `json:"hanzi_traditional"`
 	Meanings         []string `json:"meanings"`
 }
