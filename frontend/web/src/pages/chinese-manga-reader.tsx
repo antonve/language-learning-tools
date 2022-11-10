@@ -37,11 +37,12 @@ const ChineseMangaReader: NextPage<{}> = () => {
       meta: {
         sentence: getRawTextForBlock(focusWord.block),
         card_type: cardType,
-        hanzi_traditional: focusWord.cedict?.hanzi_traditional,
-        hanzi_simplified: focusWord.cedict?.hanzi_simplified,
-        pinyin: focusWord.cedict?.pinyin.toLowerCase(),
-        pinyin_tones: focusWord.cedict?.pinyin_tones.toLowerCase(),
-        meanings: focusWord.cedict?.meanings ?? [],
+        // TODO: FIX ME
+        // hanzi_traditional: focusWord.cedict?.hanzi_traditional,
+        // hanzi_simplified: focusWord.cedict?.hanzi_simplified,
+        // pinyin: focusWord.cedict?.pinyin.toLowerCase(),
+        // pinyin_tones: focusWord.cedict?.pinyin_tones.toLowerCase(),
+        // meanings: focusWord.cedict?.meanings ?? [],
       },
     })
   }
