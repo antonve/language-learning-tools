@@ -30,10 +30,10 @@ RUN ldd api_miner | tr -s '[:blank:]' '\n' | grep '^/' | \
 RUN mkdir -p lib64 && cp /lib64/ld-linux-x86-64.so.2 lib64/
 
 # Create the minimal runtime image
-FROM scratch
+FROM alpine
 
 COPY --chown=0:0 --from=builder /dist /
-COPY --chown=0:0 --from=builder /go/pkg/mod/github.com/yanyiwu /go/pkg/mod/github.com/yanyiwu
+COPY --chown=0:0 --from=builder /go/pkg/mod/github.com/yanyiwu/gojieba@v1.2.0/dict/ /go/pkg/mod/github.com/yanyiwu/gojieba@v1.2.0/dict/
 
 # Set up the app to run as a non-root user
 # User ID 65534 is usually user 'nobody'.

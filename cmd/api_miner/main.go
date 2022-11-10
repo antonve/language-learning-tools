@@ -389,21 +389,22 @@ func (api *api) Cedict(c echo.Context) error {
 		}
 
 		fmt.Println(token)
-		pinyin := api.cedict.HanziToPinyin(token)
-		meaning := api.cedict.GetByHanzi(token)
-		pinyinTones := cedict.PinyinTones(meaning.Pinyin)
+
+		defs := api.cedict.GetAllByHanzi(token)
 
 		res[token] = &CedictResponse{
-			Source:      token,
-			Pinyin:      pinyin,
-			PinyinTones: pinyinTones,
-			Meanings:    []string{},
+			Source:  token,
+			Results: []CedictResultResponse{},
 		}
 
-		if meaning != nil {
-			res[token].HanziSimplified = meaning.Simplified
-			res[token].HanziTraditional = meaning.Traditional
-			res[token].Meanings = meaning.Meanings
+		for _, d := range defs {
+			res[token].Results = append(res[token].Results, CedictResultResponse{
+				Pinyin:           d.Pinyin,
+				PinyinTones:      cedict.PinyinTones(d.Pinyin),
+				HanziSimplified:  d.Simplified,
+				HanziTraditional: d.Traditional,
+				Meanings:         d.Meanings,
+			})
 		}
 	}
 
@@ -414,13 +415,17 @@ type CedictRequest struct {
 	Words []string `json:"words"`
 }
 
-type CedictResponse struct {
-	Source           string   `json:"source"`
+type CedictResultResponse struct {
 	PinyinTones      string   `json:"pinyin_tones"`
 	Pinyin           string   `json:"pinyin"`
 	HanziSimplified  string   `json:"hanzi_simplified,omit"`
 	HanziTraditional string   `json:"hanzi_traditional"`
 	Meanings         []string `json:"meanings"`
+}
+
+type CedictResponse struct {
+	Source  string                 `json:"source"`
+	Results []CedictResultResponse `json:"results"`
 }
 
 func (api *api) Zdic(c echo.Context) error {
@@ -632,18 +637,11 @@ type ChineseTextAnalyseLine struct {
 	Tokens      []ChineseTextAnalyseToken `json:"tokens"`
 }
 
-type ChineseTextAnalyseDictionaryEntry struct {
-	PinyinTones string   `json:"pinyin_tones"`
-	Pinyin      string   `json:"pinyin"`
-	Meanings    []string `json:"meanings"`
-}
-
 type ChineseTextAnalyseToken struct {
-	Traditional       string                              `json:"hanzi_traditional"`
-	Simplified        string                              `json:"hanzi_simplified"`
-	Start             int                                 `json:"start"`
-	End               int                                 `json:"end"`
-	DictionaryEntries []ChineseTextAnalyseDictionaryEntry `json:"dictionary_entries"`
+	Traditional string `json:"hanzi_traditional"`
+	Simplified  string `json:"hanzi_simplified"`
+	Start       int    `json:"start"`
+	End         int    `json:"end"`
 }
 
 type ChineseTextAnalyseResponse struct {
@@ -680,22 +678,10 @@ func (api *api) ChineseTextAnalyse(c echo.Context) error {
 
 		for j, w := range words {
 			tokens[j] = ChineseTextAnalyseToken{
-				Traditional:       line[w.Start:w.End],
-				Simplified:        w.Str,
-				Start:             w.Start,
-				End:               w.End,
-				DictionaryEntries: []ChineseTextAnalyseDictionaryEntry{},
-			}
-
-			lookups := api.cedict.GetAllByHanzi(w.Str)
-			for _, lookup := range lookups {
-				if lookup.Pinyin != "" {
-					tokens[j].DictionaryEntries = append(tokens[j].DictionaryEntries, ChineseTextAnalyseDictionaryEntry{
-						Pinyin:      lookup.Pinyin,
-						PinyinTones: cedict.PinyinTones(lookup.Pinyin),
-						Meanings:    lookup.Meanings,
-					})
-				}
+				Traditional: line[w.Start:w.End],
+				Simplified:  w.Str,
+				Start:       w.Start,
+				End:         w.End,
 			}
 		}
 
