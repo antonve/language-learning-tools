@@ -1,12 +1,14 @@
+import { CedictResult, getCedictDefinitions } from '@app/anki/components/zh/api'
 import { TextAnalyseLine, TextAnalyseToken } from '@app/chinesetextreader/api'
 
 interface Props {
   sentence: TextAnalyseLine
   focusWord: TextAnalyseToken | undefined
   setFocusWord: (word: TextAnalyseToken | undefined) => void
+  addDef: (res: CedictResult) => void
 }
 
-const SentenceView = ({ sentence, focusWord, setFocusWord }: Props) => (
+const SentenceView = ({ sentence, focusWord, setFocusWord, addDef }: Props) => (
   <p className="text-center text-4xl m-8">
     {sentence.tokens.map((w, i) => (
       <span
@@ -24,6 +26,28 @@ const SentenceView = ({ sentence, focusWord, setFocusWord }: Props) => (
           } else {
             setFocusWord(w)
           }
+        }}
+        onMouseUp={async () => {
+          const selectedText = document.getSelection()?.toString()
+
+          if (!selectedText) {
+            return
+          }
+
+          const def = await getCedictDefinitions([selectedText])
+
+          if (!def[selectedText]) {
+            return
+          }
+
+          addDef(def[selectedText])
+
+          setFocusWord({
+            hanzi_traditional: selectedText,
+            hanzi_simplified: selectedText,
+            start: 0,
+            end: 0,
+          })
         }}
       >
         {w.hanzi_traditional}
