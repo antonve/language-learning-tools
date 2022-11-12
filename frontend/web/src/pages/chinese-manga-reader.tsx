@@ -1,16 +1,16 @@
 import type { NextPage } from 'next'
 import { useEffect, useState } from 'react'
-import BookImporter from '@app/chinesemangareader/BookImporter'
-import BookNavigation from '@app/chinesemangareader/BookNavigation'
-import BookPage from '@app/chinesemangareader/BookPage'
+import BookImporter from '@app/chinesereader/BookImporter'
+import BookNavigation from '@app/chinesereader/BookNavigation'
+import BookPage from '@app/chinesereader/BookPage'
 import {
   Book,
   fetchOcr,
   CardType,
   parseOcrForTextAnalyse,
   FocusWordWithSentence,
-} from '@app/chinesemangareader/domain'
-import Transcript from '@app/chinesemangareader/Transcript'
+} from '@app/chinesereader/domain'
+import Transcript from '@app/chinesereader/Transcript'
 import Layout from '@app/Layout'
 import {
   CedictResultCollection,
@@ -21,8 +21,8 @@ import {
   exportWordToAnki,
   textAnalyse,
   TextAnalyseResponse,
-} from '@app/chinesemangareader/api'
-import FocusWordPanel from '@app/chinesemangareader/FocusWordPanel'
+} from '@app/chinesereader/api'
+import FocusWordPanel from '@app/chinesereader/FocusWordPanel'
 
 const ChineseMangaReader: NextPage<{}> = () => {
   const [book, setBook] = useState<Book>()

@@ -1,10 +1,10 @@
-import { TextAnalyseToken } from '@app/chinesemangareader/api'
+import { TextAnalyseToken } from '@app/chinesereader/api'
 import {
   CardType,
   getReadingPairs,
   toneToColor,
-} from '@app/chinesemangareader/domain'
-import { Button, ButtonLink } from '@app/chinesemangareader/Components'
+} from '@app/chinesereader/domain'
+import { Button, ButtonLink } from '@app/chinesereader/Components'
 import {
   CedictResultCollection,
   CedictResultEntry,

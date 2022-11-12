@@ -4,11 +4,11 @@ import {
   textAnalyse,
   TextAnalyseResponse,
   TextAnalyseToken,
-} from '@app/chinesemangareader/api'
+} from '@app/chinesereader/api'
 import { useEffect, useState } from 'react'
 import Button from '@app/anki/components/Button'
 import SentenceView from './SentenceView'
-import { useKeyPress } from '@app/chinesemangareader/hooks'
+import { useKeyPress } from '@app/chinesereader/hooks'
 import {
   CedictResultCollection,
   getCedictDefinitions,

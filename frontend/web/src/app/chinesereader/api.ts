@@ -1,6 +1,6 @@
 import { root } from '@app/anki/api'
 import { CedictResultEntry } from '@app/anki/components/zh/api'
-import { CardType, createPendingCard } from '@app/chinesemangareader/domain'
+import { CardType, createPendingCard } from '@app/chinesereader/domain'
 
 export interface TextAnalyseToken {
   hanzi_traditional: string

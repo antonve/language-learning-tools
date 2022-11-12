@@ -2,8 +2,8 @@ import type { NextPage } from 'next'
 import { useState } from 'react'
 import Layout, { PageTitle } from '@app/Layout'
 import Button from '@app/anki/components/Button'
-import TextInput from '@app/chinesemangareader/TextInput'
-import Reader from '@app/chinesemangareader/Reader'
+import TextInput from '@app/chinesereader/TextInput'
+import Reader from '@app/chinesereader/Reader'
 
 const TextReader: NextPage<{}> = () => {
   const [text, setText] = useState<string | undefined>()
