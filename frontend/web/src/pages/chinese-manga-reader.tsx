@@ -6,50 +6,44 @@ import BookPage from '@app/chinesemangareader/BookPage'
 import {
   Book,
   fetchOcr,
-  OcrResult,
-  FocusWord,
-  createPendingCard,
   CardType,
-  getRawTextForBlock,
   parseOcrForTextAnalyse,
 } from '@app/chinesemangareader/domain'
 import Transcript from '@app/chinesemangareader/Transcript'
 import Layout from '@app/Layout'
 import { CedictResultEntry } from '@app/anki/components/zh/api'
-import { textAnalyse } from '@app/chinesetextreader/api'
+import {
+  exportWordToAnki,
+  textAnalyse,
+  TextAnalyseResponse,
+  TextAnalyseToken,
+} from '@app/chinesetextreader/api'
 
 const ChineseMangaReader: NextPage<{}> = () => {
   const [book, setBook] = useState<Book>()
   const [page, setPage] = useState(0)
   const [canvasData, setCanvasData] = useState<string>('')
-  const [ocr, setOcr] = useState<OcrResult>()
-  const [focusWord, setFocusWord] = useState<FocusWord>()
+  const [transcript, setTranscript] = useState<TextAnalyseResponse>()
+  const [focusWord, setFocusWord] = useState<TextAnalyseToken>()
 
-  const exportWord = (cardType: CardType, def: CedictResultEntry) => {
-    if (!focusWord) {
-      return Promise.reject()
-    }
-
+  const exportWord = (
+    cardType: CardType,
+    def: CedictResultEntry,
+    focusWord: TextAnalyseToken,
+    sentence: string,
+  ) => {
     const prefix = 'data:image/jpeg;base64,'
 
-    return createPendingCard({
-      id: undefined,
-      language_code: 'zho',
-      token: focusWord.word.text,
-      source_image: canvasData.slice(prefix.length),
-      meta: {
-        sentence: getRawTextForBlock(focusWord.block),
-        card_type: cardType,
-        hanzi_traditional: def.hanzi_traditional,
-        hanzi_simplified: def.hanzi_simplified,
-        pinyin: def.pinyin.toLowerCase(),
-        pinyin_tones: def.pinyin_tones.toLowerCase(),
-        meanings: def.meanings ?? [],
-      },
-    })
+    return exportWordToAnki(
+      cardType,
+      def,
+      focusWord,
+      sentence,
+      canvasData.slice(prefix.length),
+    )
   }
 
-  useEffect(() => setOcr(undefined), [page])
+  useEffect(() => setTranscript(undefined), [page])
 
   const loadTranscript = async () => {
     if (!book) {
@@ -58,8 +52,7 @@ const ChineseMangaReader: NextPage<{}> = () => {
 
     const ocr = await fetchOcr(book.pages[page])
     const transcript = await textAnalyse(parseOcrForTextAnalyse(ocr))
-    console.log(transcript)
-    setOcr(ocr)
+    setTranscript(transcript)
   }
 
   if (!book) {
@@ -92,8 +85,6 @@ const ChineseMangaReader: NextPage<{}> = () => {
         <BookPage
           book={book}
           index={page}
-          ocr={ocr}
-          focusWord={focusWord}
           setCanvasData={setCanvasData}
           onNextPage={onNextPage}
           onPrevPage={onPrevPage}
@@ -118,7 +109,7 @@ const ChineseMangaReader: NextPage<{}> = () => {
             </h2>
           </div>
           <Transcript
-            ocr={ocr}
+            analyse={transcript}
             focusWord={focusWord}
             setFocusWord={setFocusWord}
             exportWord={exportWord}

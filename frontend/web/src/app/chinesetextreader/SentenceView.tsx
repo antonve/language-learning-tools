@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { TextAnalyseLine, TextAnalyseToken } from '@app/chinesetextreader/api'
 import {
   CardType,
-  createPendingCard,
   getReadingPairs,
   toneToColor,
 } from '@app/chinesemangareader/domain'
@@ -18,9 +17,20 @@ interface Props {
   sentence: TextAnalyseLine
   focusWord: TextAnalyseToken | undefined
   setFocusWord: Dispatch<SetStateAction<TextAnalyseToken | undefined>>
+  exportWord: (
+    cardType: CardType,
+    def: CedictResultEntry,
+    focusWord: TextAnalyseToken,
+    sentence: string,
+  ) => void
 }
 
-const SentenceView = ({ sentence, focusWord, setFocusWord }: Props) => {
+const SentenceView = ({
+  sentence,
+  focusWord,
+  setFocusWord,
+  exportWord,
+}: Props) => {
   const [defs, setDefs] = useState<CedictResultCollection>({})
 
   useEffect(() => {
@@ -28,29 +38,6 @@ const SentenceView = ({ sentence, focusWord, setFocusWord }: Props) => {
       res => setDefs(res),
     )
   }, [sentence])
-
-  // TODO: merge text and manga reader domain logic
-  const exportWord = (cardType: CardType, def: CedictResultEntry) => {
-    if (!focusWord) {
-      return Promise.reject()
-    }
-
-    return createPendingCard({
-      id: undefined,
-      language_code: 'zho',
-      token: focusWord.hanzi_traditional,
-      source_image: undefined,
-      meta: {
-        sentence: sentence.tokens.map(t => t.hanzi_traditional).join(''),
-        card_type: cardType,
-        hanzi_traditional: focusWord.hanzi_traditional,
-        hanzi_simplified: focusWord.hanzi_simplified,
-        pinyin: def.pinyin.toLowerCase(),
-        pinyin_tones: def.pinyin_tones.toLowerCase(),
-        meanings: def.meanings ?? [],
-      },
-    })
-  }
 
   return (
     <div>
@@ -68,7 +55,18 @@ const SentenceView = ({ sentence, focusWord, setFocusWord }: Props) => {
       />
       <FocusWordPanel
         word={focusWord}
-        exportWord={exportWord}
+        exportWord={async (cardType, def) => {
+          if (!focusWord) {
+            return
+          }
+
+          return exportWord(
+            cardType,
+            def,
+            focusWord,
+            sentence.tokens.map(t => t.hanzi_traditional).join(''),
+          )
+        }}
         setFocusWord={setFocusWord}
         defs={defs}
       />

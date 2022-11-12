@@ -6,20 +6,12 @@ import {
   useRef,
   useState,
 } from 'react'
-import {
-  arrayBufferToBase64,
-  Book,
-  FocusWord,
-  OcrBoundingBox,
-  OcrResult,
-} from './domain'
+import { arrayBufferToBase64, Book } from './domain'
 import { useWindowSize } from './hooks'
 
 interface Props {
   book: Book
   index: number
-  ocr: OcrResult | undefined
-  focusWord: FocusWord | undefined
   setCanvasData: Dispatch<SetStateAction<string>>
   onPrevPage: () => void
   onNextPage: () => void
@@ -28,8 +20,6 @@ interface Props {
 const BookPage = ({
   book,
   index,
-  ocr,
-  focusWord,
   setCanvasData,
   onNextPage,
   onPrevPage,
@@ -82,40 +72,6 @@ const BookPage = ({
 
       context.drawImage(img, x, y, width, height)
 
-      const drawPath = (box: OcrBoundingBox) => {
-        const { vertices } = box
-        context.beginPath()
-        context.moveTo(
-          x + vertices[0].x * scale - 5,
-          y + vertices[0].y * scale - 5,
-        )
-        context.lineTo(
-          x + vertices[1].x * scale + 5,
-          y + vertices[1].y * scale - 5,
-        )
-        context.lineTo(
-          x + vertices[2].x * scale + 5,
-          y + vertices[2].y * scale + 5,
-        )
-        context.lineTo(
-          x + vertices[3].x * scale - 5,
-          y + vertices[3].y * scale + 5,
-        )
-        context.closePath()
-      }
-
-      if (focusWord) {
-        drawPath(focusWord.block.bounding_box)
-
-        context.strokeStyle = 'rgba(163,230,53, 0.5)'
-        context.lineWidth = 2
-        context.stroke()
-
-        drawPath(focusWord.word.boundingBox)
-        context.fillStyle = 'rgba(254, 240, 138, 0.2)'
-        context.fill()
-      }
-
       setCanvasData(canvas.toDataURL('image/jpeg'))
     }
 
@@ -125,8 +81,6 @@ const BookPage = ({
     containerRef,
     imageUrl,
     containerSize,
-    ocr,
-    focusWord,
     setCanvasData,
     fitToScreen,
   ])

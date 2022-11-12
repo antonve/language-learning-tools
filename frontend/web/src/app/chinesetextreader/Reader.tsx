@@ -1,10 +1,15 @@
 import type { NextPage } from 'next'
-import { textAnalyse, TextAnalyseToken } from '@app/chinesetextreader/api'
+import {
+  exportWordToAnki,
+  textAnalyse,
+  TextAnalyseToken,
+} from '@app/chinesetextreader/api'
 import { useEffect, useState } from 'react'
 import Button from '@app/anki/components/Button'
 import SentenceView from './SentenceView'
 import { useKeyPress } from '@app/chinesemangareader/hooks'
 import { CardType, createPendingCard } from '@app/chinesemangareader/domain'
+import { CedictResultEntry } from '@app/anki/components/zh/api'
 
 interface Props {
   text: string
@@ -52,6 +57,7 @@ const Reader: NextPage<Props> = ({ text }) => {
         sentence={analyse.lines[lineIndex]}
         focusWord={focusWord}
         setFocusWord={setFocusWord}
+        exportWord={exportWordToAnki}
       />
       <Button
         onClick={onNextSentence}

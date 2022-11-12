@@ -50,12 +50,6 @@ export interface Word {
   boundingBox: OcrBoundingBox
 }
 
-export interface FocusWord {
-  word: Word
-  block: OcrBlock
-  cedict: CedictResult | undefined
-}
-
 export interface Sentence {
   words: Word[]
 }
