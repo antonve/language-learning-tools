@@ -11,10 +11,12 @@ import {
   createPendingCard,
   CardType,
   getRawTextForBlock,
+  parseOcrForTextAnalyse,
 } from '@app/chinesemangareader/domain'
 import Transcript from '@app/chinesemangareader/Transcript'
 import Layout from '@app/Layout'
 import { CedictResultEntry } from '@app/anki/components/zh/api'
+import { textAnalyse } from '@app/chinesetextreader/api'
 
 const ChineseMangaReader: NextPage<{}> = () => {
   const [book, setBook] = useState<Book>()
@@ -49,14 +51,15 @@ const ChineseMangaReader: NextPage<{}> = () => {
 
   useEffect(() => setOcr(undefined), [page])
 
-  const loadTranscript = () => {
+  const loadTranscript = async () => {
     if (!book) {
       return
     }
 
-    fetchOcr(book.pages[page]).then(res => {
-      setOcr(res)
-    })
+    const ocr = await fetchOcr(book.pages[page])
+    const transcript = await textAnalyse(parseOcrForTextAnalyse(ocr))
+    console.log(transcript)
+    setOcr(ocr)
   }
 
   if (!book) {

@@ -60,6 +60,12 @@ export interface Sentence {
   words: Word[]
 }
 
+export const parseOcrForTextAnalyse = (ocr: OcrResult): string => {
+  return ocr.pages
+    .flatMap(p => p.blocks.map(b => getRawTextForBlock(b)).join('\n'))
+    .join('\n')
+}
+
 export const getWordsFromOcrResult = (ocr: OcrResult): Word[] => {
   const res = []
 
