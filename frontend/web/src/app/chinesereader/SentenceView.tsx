@@ -1,5 +1,5 @@
 import { CedictResult, getCedictDefinitions } from '@app/anki/components/zh/api'
-import { TextAnalyseLine, TextAnalyseToken } from '@app/chinesereader/api'
+import { TextAnalyseLine, TextAnalyseToken } from '@app/chinesereader/domain'
 
 interface Props {
   sentence: TextAnalyseLine

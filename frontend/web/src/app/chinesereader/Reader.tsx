@@ -4,7 +4,7 @@ import {
   textAnalyse,
   TextAnalyseResponse,
   TextAnalyseToken,
-} from '@app/chinesereader/api'
+} from '@app/chinesereader/domain'
 import { useEffect, useState } from 'react'
 import Button from '@app/anki/components/Button'
 import SentenceView from './SentenceView'

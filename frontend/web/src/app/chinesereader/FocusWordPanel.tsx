@@ -1,8 +1,8 @@
-import { TextAnalyseToken } from '@app/chinesereader/api'
 import {
   CardType,
   getReadingPairs,
   toneToColor,
+  TextAnalyseToken,
 } from '@app/chinesereader/domain'
 import { Button, ButtonLink } from '@app/chinesereader/Components'
 import {

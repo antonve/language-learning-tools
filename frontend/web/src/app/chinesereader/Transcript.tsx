@@ -1,4 +1,7 @@
-import { TextAnalyseResponse, TextAnalyseToken } from '@app/chinesereader/api'
+import {
+  TextAnalyseResponse,
+  TextAnalyseToken,
+} from '@app/chinesereader/domain'
 import SentenceView from '@app/chinesereader/SentenceView'
 import { Dispatch, SetStateAction } from 'react'
 import { FocusWordWithSentence } from '@app/chinesereader/domain'
