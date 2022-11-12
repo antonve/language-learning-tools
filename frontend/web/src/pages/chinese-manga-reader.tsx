@@ -21,8 +21,8 @@ import {
   exportWordToAnki,
   textAnalyse,
   TextAnalyseResponse,
-} from '@app/chinesetextreader/api'
-import FocusWordPanel from '@app/chinesetextreader/FocusWordPanel'
+} from '@app/chinesemangareader/api'
+import FocusWordPanel from '@app/chinesemangareader/FocusWordPanel'
 
 const ChineseMangaReader: NextPage<{}> = () => {
   const [book, setBook] = useState<Book>()

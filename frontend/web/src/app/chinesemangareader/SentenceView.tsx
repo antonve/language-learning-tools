@@ -1,5 +1,5 @@
 import { CedictResult, getCedictDefinitions } from '@app/anki/components/zh/api'
-import { TextAnalyseLine, TextAnalyseToken } from '@app/chinesetextreader/api'
+import { TextAnalyseLine, TextAnalyseToken } from '@app/chinesemangareader/api'
 
 interface Props {
   sentence: TextAnalyseLine
@@ -41,7 +41,6 @@ const SentenceView = ({ sentence, focusWord, setFocusWord, addDef }: Props) => (
           }
 
           addDef(def[selectedText])
-
           setFocusWord({
             hanzi_traditional: selectedText,
             hanzi_simplified: selectedText,

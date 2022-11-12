@@ -1,4 +1,4 @@
-import { TextAnalyseToken } from '@app/chinesetextreader/api'
+import { TextAnalyseToken } from '@app/chinesemangareader/api'
 import { unzipSync } from 'fflate'
 import getConfig from 'next/config'
 

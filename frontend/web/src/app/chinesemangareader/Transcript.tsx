@@ -1,8 +1,8 @@
 import {
   TextAnalyseResponse,
   TextAnalyseToken,
-} from '@app/chinesetextreader/api'
-import SentenceView from '@app/chinesetextreader/SentenceView'
+} from '@app/chinesemangareader/api'
+import SentenceView from '@app/chinesemangareader/SentenceView'
 import { Dispatch, SetStateAction } from 'react'
 import { FocusWordWithSentence } from '@app/chinesemangareader/domain'
 import { CedictResult } from '@app/anki/components/zh/api'
