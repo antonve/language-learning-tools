@@ -1,10 +1,15 @@
-import { CedictResult } from '@app/anki/components/zh/api'
+import { TextAnalyseToken } from '@app/chinesetextreader/api'
 import { unzipSync } from 'fflate'
 import getConfig from 'next/config'
 
 const { publicRuntimeConfig } = getConfig()
 
 const root = publicRuntimeConfig.API_ROOT || 'http://localhost:8080'
+
+export interface FocusWordWithSentence {
+  word: TextAnalyseToken
+  sentence: string
+}
 
 export type CardType = 'sentence' | 'vocab'
 

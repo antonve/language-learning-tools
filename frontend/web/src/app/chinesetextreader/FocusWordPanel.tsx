@@ -1,5 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { TextAnalyseLine, TextAnalyseToken } from '@app/chinesetextreader/api'
+import { TextAnalyseToken } from '@app/chinesetextreader/api'
 import {
   CardType,
   getReadingPairs,
@@ -7,20 +6,18 @@ import {
 } from '@app/chinesemangareader/domain'
 import { Button, ButtonLink } from '@app/chinesemangareader/Components'
 import {
-  CedictResult,
   CedictResultCollection,
   CedictResultEntry,
-  getCedictDefinitions,
 } from '@app/anki/components/zh/api'
 
 interface Props {
   word: TextAnalyseToken | undefined
   exportWord: (cardType: CardType, def: CedictResultEntry) => Promise<void>
-  setFocusWord: Dispatch<SetStateAction<TextAnalyseToken | undefined>>
+  resetFocusWord: () => void
   defs: CedictResultCollection
 }
 
-const FocusWordPanel = ({ word, exportWord, setFocusWord, defs }: Props) => {
+const FocusWordPanel = ({ word, exportWord, resetFocusWord, defs }: Props) => {
   if (!word) {
     return null
   }
@@ -68,7 +65,7 @@ const FocusWordPanel = ({ word, exportWord, setFocusWord, defs }: Props) => {
               <Button
                 onClick={() =>
                   exportWord('sentence', d)
-                    .then(() => setFocusWord(undefined))
+                    .then(() => resetFocusWord())
                     .catch(reason =>
                       window.alert('could not export word: ' + reason),
                     )
@@ -80,7 +77,7 @@ const FocusWordPanel = ({ word, exportWord, setFocusWord, defs }: Props) => {
               <Button
                 onClick={() =>
                   exportWord('vocab', d)
-                    .then(() => setFocusWord(undefined))
+                    .then(() => resetFocusWord())
                     .catch(reason =>
                       window.alert('could not export word: ' + reason),
                     )

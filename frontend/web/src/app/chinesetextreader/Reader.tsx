@@ -2,26 +2,42 @@ import type { NextPage } from 'next'
 import {
   exportWordToAnki,
   textAnalyse,
+  TextAnalyseResponse,
   TextAnalyseToken,
 } from '@app/chinesetextreader/api'
 import { useEffect, useState } from 'react'
 import Button from '@app/anki/components/Button'
 import SentenceView from './SentenceView'
 import { useKeyPress } from '@app/chinesemangareader/hooks'
-import { CardType, createPendingCard } from '@app/chinesemangareader/domain'
-import { CedictResultEntry } from '@app/anki/components/zh/api'
+import {
+  CedictResultCollection,
+  getCedictDefinitions,
+} from '@app/anki/components/zh/api'
+import FocusWordPanel from './FocusWordPanel'
 
 interface Props {
   text: string
 }
 
 const Reader: NextPage<Props> = ({ text }) => {
-  const [analyse, setAnalyse] = useState<undefined | any>()
+  const [analyse, setAnalyse] = useState<TextAnalyseResponse>()
   const [lineIndex, setLineIndex] = useState<number>(0)
   const [focusWord, setFocusWord] = useState<TextAnalyseToken | undefined>()
+  const [defs, setDefs] = useState<CedictResultCollection>({})
+
+  const sentence = analyse?.lines[lineIndex].tokens.map(
+    t => t.hanzi_traditional,
+  )
+
+  useEffect(() => {
+    if (!sentence) {
+      return
+    }
+    getCedictDefinitions(sentence).then(res => setDefs(res))
+  }, [sentence?.join('')])
 
   const onNextSentence = () => {
-    if (lineIndex < analyse.lines.length - 1) {
+    if (analyse && lineIndex < analyse.lines.length - 1) {
       setLineIndex(lineIndex + 1)
       setFocusWord(undefined)
     }
@@ -53,12 +69,26 @@ const Reader: NextPage<Props> = ({ text }) => {
       >
         &larr;
       </Button>
-      <SentenceView
-        sentence={analyse.lines[lineIndex]}
-        focusWord={focusWord}
-        setFocusWord={setFocusWord}
-        exportWord={exportWordToAnki}
-      />
+      <div>
+        <SentenceView
+          sentence={analyse.lines[lineIndex]}
+          focusWord={focusWord}
+          setFocusWord={setFocusWord}
+          defs={defs}
+        />
+        <FocusWordPanel
+          word={focusWord}
+          exportWord={async (cardType, def) => {
+            if (!focusWord || !sentence) {
+              return
+            }
+
+            return exportWordToAnki(cardType, def, focusWord, sentence.join(''))
+          }}
+          resetFocusWord={() => setFocusWord(undefined)}
+          defs={defs}
+        />
+      </div>
       <Button
         onClick={onNextSentence}
         disabled={lineIndex >= analyse.lines.length - 1}

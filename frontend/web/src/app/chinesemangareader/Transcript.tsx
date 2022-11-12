@@ -1,30 +1,20 @@
-import { CedictResultEntry } from '@app/anki/components/zh/api'
 import {
   TextAnalyseResponse,
   TextAnalyseToken,
 } from '@app/chinesetextreader/api'
 import SentenceView from '@app/chinesetextreader/SentenceView'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
-import { CardType } from './domain'
+import { Dispatch, SetStateAction } from 'react'
+import { FocusWordWithSentence } from '@app/chinesemangareader/domain'
+import { CedictResultCollection } from '@app/anki/components/zh/api'
 
 interface Props {
   analyse: TextAnalyseResponse | undefined
-  focusWord: TextAnalyseToken | undefined
-  setFocusWord: Dispatch<SetStateAction<TextAnalyseToken | undefined>>
-  exportWord: (
-    cardType: CardType,
-    def: CedictResultEntry,
-    focusWord: TextAnalyseToken,
-    sentence: string,
-  ) => void
+  focusWord: FocusWordWithSentence | undefined
+  setFocusWord: Dispatch<SetStateAction<FocusWordWithSentence | undefined>>
+  defs: CedictResultCollection
 }
 
-const Transcript = ({
-  analyse,
-  focusWord,
-  setFocusWord,
-  exportWord,
-}: Props) => {
+const Transcript = ({ analyse, focusWord, setFocusWord, defs }: Props) => {
   if (!analyse) {
     return <p>Not yet loaded, click title to load.</p>
   }
@@ -35,10 +25,19 @@ const Transcript = ({
         {analyse.lines.map((l, i) => (
           <li key={`${l.traditional}-${i}`}>
             <SentenceView
-              focusWord={focusWord}
+              focusWord={focusWord?.word}
               sentence={l}
-              setFocusWord={setFocusWord}
-              exportWord={exportWord}
+              setFocusWord={(word: TextAnalyseToken | undefined) => {
+                if (!word) {
+                  return setFocusWord(undefined)
+                }
+
+                setFocusWord({
+                  word,
+                  sentence: l.traditional,
+                })
+              }}
+              defs={defs}
             />
           </li>
         ))}

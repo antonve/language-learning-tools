@@ -8,37 +8,50 @@ import {
   fetchOcr,
   CardType,
   parseOcrForTextAnalyse,
+  FocusWordWithSentence,
 } from '@app/chinesemangareader/domain'
 import Transcript from '@app/chinesemangareader/Transcript'
 import Layout from '@app/Layout'
-import { CedictResultEntry } from '@app/anki/components/zh/api'
+import {
+  CedictResultCollection,
+  CedictResultEntry,
+  getCedictDefinitions,
+} from '@app/anki/components/zh/api'
 import {
   exportWordToAnki,
   textAnalyse,
   TextAnalyseResponse,
-  TextAnalyseToken,
 } from '@app/chinesetextreader/api'
+import FocusWordPanel from '@app/chinesetextreader/FocusWordPanel'
 
 const ChineseMangaReader: NextPage<{}> = () => {
   const [book, setBook] = useState<Book>()
   const [page, setPage] = useState(0)
   const [canvasData, setCanvasData] = useState<string>('')
   const [transcript, setTranscript] = useState<TextAnalyseResponse>()
-  const [focusWord, setFocusWord] = useState<TextAnalyseToken>()
+  const [focusWord, setFocusWord] = useState<FocusWordWithSentence>()
+  const [defs, setDefs] = useState<CedictResultCollection>({})
 
-  const exportWord = (
-    cardType: CardType,
-    def: CedictResultEntry,
-    focusWord: TextAnalyseToken,
-    sentence: string,
-  ) => {
+  useEffect(() => {
+    if (!transcript) {
+      return
+    }
+    getCedictDefinitions(
+      transcript.lines.flatMap(l => l.tokens.map(t => t.hanzi_traditional)),
+    ).then(res => setDefs(res))
+  }, [transcript])
+
+  const exportWord = (cardType: CardType, def: CedictResultEntry) => {
+    if (!focusWord) {
+      return Promise.reject()
+    }
     const prefix = 'data:image/jpeg;base64,'
 
     return exportWordToAnki(
       cardType,
       def,
-      focusWord,
-      sentence,
+      focusWord.word,
+      focusWord.sentence,
       canvasData.slice(prefix.length),
     )
   }
@@ -69,6 +82,7 @@ const ChineseMangaReader: NextPage<{}> = () => {
     if (!book || book.pages.length - 1 <= page) {
       return
     }
+    setFocusWord(undefined)
     setPage(page + 1)
   }
 
@@ -76,12 +90,21 @@ const ChineseMangaReader: NextPage<{}> = () => {
     if (page <= 0) {
       return
     }
+    setFocusWord(undefined)
     setPage(page - 1)
   }
 
   return (
     <div className="w-screen h-screen flex">
-      <div className="w-1/2 h-screen flex flex-col overflow-auto">
+      <div className="w-1/2 h-screen flex flex-col overflow-auto relative">
+        <div className="absolute left-20 top-20 right-20 z-50">
+          <FocusWordPanel
+            word={focusWord?.word}
+            exportWord={exportWord}
+            resetFocusWord={() => setFocusWord(undefined)}
+            defs={defs}
+          />
+        </div>
         <BookPage
           book={book}
           index={page}
@@ -112,7 +135,7 @@ const ChineseMangaReader: NextPage<{}> = () => {
             analyse={transcript}
             focusWord={focusWord}
             setFocusWord={setFocusWord}
-            exportWord={exportWord}
+            defs={defs}
           />
         </div>
       </div>
