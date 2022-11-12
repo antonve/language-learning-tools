@@ -65,7 +65,7 @@ const Reader: NextPage<Props> = ({ text }) => {
       <Button
         onClick={onPrevSentence}
         disabled={lineIndex <= 0}
-        overrides={`dark:border-none dark:bg-gray-900 w-32 text-4xl`}
+        overrides={`dark:border-none dark:bg-gray-900 w-32 text-4xl shrink-0`}
       >
         &larr;
       </Button>
@@ -92,7 +92,7 @@ const Reader: NextPage<Props> = ({ text }) => {
       <Button
         onClick={onNextSentence}
         disabled={lineIndex >= analyse.lines.length - 1}
-        overrides={`dark:border-none dark:bg-gray-900 w-32 text-4xl`}
+        overrides={`dark:border-none dark:bg-gray-900 w-32 text-4xl shrink-0`}
       >
         &rarr;
       </Button>
