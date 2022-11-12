@@ -135,7 +135,6 @@ const ChineseMangaReader: NextPage<{}> = () => {
             analyse={transcript}
             focusWord={focusWord}
             setFocusWord={setFocusWord}
-            defs={defs}
           />
         </div>
       </div>

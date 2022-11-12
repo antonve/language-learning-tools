@@ -5,16 +5,14 @@ import {
 import SentenceView from '@app/chinesetextreader/SentenceView'
 import { Dispatch, SetStateAction } from 'react'
 import { FocusWordWithSentence } from '@app/chinesemangareader/domain'
-import { CedictResultCollection } from '@app/anki/components/zh/api'
 
 interface Props {
   analyse: TextAnalyseResponse | undefined
   focusWord: FocusWordWithSentence | undefined
   setFocusWord: Dispatch<SetStateAction<FocusWordWithSentence | undefined>>
-  defs: CedictResultCollection
 }
 
-const Transcript = ({ analyse, focusWord, setFocusWord, defs }: Props) => {
+const Transcript = ({ analyse, focusWord, setFocusWord }: Props) => {
   if (!analyse) {
     return <p>Not yet loaded, click title to load.</p>
   }
@@ -37,7 +35,6 @@ const Transcript = ({ analyse, focusWord, setFocusWord, defs }: Props) => {
                   sentence: l.traditional,
                 })
               }}
-              defs={defs}
             />
           </li>
         ))}

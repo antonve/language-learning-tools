@@ -74,7 +74,6 @@ const Reader: NextPage<Props> = ({ text }) => {
           sentence={analyse.lines[lineIndex]}
           focusWord={focusWord}
           setFocusWord={setFocusWord}
-          defs={defs}
         />
         <FocusWordPanel
           word={focusWord}
