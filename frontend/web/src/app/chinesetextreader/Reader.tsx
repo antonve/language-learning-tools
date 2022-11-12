@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Button from '@app/anki/components/Button'
 import SentenceView from './SentenceView'
 import { useKeyPress } from '@app/chinesemangareader/hooks'
+import { CardType, createPendingCard } from '@app/chinesemangareader/domain'
 
 interface Props {
   text: string

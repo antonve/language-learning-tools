@@ -2,6 +2,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import { TextAnalyseLine, TextAnalyseToken } from '@app/chinesetextreader/api'
 import {
   CardType,
+  createPendingCard,
   getReadingPairs,
   toneToColor,
 } from '@app/chinesemangareader/domain'
@@ -28,6 +29,29 @@ const SentenceView = ({ sentence, focusWord, setFocusWord }: Props) => {
     )
   }, [sentence])
 
+  // TODO: merge text and manga reader domain logic
+  const exportWord = (cardType: CardType, def: CedictResultEntry) => {
+    if (!focusWord) {
+      return Promise.reject()
+    }
+
+    return createPendingCard({
+      id: undefined,
+      language_code: 'zho',
+      token: focusWord.hanzi_traditional,
+      source_image: undefined,
+      meta: {
+        sentence: sentence.tokens.map(t => t.hanzi_traditional).join(''),
+        card_type: cardType,
+        hanzi_traditional: focusWord.hanzi_traditional,
+        hanzi_simplified: focusWord.hanzi_simplified,
+        pinyin: def.pinyin.toLowerCase(),
+        pinyin_tones: def.pinyin_tones.toLowerCase(),
+        meanings: def.meanings ?? [],
+      },
+    })
+  }
+
   return (
     <div>
       <SentenceTranscript
@@ -44,7 +68,7 @@ const SentenceView = ({ sentence, focusWord, setFocusWord }: Props) => {
       />
       <FocusWordPanel
         word={focusWord}
-        exportWord={async (cardType: CardType) => {}}
+        exportWord={exportWord}
         setFocusWord={setFocusWord}
         defs={defs}
       />
@@ -61,7 +85,7 @@ const FocusWordPanel = ({
   defs,
 }: {
   word: TextAnalyseToken | undefined
-  exportWord: (cardType: CardType) => Promise<void>
+  exportWord: (cardType: CardType, def: CedictResultEntry) => Promise<void>
   setFocusWord: Dispatch<SetStateAction<TextAnalyseToken | undefined>>
   defs: CedictResultCollection
 }) => {
@@ -111,7 +135,7 @@ const FocusWordPanel = ({
             <div className="flex flex-row space-x-4">
               <Button
                 onClick={() =>
-                  exportWord('sentence')
+                  exportWord('sentence', d)
                     .then(() => setFocusWord(undefined))
                     .catch(reason =>
                       window.alert('could not export word: ' + reason),
@@ -123,7 +147,7 @@ const FocusWordPanel = ({
               </Button>
               <Button
                 onClick={() =>
-                  exportWord('vocab')
+                  exportWord('vocab', d)
                     .then(() => setFocusWord(undefined))
                     .catch(reason =>
                       window.alert('could not export word: ' + reason),

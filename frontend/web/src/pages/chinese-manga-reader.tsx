@@ -14,6 +14,7 @@ import {
 } from '@app/chinesemangareader/domain'
 import Transcript from '@app/chinesemangareader/Transcript'
 import Layout from '@app/Layout'
+import { CedictResultEntry } from '@app/anki/components/zh/api'
 
 const ChineseMangaReader: NextPage<{}> = () => {
   const [book, setBook] = useState<Book>()
@@ -22,7 +23,7 @@ const ChineseMangaReader: NextPage<{}> = () => {
   const [ocr, setOcr] = useState<OcrResult>()
   const [focusWord, setFocusWord] = useState<FocusWord>()
 
-  const exportWord = (cardType: CardType) => {
+  const exportWord = (cardType: CardType, def: CedictResultEntry) => {
     if (!focusWord) {
       return Promise.reject()
     }
@@ -37,12 +38,11 @@ const ChineseMangaReader: NextPage<{}> = () => {
       meta: {
         sentence: getRawTextForBlock(focusWord.block),
         card_type: cardType,
-        // TODO: FIX ME
-        // hanzi_traditional: focusWord.cedict?.hanzi_traditional,
-        // hanzi_simplified: focusWord.cedict?.hanzi_simplified,
-        // pinyin: focusWord.cedict?.pinyin.toLowerCase(),
-        // pinyin_tones: focusWord.cedict?.pinyin_tones.toLowerCase(),
-        // meanings: focusWord.cedict?.meanings ?? [],
+        hanzi_traditional: def.hanzi_traditional,
+        hanzi_simplified: def.hanzi_simplified,
+        pinyin: def.pinyin.toLowerCase(),
+        pinyin_tones: def.pinyin_tones.toLowerCase(),
+        meanings: def.meanings ?? [],
       },
     })
   }

@@ -23,7 +23,7 @@ interface Props {
   ocr?: OcrResult | undefined
   focusWord: FocusWord | undefined
   setFocusWord: Dispatch<SetStateAction<FocusWord | undefined>>
-  exportWord: (cardType: CardType) => Promise<void>
+  exportWord: (cardType: CardType, def: CedictResultEntry) => Promise<void>
 }
 
 const Transcript = ({ ocr, focusWord, setFocusWord, exportWord }: Props) => {
@@ -75,7 +75,7 @@ const BlockTranscript = ({
   block: OcrBlock
   focusWord: FocusWord | undefined
   setFocusWord: Dispatch<SetStateAction<FocusWord | undefined>>
-  exportWord: (cardType: CardType) => Promise<void>
+  exportWord: (cardType: CardType, def: CedictResultEntry) => Promise<void>
   cedict: CedictResultCollection
 }) => {
   const sentences = getTextForBlock(block)
@@ -119,7 +119,7 @@ const FocusWordPanel = ({
 }: {
   word: FocusWord | undefined
   block: OcrBlock
-  exportWord: (cardType: CardType) => Promise<void>
+  exportWord: (cardType: CardType, def: CedictResultEntry) => Promise<void>
   setFocusWord: Dispatch<SetStateAction<FocusWord | undefined>>
 }) => {
   if (!word || block != word.block) {
@@ -162,7 +162,7 @@ const FocusWordPanel = ({
             <div className="flex flex-row space-x-4">
               <Button
                 onClick={() =>
-                  exportWord('sentence')
+                  exportWord('sentence', d)
                     .then(() => setFocusWord(undefined))
                     .catch(reason =>
                       window.alert('could not export word: ' + reason),
@@ -174,7 +174,7 @@ const FocusWordPanel = ({
               </Button>
               <Button
                 onClick={() =>
-                  exportWord('vocab')
+                  exportWord('vocab', d)
                     .then(() => setFocusWord(undefined))
                     .catch(reason =>
                       window.alert('could not export word: ' + reason),

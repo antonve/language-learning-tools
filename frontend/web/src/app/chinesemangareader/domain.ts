@@ -203,7 +203,7 @@ export interface Card {
   id: undefined | number
   token: string
   language_code: string
-  source_image: string
+  source_image?: string
   meta: object
 }
 
