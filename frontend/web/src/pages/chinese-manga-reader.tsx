@@ -9,6 +9,9 @@ import {
   CardType,
   parseOcrForTextAnalyse,
   FocusWordWithSentence,
+  exportWordToAnki,
+  textAnalyse,
+  TextAnalyseResponse,
 } from '@app/chinesereader/domain'
 import Transcript from '@app/chinesereader/Transcript'
 import Layout from '@app/Layout'
@@ -17,11 +20,6 @@ import {
   CedictResultEntry,
   getCedictDefinitions,
 } from '@app/anki/components/zh/api'
-import {
-  exportWordToAnki,
-  textAnalyse,
-  TextAnalyseResponse,
-} from '@app/chinesereader/api'
 import FocusWordPanel from '@app/chinesereader/FocusWordPanel'
 
 const ChineseMangaReader: NextPage<{}> = () => {
