@@ -1,5 +1,7 @@
 import { CedictResult, getCedictDefinitions } from '@app/anki/components/zh/api'
 import { TextAnalyseLine, TextAnalyseToken } from '@app/chinesereader/domain'
+import { useEffect } from 'react'
+import { useTextSelection } from './hooks'
 
 interface Props {
   sentence: TextAnalyseLine
@@ -8,51 +10,59 @@ interface Props {
   addDef: (res: CedictResult) => void
 }
 
-const SentenceView = ({ sentence, focusWord, setFocusWord, addDef }: Props) => (
-  <p className="text-center text-4xl m-8">
-    {sentence.tokens.map((w, i) => (
-      <span
-        className={`group hover:bg-yellow-100 dark:hover:bg-green-800 cursor-pointer ${
-          w.start == focusWord?.start &&
-          w.end == focusWord?.end &&
-          focusWord.hanzi_traditional == w.hanzi_traditional
-            ? 'bg-yellow-100 dark:bg-pink-300 dark:bg-opacity-20'
-            : ''
-        }`}
-        key={i}
-        onClick={() => {
-          if (focusWord?.start === w.start && focusWord?.end === w.end) {
-            setFocusWord(undefined)
-          } else {
-            setFocusWord(w)
-          }
-        }}
-        onMouseUp={async () => {
-          const selectedText = document.getSelection()?.toString()
+const SentenceView = ({ sentence, focusWord, setFocusWord, addDef }: Props) => {
+  const { range, ref } = useTextSelection()
 
-          if (!selectedText) {
-            return
-          }
+  useEffect(() => {
+    const action = async () => {
+      const selectedText = range?.toString()
 
-          const def = await getCedictDefinitions([selectedText])
+      if (!selectedText) {
+        return
+      }
 
-          if (!def[selectedText]) {
-            return
-          }
+      const def = await getCedictDefinitions([selectedText])
 
-          addDef(def[selectedText])
-          setFocusWord({
-            hanzi_traditional: selectedText,
-            hanzi_simplified: selectedText,
-            start: 0,
-            end: 0,
-          })
-        }}
-      >
-        {w.hanzi_traditional}
-      </span>
-    ))}
-  </p>
-)
+      if (!def[selectedText]) {
+        return
+      }
+
+      addDef(def[selectedText])
+      setFocusWord({
+        hanzi_traditional: selectedText,
+        hanzi_simplified: selectedText,
+        start: 0,
+        end: 0,
+      })
+    }
+    action()
+  }, [range])
+
+  return (
+    <p className="text-center text-4xl m-8">
+      {sentence.tokens.map((w, i) => (
+        <span
+          className={`group hover:bg-yellow-100 dark:hover:bg-green-800 cursor-pointer ${
+            w.start == focusWord?.start &&
+            w.end == focusWord?.end &&
+            focusWord.hanzi_traditional == w.hanzi_traditional
+              ? 'bg-yellow-100 dark:bg-pink-300 dark:bg-opacity-20'
+              : ''
+          }`}
+          key={i}
+          onClick={() => {
+            if (focusWord?.start === w.start && focusWord?.end === w.end) {
+              setFocusWord(undefined)
+            } else {
+              setFocusWord(w)
+            }
+          }}
+        >
+          {w.hanzi_traditional}
+        </span>
+      ))}
+    </p>
+  )
+}
 
 export default SentenceView
