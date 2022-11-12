@@ -19,7 +19,7 @@ interface Props {
   text: string
 }
 
-const Reader: NextPage<Props> = ({ text }) => {
+const TextReader: NextPage<Props> = ({ text }) => {
   const [analyse, setAnalyse] = useState<TextAnalyseResponse>()
   const [lineIndex, setLineIndex] = useState<number>(0)
   const [focusWord, setFocusWord] = useState<TextAnalyseToken | undefined>()
@@ -100,4 +100,4 @@ const Reader: NextPage<Props> = ({ text }) => {
   )
 }
 
-export default Reader
+export default TextReader
