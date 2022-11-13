@@ -1,10 +1,8 @@
 import type { NextPage } from 'next'
 import { useEffect, useState } from 'react'
 import Layout, { PageTitle } from '@app/Layout'
-import Button from '@app/anki/components/Button'
-import TextInput from '@app/chinesereader/TextInput'
-import Reader from '@app/chinesereader/TextReader'
 import { listTexts, ListTextsResponse } from '@app/chinesereader/domain'
+import { ButtonLink } from '@app/anki/components/Button'
 
 const Index: NextPage<{}> = () => {
   const [texts, setTexts] = useState<ListTextsResponse>()
@@ -35,6 +33,7 @@ const Index: NextPage<{}> = () => {
       navigation={() => (
         <>
           <PageTitle>Chinese Text Reader</PageTitle>
+          <ButtonLink href="/chinese-reader/text">Add text</ButtonLink>
         </>
       )}
     >
