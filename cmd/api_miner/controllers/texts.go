@@ -50,6 +50,7 @@ func (api *textsAPI) ListTexts(c echo.Context) error {
 		res.Texts = append(res.Texts, Text{
 			ID:           row.ID,
 			LanguageCode: row.LanguageCode,
+			Title:        row.Title,
 		})
 	}
 
@@ -59,6 +60,7 @@ func (api *textsAPI) ListTexts(c echo.Context) error {
 type Text struct {
 	ID           int64  `json:"id"`
 	LanguageCode string `json:"language_code"`
+	Title        string `json:"title"`
 	Content      string `json:"content,omitempty"`
 }
 
@@ -86,6 +88,7 @@ func (api *textsAPI) CreateText(c echo.Context) error {
 
 	_, err = api.queries.CreateText(c.Request().Context(), postgres.CreateTextParams{
 		LanguageCode: req.LanguageCode,
+		Title:        req.Title,
 		Content:      req.Content,
 	})
 	if err != nil {
@@ -98,12 +101,17 @@ func (api *textsAPI) CreateText(c echo.Context) error {
 
 type CreateTextRequest struct {
 	LanguageCode string `json:"language_code"`
+	Title        string `json:"title"`
 	Content      string `json:"content"`
 }
 
 func (req *CreateTextRequest) Validate() error {
 	if req.LanguageCode == "" {
 		return errors.Errorf("language_code is required")
+	}
+
+	if req.Title == "" {
+		return errors.Errorf("title is required")
 	}
 
 	if req.Content == "" {
@@ -133,6 +141,7 @@ func (api *textsAPI) GetText(c echo.Context) error {
 	return c.JSON(http.StatusOK, Text{
 		ID:           row.ID,
 		LanguageCode: row.LanguageCode,
+		Title:        row.Title,
 		Content:      row.Content,
 	})
 }

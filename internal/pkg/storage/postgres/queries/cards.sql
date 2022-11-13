@@ -49,19 +49,22 @@ where id = sqlc.arg('id');
 select
   id,
   language_code,
+  title,
   created_at,
   updated_at
 from texts
 where
   language_code = sqlc.arg('language_code')
-order by created_at asc;
+order by created_at desc;
 
 -- name: CreateText :one
 insert into texts (
   language_code,
+  title,
   content
 ) values (
   sqlc.arg('language_code'),
+  sqlc.arg('title'),
   sqlc.arg('content')
 )
 returning id;
@@ -70,6 +73,7 @@ returning id;
 select
   id,
   language_code,
+  title,
   content,
   created_at,
   updated_at

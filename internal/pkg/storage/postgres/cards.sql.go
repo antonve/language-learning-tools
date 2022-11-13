@@ -48,21 +48,24 @@ func (q *Queries) CreatePendingCard(ctx context.Context, arg CreatePendingCardPa
 const createText = `-- name: CreateText :one
 insert into texts (
   language_code,
+  title,
   content
 ) values (
   $1,
-  $2
+  $2,
+  $3
 )
 returning id
 `
 
 type CreateTextParams struct {
 	LanguageCode string
+	Title        string
 	Content      string
 }
 
 func (q *Queries) CreateText(ctx context.Context, arg CreateTextParams) (int64, error) {
-	row := q.db.QueryRowContext(ctx, createText, arg.LanguageCode, arg.Content)
+	row := q.db.QueryRowContext(ctx, createText, arg.LanguageCode, arg.Title, arg.Content)
 	var id int64
 	err := row.Scan(&id)
 	return id, err
@@ -85,6 +88,7 @@ const getText = `-- name: GetText :one
 select
   id,
   language_code,
+  title,
   content,
   created_at,
   updated_at
@@ -99,6 +103,7 @@ func (q *Queries) GetText(ctx context.Context, id int64) (Text, error) {
 	err := row.Scan(
 		&i.ID,
 		&i.LanguageCode,
+		&i.Title,
 		&i.Content,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -110,17 +115,19 @@ const getTextsForLanguage = `-- name: GetTextsForLanguage :many
 select
   id,
   language_code,
+  title,
   created_at,
   updated_at
 from texts
 where
   language_code = $1
-order by created_at asc
+order by created_at desc
 `
 
 type GetTextsForLanguageRow struct {
 	ID           int64
 	LanguageCode string
+	Title        string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }
@@ -137,6 +144,7 @@ func (q *Queries) GetTextsForLanguage(ctx context.Context, languageCode string) 
 		if err := rows.Scan(
 			&i.ID,
 			&i.LanguageCode,
+			&i.Title,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {

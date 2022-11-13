@@ -24,6 +24,7 @@ type PendingCard struct {
 type Text struct {
 	ID           int64
 	LanguageCode string
+	Title        string
 	Content      string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
