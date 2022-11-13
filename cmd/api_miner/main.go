@@ -11,23 +11,18 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 
 	_ "github.com/jackc/pgx/v4/stdlib"
-	"github.com/jcramb/cedict"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
-	"github.com/siongui/gojianfan"
-	"github.com/yanyiwu/gojieba"
 
 	"github.com/antonve/language-learning-tools/cmd/api_miner/controllers"
 	"github.com/antonve/language-learning-tools/internal/pkg/corpus"
 	"github.com/antonve/language-learning-tools/internal/pkg/ocr"
 	"github.com/antonve/language-learning-tools/internal/pkg/persistedcache"
 	"github.com/antonve/language-learning-tools/internal/pkg/storage/postgres"
-	"github.com/antonve/language-learning-tools/internal/pkg/zdic"
 )
 
 func main() {
@@ -44,10 +39,10 @@ func main() {
 	e.GET("/:lang/chapter/:series/:filename", api.Corpus().GetChapter)
 	e.GET("/jp/jisho/:token", api.Japanese().JishoProxy)
 	e.GET("/jp/goo/:token", api.Japanese().GooProxy)
-	e.POST("/zh/cedict", api.Cedict)
-	e.GET("/zh/zdic/:token", api.Zdic)
+	e.POST("/zh/cedict", api.Chinese().Cedict)
+	e.GET("/zh/zdic/:token", api.Chinese().Zdic)
 	e.POST("/ocr", api.OCR)
-	e.POST("/zh/text-analyse", api.ChineseTextAnalyse)
+	e.POST("/zh/text-analyse", api.Chinese().TextAnalyse)
 
 	e.GET("/pending_cards", api.ListPendingCards)
 	e.POST("/pending_cards", api.CreatePendingCard)
@@ -73,11 +68,9 @@ type Config struct {
 type API interface {
 	Corpus() controllers.CorpusAPI
 	Japanese() controllers.JapaneseAPI
+	Chinese() controllers.ChineseAPI
 
 	OCR(c echo.Context) error
-	Cedict(c echo.Context) error
-	Zdic(c echo.Context) error
-	ChineseTextAnalyse(e echo.Context) error
 
 	ListPendingCards(c echo.Context) error
 	CreatePendingCard(c echo.Context) error
@@ -96,12 +89,9 @@ type api struct {
 
 	corpus   controllers.CorpusAPI
 	japanese controllers.JapaneseAPI
+	chinese  controllers.ChineseAPI
 
-	ocr    ocr.Client
-	cedict *cedict.Dict
-	zdic   zdic.Zdic
-	jieba  *gojieba.Jieba
-
+	ocr      ocr.Client
 	ocrCache persistedcache.PersistedCache
 }
 
@@ -135,13 +125,11 @@ func NewAPI() API {
 		config:   cfg,
 		corpus:   controllers.NewCorpusAPI(cjp, czh),
 		japanese: controllers.NewJapaneseAPI(),
+		chinese:  controllers.NewChineseAPI(),
 		ocr:      ocrClient,
 		ocrCache: ocrCache,
-		cedict:   cedict.New(),
-		zdic:     zdic.New(),
 		psql:     psql,
 		queries:  postgres.New(psql),
-		jieba:    gojieba.NewJieba(),
 	}
 }
 
@@ -173,6 +161,10 @@ func (api *api) Corpus() controllers.CorpusAPI {
 
 func (api *api) Japanese() controllers.JapaneseAPI {
 	return api.japanese
+}
+
+func (api *api) Chinese() controllers.ChineseAPI {
+	return api.chinese
 }
 
 func Hash(r io.Reader) (string, error) {
@@ -209,96 +201,6 @@ func (api *api) OCR(c echo.Context) error {
 	api.ocrCache.Put(sum, res)
 
 	return c.String(http.StatusOK, string(res))
-}
-
-func (api *api) Cedict(c echo.Context) error {
-	body, err := io.ReadAll(c.Request().Body)
-	if err != nil {
-		log.Println("could not process cedict request:", err)
-		return c.NoContent(http.StatusBadRequest)
-	}
-
-	req := &CedictRequest{}
-	if err := json.Unmarshal(body, req); err != nil {
-		log.Println("could not process cedict request:", err)
-		return c.NoContent(http.StatusBadRequest)
-	}
-
-	res := map[string]*CedictResponse{}
-	for _, token := range req.Words {
-		if _, ok := res[token]; ok {
-			continue
-		}
-
-		fmt.Println(token)
-
-		defs := api.cedict.GetAllByHanzi(token)
-
-		res[token] = &CedictResponse{
-			Source:  token,
-			Results: []CedictResultResponse{},
-		}
-
-		for _, d := range defs {
-			res[token].Results = append(res[token].Results, CedictResultResponse{
-				Pinyin:           d.Pinyin,
-				PinyinTones:      cedict.PinyinTones(d.Pinyin),
-				HanziSimplified:  d.Simplified,
-				HanziTraditional: d.Traditional,
-				Meanings:         d.Meanings,
-			})
-		}
-	}
-
-	return c.JSON(http.StatusOK, res)
-}
-
-type CedictRequest struct {
-	Words []string `json:"words"`
-}
-
-type CedictResultResponse struct {
-	PinyinTones      string   `json:"pinyin_tones"`
-	Pinyin           string   `json:"pinyin"`
-	HanziSimplified  string   `json:"hanzi_simplified"`
-	HanziTraditional string   `json:"hanzi_traditional"`
-	Meanings         []string `json:"meanings"`
-}
-
-type CedictResponse struct {
-	Source  string                 `json:"source"`
-	Results []CedictResultResponse `json:"results"`
-}
-
-func (api *api) Zdic(c echo.Context) error {
-	token := c.Param("token")
-
-	res, err := api.zdic.Search(token)
-	if err != nil {
-		fmt.Println(err)
-		return c.NoContent(http.StatusInternalServerError)
-	}
-
-	b := new(bytes.Buffer)
-	enc := json.NewEncoder(b)
-	enc.SetEscapeHTML(false)
-	enc.Encode(&ZdicResponse{
-		Source:     res.Word,
-		Pinyin:     res.Pinyin,
-		Zhuyin:     res.Zhuyin,
-		AudioURL:   res.AudioURL,
-		Definition: res.Definition,
-	})
-
-	return c.JSONBlob(http.StatusOK, b.Bytes())
-}
-
-type ZdicResponse struct {
-	Source     string `json:"source"`
-	Pinyin     string `json:"pinyin"`
-	Zhuyin     string `json:"zhuyin"`
-	AudioURL   string `json:"audio_url"`
-	Definition string `json:"definition"`
 }
 
 type Card struct {
@@ -467,72 +369,4 @@ func (api *api) MarkCardAsExported(c echo.Context) error {
 	}
 
 	return c.NoContent(http.StatusCreated)
-}
-
-type ChineseTextAnalyseRequest struct {
-	Text string `json:"text"`
-}
-
-type ChineseTextAnalyseLine struct {
-	Simplified  string                    `json:"simplified"`
-	Traditional string                    `json:"traditional"`
-	Tokens      []ChineseTextAnalyseToken `json:"tokens"`
-}
-
-type ChineseTextAnalyseToken struct {
-	Traditional string `json:"hanzi_traditional"`
-	Simplified  string `json:"hanzi_simplified"`
-	Start       int    `json:"start"`
-	End         int    `json:"end"`
-}
-
-type ChineseTextAnalyseResponse struct {
-	Lines []ChineseTextAnalyseLine `json:"lines"`
-}
-
-func (api *api) ChineseTextAnalyse(c echo.Context) error {
-	body, err := io.ReadAll(c.Request().Body)
-	if err != nil {
-		log.Println("could not process request:", err)
-		return c.NoContent(http.StatusBadRequest)
-	}
-
-	req := &ChineseTextAnalyseRequest{}
-	if err := json.Unmarshal(body, req); err != nil {
-		log.Println("could not process request:", err)
-		return c.NoContent(http.StatusBadRequest)
-	}
-
-	lines := strings.FieldsFunc(req.Text, func(c rune) bool {
-		return c == '\n'
-	})
-
-	res := &ChineseTextAnalyseResponse{
-		Lines: make([]ChineseTextAnalyseLine, len(lines)),
-	}
-
-	useHMM := true
-
-	for i, line := range lines {
-		simplified := gojianfan.T2S(line)
-		words := api.jieba.Tokenize(simplified, gojieba.DefaultMode, useHMM)
-		tokens := make([]ChineseTextAnalyseToken, len(words))
-
-		for j, w := range words {
-			tokens[j] = ChineseTextAnalyseToken{
-				Traditional: line[w.Start:w.End],
-				Simplified:  w.Str,
-				Start:       w.Start,
-				End:         w.End,
-			}
-		}
-
-		res.Lines[i] = ChineseTextAnalyseLine{
-			Simplified:  simplified,
-			Traditional: line,
-			Tokens:      tokens,
-		}
-
-	}
-	return c.JSON(http.StatusOK, res)
 }
