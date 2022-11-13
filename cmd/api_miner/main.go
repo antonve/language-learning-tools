@@ -24,8 +24,6 @@ import (
 
 	"github.com/antonve/language-learning-tools/cmd/api_miner/controllers"
 	"github.com/antonve/language-learning-tools/internal/pkg/corpus"
-	"github.com/antonve/language-learning-tools/internal/pkg/goo"
-	"github.com/antonve/language-learning-tools/internal/pkg/jisho"
 	"github.com/antonve/language-learning-tools/internal/pkg/ocr"
 	"github.com/antonve/language-learning-tools/internal/pkg/persistedcache"
 	"github.com/antonve/language-learning-tools/internal/pkg/storage/postgres"
@@ -44,8 +42,8 @@ func main() {
 
 	e.GET("/:lang/corpus/:token", api.Corpus().Search)
 	e.GET("/:lang/chapter/:series/:filename", api.Corpus().GetChapter)
-	e.GET("/jp/jisho/:token", api.JishoProxy)
-	e.GET("/jp/goo/:token", api.GooProxy)
+	e.GET("/jp/jisho/:token", api.Japanese().JishoProxy)
+	e.GET("/jp/goo/:token", api.Japanese().GooProxy)
 	e.POST("/zh/cedict", api.Cedict)
 	e.GET("/zh/zdic/:token", api.Zdic)
 	e.POST("/ocr", api.OCR)
@@ -74,8 +72,8 @@ type Config struct {
 
 type API interface {
 	Corpus() controllers.CorpusAPI
-	JishoProxy(c echo.Context) error
-	GooProxy(c echo.Context) error
+	Japanese() controllers.JapaneseAPI
+
 	OCR(c echo.Context) error
 	Cedict(c echo.Context) error
 	Zdic(c echo.Context) error
@@ -96,18 +94,15 @@ type api struct {
 	psql    *sql.DB
 	queries *postgres.Queries
 
-	corpus controllers.CorpusAPI
+	corpus   controllers.CorpusAPI
+	japanese controllers.JapaneseAPI
 
-	jisho  jisho.Jisho
-	goo    goo.Goo
 	ocr    ocr.Client
 	cedict *cedict.Dict
 	zdic   zdic.Zdic
 	jieba  *gojieba.Jieba
 
-	jishoCache map[string]*JishoProxyResponse
-	gooCache   map[string]*GooProxyResponse
-	ocrCache   persistedcache.PersistedCache
+	ocrCache persistedcache.PersistedCache
 }
 
 func NewAPI() API {
@@ -129,8 +124,6 @@ func NewAPI() API {
 		panic(err)
 	}
 
-	jishoCache := map[string]*JishoProxyResponse{}
-	gooCache := map[string]*GooProxyResponse{}
 	ocrCache, err := persistedcache.New("/app/out/ocr_cache/")
 	if err != nil {
 		panic(err)
@@ -139,19 +132,16 @@ func NewAPI() API {
 	psql := initPostgres(cfg)
 
 	return &api{
-		config:     cfg,
-		corpus:     controllers.NewCorpusAPI(cjp, czh),
-		jisho:      jisho.New(),
-		goo:        goo.New(),
-		jishoCache: jishoCache,
-		gooCache:   gooCache,
-		ocr:        ocrClient,
-		ocrCache:   ocrCache,
-		cedict:     cedict.New(),
-		zdic:       zdic.New(),
-		psql:       psql,
-		queries:    postgres.New(psql),
-		jieba:      gojieba.NewJieba(),
+		config:   cfg,
+		corpus:   controllers.NewCorpusAPI(cjp, czh),
+		japanese: controllers.NewJapaneseAPI(),
+		ocr:      ocrClient,
+		ocrCache: ocrCache,
+		cedict:   cedict.New(),
+		zdic:     zdic.New(),
+		psql:     psql,
+		queries:  postgres.New(psql),
+		jieba:    gojieba.NewJieba(),
 	}
 }
 
@@ -181,75 +171,8 @@ func (api *api) Corpus() controllers.CorpusAPI {
 	return api.corpus
 }
 
-func (api *api) JishoProxy(c echo.Context) error {
-	token := c.Param("token")
-
-	if response, ok := api.jishoCache[token]; ok {
-		return c.JSON(http.StatusOK, response)
-	}
-
-	res, err := api.jisho.Search(token)
-
-	if err != nil {
-		return c.NoContent(http.StatusInternalServerError)
-	}
-
-	response := JishoProxyResponse{
-		Word:        token,
-		Definitions: make([]JishoProxyDefinition, len(res.Definitions)),
-	}
-
-	for i, d := range res.Definitions {
-		response.Definitions[i] = JishoProxyDefinition{Meaning: d.Meaning}
-	}
-
-	api.jishoCache[token] = &response
-
-	return c.JSON(http.StatusOK, response)
-}
-
-type JishoProxyResponse struct {
-	Word        string                 `json:"word"`
-	Definitions []JishoProxyDefinition `json:"definitions"`
-}
-
-type JishoProxyDefinition struct {
-	Meaning string `json:"meaning"`
-}
-
-func (api *api) GooProxy(c echo.Context) error {
-	token := c.Param("token")
-
-	if response, ok := api.gooCache[token]; ok {
-		return c.JSON(http.StatusOK, response)
-	}
-
-	res, err := api.goo.Search(token)
-
-	if err != nil {
-		switch errors.Cause(err) {
-		case goo.ErrNotFound:
-			return c.NoContent(http.StatusNotFound)
-		default:
-			return c.NoContent(http.StatusInternalServerError)
-		}
-	}
-
-	response := GooProxyResponse{
-		Word:       token,
-		Reading:    res.Reading,
-		Definition: res.Definition,
-	}
-
-	api.gooCache[token] = &response
-
-	return c.JSON(http.StatusOK, response)
-}
-
-type GooProxyResponse struct {
-	Word       string `json:"word"`
-	Reading    string `json:"reading"`
-	Definition string `json:"definition"`
+func (api *api) Japanese() controllers.JapaneseAPI {
+	return api.japanese
 }
 
 func Hash(r io.Reader) (string, error) {
