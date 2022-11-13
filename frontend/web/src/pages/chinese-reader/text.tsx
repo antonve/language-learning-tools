@@ -57,7 +57,16 @@ const TextReader: NextPage<{}> = () => {
       navigation={() => (
         <>
           <PageTitle>Chinese Text Reader</PageTitle>
-          <Button onClick={() => setText(undefined)}>Reset text</Button>
+          <Button
+            onClick={() => {
+              router.replace('/chinese-reader/text', undefined, {
+                shallow: true,
+              })
+              setText(undefined)
+            }}
+          >
+            Reset text
+          </Button>
         </>
       )}
     >
