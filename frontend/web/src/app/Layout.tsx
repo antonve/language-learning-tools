@@ -24,8 +24,8 @@ const Layout: FC<Props> = ({
     <div className="flex bg-gray-100 absolute dark:bg-gray-900">
       <NavLink href="/anki/ja">Anki Miner</NavLink>
       <NavLink href="/mined-words">Mined Words</NavLink>
-      <NavLink href="/chinese-manga-reader">Chinese Manga Reader</NavLink>
-      <NavLink href="/chinese-text-reader">Chinese Text Reader</NavLink>
+      <NavLink href="/chinese-reader/manga">Chinese Manga Reader</NavLink>
+      <NavLink href="/chinese-reader/text">Chinese Text Reader</NavLink>
     </div>
     {navigation && (
       <header className={`hero-background p-10 flex justify-between`}>
