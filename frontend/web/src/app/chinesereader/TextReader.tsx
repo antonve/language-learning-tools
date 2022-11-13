@@ -25,7 +25,7 @@ const TextReader: NextPage<Props> = ({ text }) => {
   const [focusWord, setFocusWord] = useState<TextAnalyseToken | undefined>()
   const [defs, setDefs] = useState<CedictResultCollection>({})
 
-  const sentence = analyse?.lines[lineIndex].tokens.map(
+  const sentence = analyse?.lines[lineIndex]?.tokens.map(
     t => t.hanzi_traditional,
   )
 
@@ -37,7 +37,7 @@ const TextReader: NextPage<Props> = ({ text }) => {
   }, [sentence?.join('')])
 
   const onNextSentence = () => {
-    if (analyse && lineIndex < analyse.lines.length - 1) {
+    if (analyse && lineIndex < analyse.lines.length) {
       setLineIndex(lineIndex + 1)
       setFocusWord(undefined)
     }
@@ -60,6 +60,11 @@ const TextReader: NextPage<Props> = ({ text }) => {
     return <p>Loading...</p>
   }
 
+  const charCount = analyse.lines
+    .slice(0, lineIndex)
+    .map(l => l.traditional.length)
+    .reduce((prev, cur) => cur + prev, 0)
+
   return (
     <div className="flex justify-between space-x-10 flex-grow">
       <Button
@@ -69,29 +74,47 @@ const TextReader: NextPage<Props> = ({ text }) => {
       >
         &larr;
       </Button>
-      <div>
-        <SentenceView
-          sentence={analyse.lines[lineIndex]}
-          focusWord={focusWord}
-          setFocusWord={setFocusWord}
-          addDef={def => setDefs({ ...defs, [def.source]: def })}
-        />
-        <FocusWordPanel
-          word={focusWord}
-          exportWord={async (cardType, def) => {
-            if (!focusWord || !sentence) {
-              return
-            }
+      <div className="flex flex-col flex-grow">
+        {lineIndex < analyse.lines.length ? (
+          <>
+            <SentenceView
+              sentence={analyse.lines[lineIndex]}
+              focusWord={focusWord}
+              setFocusWord={setFocusWord}
+              addDef={def => setDefs({ ...defs, [def.source]: def })}
+            />
+            <div className="flex-grow">
+              <FocusWordPanel
+                word={focusWord}
+                exportWord={async (cardType, def) => {
+                  if (!focusWord || !sentence) {
+                    return
+                  }
 
-            return exportWordToAnki(cardType, def, focusWord, sentence.join(''))
-          }}
-          resetFocusWord={() => setFocusWord(undefined)}
-          defs={defs}
-        />
+                  return exportWordToAnki(
+                    cardType,
+                    def,
+                    focusWord,
+                    sentence.join(''),
+                  )
+                }}
+                resetFocusWord={() => setFocusWord(undefined)}
+                defs={defs}
+              />
+            </div>
+          </>
+        ) : null}
+        <div className="space-x-10 flex justify-between">
+          <span>
+            {lineIndex} / {analyse.lines.length}
+          </span>
+          <span>{charCount} characters read</span>
+          <span>{charCount / 400} pages read</span>
+        </div>
       </div>
       <Button
         onClick={onNextSentence}
-        disabled={lineIndex >= analyse.lines.length - 1}
+        disabled={lineIndex > analyse.lines.length - 1}
         overrides={`dark:border-none dark:bg-gray-900 w-32 text-4xl shrink-0`}
       >
         &rarr;
