@@ -44,3 +44,25 @@ set
   updated_at = now(),
   exported_at = now()
 where id = sqlc.arg('id');
+
+-- name: GetTextsForLanguage :many
+select
+  id,
+  language_code,
+  content,
+  created_at,
+  updated_at
+from texts
+where
+  language_code = sqlc.arg('language_code')
+order by created_at asc;
+
+-- name: CreateText :one
+insert into texts (
+  language_code,
+  content
+) values (
+  sqlc.arg('language_code'),
+  sqlc.arg('content')
+)
+returning id;
