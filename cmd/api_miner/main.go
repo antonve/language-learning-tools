@@ -22,6 +22,7 @@ import (
 	"github.com/siongui/gojianfan"
 	"github.com/yanyiwu/gojieba"
 
+	"github.com/antonve/language-learning-tools/cmd/api_miner/controllers"
 	"github.com/antonve/language-learning-tools/internal/pkg/corpus"
 	"github.com/antonve/language-learning-tools/internal/pkg/goo"
 	"github.com/antonve/language-learning-tools/internal/pkg/jisho"
@@ -41,8 +42,8 @@ func main() {
 		return c.NoContent(http.StatusOK)
 	})
 
-	e.GET("/:lang/corpus/:token", api.SearchCorpus)
-	e.GET("/:lang/chapter/:series/:filename", api.GetChapter)
+	e.GET("/:lang/corpus/:token", api.Corpus().Search)
+	e.GET("/:lang/chapter/:series/:filename", api.Corpus().GetChapter)
 	e.GET("/jp/jisho/:token", api.JishoProxy)
 	e.GET("/jp/goo/:token", api.GooProxy)
 	e.POST("/zh/cedict", api.Cedict)
@@ -72,8 +73,7 @@ type Config struct {
 }
 
 type API interface {
-	SearchCorpus(c echo.Context) error
-	GetChapter(c echo.Context) error
+	Corpus() controllers.CorpusAPI
 	JishoProxy(c echo.Context) error
 	GooProxy(c echo.Context) error
 	OCR(c echo.Context) error
@@ -96,14 +96,14 @@ type api struct {
 	psql    *sql.DB
 	queries *postgres.Queries
 
-	jpCorpus corpus.Corpus
-	zhCorpus corpus.Corpus
-	jisho    jisho.Jisho
-	goo      goo.Goo
-	ocr      ocr.Client
-	cedict   *cedict.Dict
-	zdic     zdic.Zdic
-	jieba    *gojieba.Jieba
+	corpus controllers.CorpusAPI
+
+	jisho  jisho.Jisho
+	goo    goo.Goo
+	ocr    ocr.Client
+	cedict *cedict.Dict
+	zdic   zdic.Zdic
+	jieba  *gojieba.Jieba
 
 	jishoCache map[string]*JishoProxyResponse
 	gooCache   map[string]*GooProxyResponse
@@ -140,8 +140,7 @@ func NewAPI() API {
 
 	return &api{
 		config:     cfg,
-		jpCorpus:   cjp,
-		zhCorpus:   czh,
+		corpus:     controllers.NewCorpusAPI(cjp, czh),
 		jisho:      jisho.New(),
 		goo:        goo.New(),
 		jishoCache: jishoCache,
@@ -178,88 +177,8 @@ func (api *api) Config() Config {
 	return api.config
 }
 
-func (api *api) getCorpus(lang string) (corpus.Corpus, error) {
-	switch lang {
-	case "jp":
-		return api.jpCorpus, nil
-	case "zh":
-		return api.zhCorpus, nil
-	}
-
-	return nil, fmt.Errorf("no corpus found for language %s", lang)
-}
-
-func (api *api) SearchCorpus(c echo.Context) error {
-	token := c.Param("token")
-	cor, err := api.getCorpus(c.Param("lang"))
-	if err != nil {
-		return err
-	}
-
-	res := cor.Search(token)
-	results := make([]SearchResult, len(res))
-
-	for i, r := range res {
-		results[i] = SearchResult{
-			Language: r.Chapter.Language,
-			Filename: r.Chapter.Filename,
-			Series:   r.Chapter.Series,
-			Chapter:  r.Chapter.Title(),
-			Line:     r.Line,
-		}
-	}
-
-	response := SearchCorpusResponse{Results: results}
-
-	return c.JSON(http.StatusOK, response)
-}
-
-type SearchCorpusResponse struct {
-	Results []SearchResult `json:"results"`
-}
-
-type SearchResult struct {
-	Language string `json:"language"`
-	Filename string `json:"filename"`
-	Series   string `json:"series"`
-	Chapter  string `json:"chapter"`
-	Line     string `json:"line"`
-}
-
-func (api *api) GetChapter(c echo.Context) error {
-	series := c.Param("series")
-	filename := c.Param("filename")
-	cor, err := api.getCorpus(c.Param("lang"))
-	if err != nil {
-		return err
-	}
-
-	chapter, err := cor.FindOriginal(series, filename)
-
-	if err != nil {
-		switch errors.Cause(err) {
-		case corpus.ErrChapterNotFound:
-			return c.NoContent(http.StatusNotFound)
-		default:
-			return c.NoContent(http.StatusInternalServerError)
-		}
-	}
-
-	response := GetChapterResponse{
-		Filename: chapter.Filename,
-		Series:   chapter.Series,
-		Title:    chapter.Title(),
-		Body:     chapter.BodyWithoutTitle(),
-	}
-
-	return c.JSON(http.StatusOK, response)
-}
-
-type GetChapterResponse struct {
-	Filename string `json:"filename"`
-	Series   string `json:"series"`
-	Title    string `json:"title"`
-	Body     string `json:"body"`
+func (api *api) Corpus() controllers.CorpusAPI {
+	return api.corpus
 }
 
 func (api *api) JishoProxy(c echo.Context) error {
