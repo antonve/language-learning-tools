@@ -86,7 +86,7 @@ func (api *textsAPI) CreateText(c echo.Context) error {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-	_, err = api.queries.CreateText(c.Request().Context(), postgres.CreateTextParams{
+	id, err := api.queries.CreateText(c.Request().Context(), postgres.CreateTextParams{
 		LanguageCode: req.LanguageCode,
 		Title:        req.Title,
 		Content:      req.Content,
@@ -96,7 +96,7 @@ func (api *textsAPI) CreateText(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	return c.NoContent(http.StatusCreated)
+	return c.JSON(http.StatusCreated, id)
 }
 
 type CreateTextRequest struct {

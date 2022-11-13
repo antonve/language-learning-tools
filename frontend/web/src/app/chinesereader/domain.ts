@@ -286,6 +286,7 @@ export const createPendingCard = async (card: Card): Promise<void> => {
 }
 
 export const createText = async (request: {
+  title: string
   content: string
   language_code: string
 }): Promise<any> => {

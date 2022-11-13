@@ -5,7 +5,7 @@ import Button from '@app/anki/components/Button'
 import TextInput from '@app/chinesereader/TextInput'
 import Reader from '@app/chinesereader/TextReader'
 import { useRouter } from 'next/router'
-import { getText } from '@app/chinesereader/domain'
+import { createText, getText } from '@app/chinesereader/domain'
 
 const TextReader: NextPage<{}> = () => {
   const [text, setText] = useState<string | undefined>()
@@ -45,7 +45,21 @@ const TextReader: NextPage<{}> = () => {
           </>
         )}
       >
-        <TextInput submitText={setText} />
+        <TextInput
+          submitText={setText}
+          saveText={text => {
+            const title = window.prompt(`Title for text?`)
+            if (!title) {
+              return
+            }
+
+            createText({ title, content: text, language_code: 'zho' }).then(
+              id => {
+                router.replace(`/chinese-reader/text?id=${id}`)
+              },
+            )
+          }}
+        />
       </Layout>
     )
   }
