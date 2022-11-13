@@ -284,3 +284,62 @@ export const createPendingCard = async (card: Card): Promise<void> => {
 
   return
 }
+
+export const createText = async (request: {
+  content: string
+  language_code: string
+}): Promise<any> => {
+  const url = `${root}/texts`
+  const response = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify(request),
+  })
+  const body = await response.json()
+
+  return body
+}
+
+export interface ListTextsResponse {
+  texts: {
+    id: number
+    title: string
+  }[]
+}
+
+export const listTexts = async (
+  languageCode: string,
+): Promise<ListTextsResponse> => {
+  const url = `${root}/texts?language_code=${languageCode}`
+  const response = await fetch(url)
+
+  if (response.status !== 200) {
+    return {
+      texts: [],
+    }
+  }
+
+  const body = await response.json()
+
+  return body
+}
+
+export interface GetTextResponse {
+  id: number
+  title: string
+  content: string
+}
+
+export const getText = async (
+  id: number,
+): Promise<GetTextResponse | undefined> => {
+  const url = `${root}/texts/${id}`
+  const response = await fetch(url)
+
+  if (response.status !== 200) {
+    return
+  }
+
+  const body = await response.json()
+
+  return body
+}
