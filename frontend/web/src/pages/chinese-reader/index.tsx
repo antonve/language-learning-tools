@@ -38,13 +38,21 @@ const Index: NextPage<{}> = () => {
         </>
       )}
     >
-      <ul>
-        {texts.texts.map(t => (
-          <li key={t.id}>
-            <a href={`/chinese-reader/text?id=${t.id}`}>{t.title}</a>
-          </li>
-        ))}
-      </ul>
+      <div className="w-full">
+        <h2 className="text-2xl mb-4 font-bold">Saved texts</h2>
+        <ul className="list-disc ml-4 w-full">
+          {texts.texts.map(t => (
+            <li key={t.id} className={`my-2`}>
+              <a
+                href={`/chinese-reader/text?id=${t.id}`}
+                className="block hover:bg-gray-900"
+              >
+                {t.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
     </Layout>
   )
 }
