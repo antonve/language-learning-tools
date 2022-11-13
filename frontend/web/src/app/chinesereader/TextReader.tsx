@@ -105,8 +105,22 @@ const TextReader: NextPage<Props> = ({ text }) => {
           </>
         ) : null}
         <div className="space-x-10 flex justify-between">
-          <span>
-            {lineIndex} / {analyse.lines.length}
+          <span
+            onClick={() => {
+              const p =
+                parseInt(
+                  window.prompt(`Skip to line (max ${analyse.lines.length})`) ??
+                    '0',
+                ) - 1
+              if (p >= 0 && p < analyse.lines.length) {
+                setLineIndex(p)
+              }
+            }}
+            className="cursor-pointer text-center"
+          >
+            {lineIndex == analyse.lines.length
+              ? 'Summary'
+              : `${lineIndex + 1} / ${analyse.lines.length}`}
           </span>
           <span>{charCount} characters read</span>
           <span>{charCount / 400} pages read</span>
