@@ -330,7 +330,7 @@ export interface GetTextResponse {
 }
 
 export const getText = async (
-  id: number,
+  id: string,
 ): Promise<GetTextResponse | undefined> => {
   const url = `${root}/texts/${id}`
   const response = await fetch(url)

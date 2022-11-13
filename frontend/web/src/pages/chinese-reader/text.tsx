@@ -1,12 +1,39 @@
 import type { NextPage } from 'next'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Layout, { PageTitle } from '@app/Layout'
 import Button from '@app/anki/components/Button'
 import TextInput from '@app/chinesereader/TextInput'
 import Reader from '@app/chinesereader/TextReader'
+import { useRouter } from 'next/router'
+import { getText } from '@app/chinesereader/domain'
 
 const TextReader: NextPage<{}> = () => {
   const [text, setText] = useState<string | undefined>()
+  const router = useRouter()
+  const id = router.query['id']
+
+  useEffect(() => {
+    if (!id) {
+      return
+    }
+
+    getText(id.toString()).then(t => setText(t?.content))
+  }, [id])
+
+  if (!text && id) {
+    return (
+      <Layout
+        darkMode={true}
+        navigation={() => (
+          <>
+            <PageTitle>Chinese Text Reader</PageTitle>
+          </>
+        )}
+      >
+        Loading...
+      </Layout>
+    )
+  }
 
   if (!text) {
     return (
