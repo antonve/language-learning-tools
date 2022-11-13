@@ -27,18 +27,24 @@ func main() {
 
 	e.GET("/:lang/corpus/:token", api.Corpus().Search)
 	e.GET("/:lang/chapter/:series/:filename", api.Corpus().GetChapter)
+
 	e.GET("/jp/jisho/:token", api.Japanese().JishoProxy)
 	e.GET("/jp/goo/:token", api.Japanese().GooProxy)
+
 	e.POST("/zh/cedict", api.Chinese().Cedict)
 	e.GET("/zh/zdic/:token", api.Chinese().Zdic)
-	e.POST("/ocr", api.CloudVision().OCR)
 	e.POST("/zh/text-analyse", api.Chinese().TextAnalyse)
+
+	e.POST("/ocr", api.CloudVision().OCR)
 
 	e.GET("/pending_cards", api.Mining().ListPendingCards)
 	e.POST("/pending_cards", api.Mining().CreatePendingCard)
 	e.PUT("/pending_cards/:id", api.Mining().UpdateCard)
 	e.GET("/pending_cards/:id/image", api.Mining().CardImage)
 	e.POST("/pending_cards/:id/mark", api.Mining().MarkCardAsExported)
+
+	e.GET("/texts", api.Texts().ListTexts)
+	e.POST("/texts", api.Texts().CreateText)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", api.Config().Port)))
 }
@@ -61,6 +67,7 @@ type API interface {
 	Chinese() controllers.ChineseAPI
 	Mining() controllers.MiningAPI
 	CloudVision() controllers.CloudVisionAPI
+	Texts() controllers.TextsAPI
 
 	Config() Config
 }
@@ -73,6 +80,7 @@ type api struct {
 	chinese     controllers.ChineseAPI
 	mining      controllers.MiningAPI
 	cloudvision controllers.CloudVisionAPI
+	texts       controllers.TextsAPI
 }
 
 func NewAPI() API {
@@ -103,6 +111,7 @@ func NewAPI() API {
 		chinese:     controllers.NewChineseAPI(),
 		mining:      controllers.NewMiningAPI(psql),
 		cloudvision: controllers.NewCloudVisionAPI(ocrCache),
+		texts:       controllers.NewTextsAPI(psql),
 	}
 }
 
@@ -146,4 +155,8 @@ func (api *api) Mining() controllers.MiningAPI {
 
 func (api *api) CloudVision() controllers.CloudVisionAPI {
 	return api.cloudvision
+}
+
+func (api *api) Texts() controllers.TextsAPI {
+	return api.texts
 }
