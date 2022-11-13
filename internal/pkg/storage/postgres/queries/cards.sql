@@ -49,7 +49,6 @@ where id = sqlc.arg('id');
 select
   id,
   language_code,
-  content,
   created_at,
   updated_at
 from texts
@@ -66,3 +65,14 @@ insert into texts (
   sqlc.arg('content')
 )
 returning id;
+
+-- name: GetText :one
+select
+  id,
+  language_code,
+  content,
+  created_at,
+  updated_at
+from texts
+where
+  id = sqlc.arg('id');

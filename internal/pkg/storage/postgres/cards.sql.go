@@ -81,7 +81,7 @@ func (q *Queries) GetImageFromPendingCard(ctx context.Context, id int64) ([]byte
 	return source_image, err
 }
 
-const getTextsForLanguage = `-- name: GetTextsForLanguage :many
+const getText = `-- name: GetText :one
 select
   id,
   language_code,
@@ -90,23 +90,53 @@ select
   updated_at
 from texts
 where
+  id = $1
+`
+
+func (q *Queries) GetText(ctx context.Context, id int64) (Text, error) {
+	row := q.db.QueryRowContext(ctx, getText, id)
+	var i Text
+	err := row.Scan(
+		&i.ID,
+		&i.LanguageCode,
+		&i.Content,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const getTextsForLanguage = `-- name: GetTextsForLanguage :many
+select
+  id,
+  language_code,
+  created_at,
+  updated_at
+from texts
+where
   language_code = $1
 order by created_at asc
 `
 
-func (q *Queries) GetTextsForLanguage(ctx context.Context, languageCode string) ([]Text, error) {
+type GetTextsForLanguageRow struct {
+	ID           int64
+	LanguageCode string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+}
+
+func (q *Queries) GetTextsForLanguage(ctx context.Context, languageCode string) ([]GetTextsForLanguageRow, error) {
 	rows, err := q.db.QueryContext(ctx, getTextsForLanguage, languageCode)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Text
+	var items []GetTextsForLanguageRow
 	for rows.Next() {
-		var i Text
+		var i GetTextsForLanguageRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.LanguageCode,
-			&i.Content,
 			&i.CreatedAt,
 			&i.UpdatedAt,
 		); err != nil {

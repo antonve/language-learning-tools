@@ -45,6 +45,7 @@ func main() {
 
 	e.GET("/texts", api.Texts().ListTexts)
 	e.POST("/texts", api.Texts().CreateText)
+	e.GET("/texts/:id", api.Texts().GetText)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", api.Config().Port)))
 }

@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
@@ -16,6 +17,7 @@ import (
 type TextsAPI interface {
 	CreateText(c echo.Context) error
 	ListTexts(c echo.Context) error
+	GetText(c echo.Context) error
 }
 
 type textsAPI struct {
@@ -48,7 +50,6 @@ func (api *textsAPI) ListTexts(c echo.Context) error {
 		res.Texts = append(res.Texts, Text{
 			ID:           row.ID,
 			LanguageCode: row.LanguageCode,
-			Content:      row.Content,
 		})
 	}
 
@@ -58,7 +59,7 @@ func (api *textsAPI) ListTexts(c echo.Context) error {
 type Text struct {
 	ID           int64  `json:"id"`
 	LanguageCode string `json:"language_code"`
-	Content      string `json:"content"`
+	Content      string `json:"content,omitempty"`
 }
 
 type ListTextsResponse struct {
@@ -110,4 +111,28 @@ func (req *CreateTextRequest) Validate() error {
 	}
 
 	return nil
+}
+
+func (api *textsAPI) GetText(c echo.Context) error {
+	id := c.Param("id")
+	if id == "" {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	intId, err := strconv.Atoi(id)
+	if err != nil {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	row, err := api.queries.GetText(c.Request().Context(), int64(intId))
+	if err != nil {
+		log.Println("could not process request:", err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	return c.JSON(http.StatusOK, Text{
+		ID:           row.ID,
+		LanguageCode: row.LanguageCode,
+		Content:      row.Content,
+	})
 }
