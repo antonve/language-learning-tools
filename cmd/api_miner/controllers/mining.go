@@ -2,14 +2,12 @@ package controllers
 
 import (
 	"database/sql"
-	_ "embed"
 	"encoding/json"
 	"io"
 	"log"
 	"net/http"
 	"strconv"
 
-	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 

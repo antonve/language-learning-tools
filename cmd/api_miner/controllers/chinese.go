@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"bytes"
-	_ "embed"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -10,7 +9,6 @@ import (
 	"net/http"
 	"strings"
 
-	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jcramb/cedict"
 	"github.com/labstack/echo/v4"
 	"github.com/siongui/gojianfan"

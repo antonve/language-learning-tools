@@ -1,13 +1,8 @@
 package main
 
 import (
-	"bytes"
-	"crypto/sha256"
 	"database/sql"
-	_ "embed"
 	"fmt"
-	"io"
-	"log"
 	"net/http"
 
 	_ "github.com/jackc/pgx/v4/stdlib"
@@ -17,7 +12,6 @@ import (
 
 	"github.com/antonve/language-learning-tools/cmd/api_miner/controllers"
 	"github.com/antonve/language-learning-tools/internal/pkg/corpus"
-	"github.com/antonve/language-learning-tools/internal/pkg/ocr"
 	"github.com/antonve/language-learning-tools/internal/pkg/persistedcache"
 )
 
@@ -37,7 +31,7 @@ func main() {
 	e.GET("/jp/goo/:token", api.Japanese().GooProxy)
 	e.POST("/zh/cedict", api.Chinese().Cedict)
 	e.GET("/zh/zdic/:token", api.Chinese().Zdic)
-	e.POST("/ocr", api.OCR)
+	e.POST("/ocr", api.CloudVision().OCR)
 	e.POST("/zh/text-analyse", api.Chinese().TextAnalyse)
 
 	e.GET("/pending_cards", api.Mining().ListPendingCards)
@@ -66,8 +60,7 @@ type API interface {
 	Japanese() controllers.JapaneseAPI
 	Chinese() controllers.ChineseAPI
 	Mining() controllers.MiningAPI
-
-	OCR(c echo.Context) error
+	CloudVision() controllers.CloudVisionAPI
 
 	Config() Config
 }
@@ -75,13 +68,11 @@ type API interface {
 type api struct {
 	config Config
 
-	corpus   controllers.CorpusAPI
-	japanese controllers.JapaneseAPI
-	chinese  controllers.ChineseAPI
-	mining   controllers.MiningAPI
-
-	ocr      ocr.Client
-	ocrCache persistedcache.PersistedCache
+	corpus      controllers.CorpusAPI
+	japanese    controllers.JapaneseAPI
+	chinese     controllers.ChineseAPI
+	mining      controllers.MiningAPI
+	cloudvision controllers.CloudVisionAPI
 }
 
 func NewAPI() API {
@@ -98,11 +89,6 @@ func NewAPI() API {
 		panic(err)
 	}
 
-	ocrClient, err := ocr.New()
-	if err != nil {
-		panic(err)
-	}
-
 	ocrCache, err := persistedcache.New("/app/out/ocr_cache/")
 	if err != nil {
 		panic(err)
@@ -111,13 +97,12 @@ func NewAPI() API {
 	psql := initPostgres(cfg)
 
 	return &api{
-		config:   cfg,
-		corpus:   controllers.NewCorpusAPI(cjp, czh),
-		japanese: controllers.NewJapaneseAPI(),
-		chinese:  controllers.NewChineseAPI(),
-		mining:   controllers.NewMiningAPI(psql),
-		ocr:      ocrClient,
-		ocrCache: ocrCache,
+		config:      cfg,
+		corpus:      controllers.NewCorpusAPI(cjp, czh),
+		japanese:    controllers.NewJapaneseAPI(),
+		chinese:     controllers.NewChineseAPI(),
+		mining:      controllers.NewMiningAPI(psql),
+		cloudvision: controllers.NewCloudVisionAPI(ocrCache),
 	}
 }
 
@@ -159,38 +144,6 @@ func (api *api) Mining() controllers.MiningAPI {
 	return api.mining
 }
 
-func Hash(r io.Reader) (string, error) {
-	hash := sha256.New()
-	if _, err := io.Copy(hash, r); err != nil {
-		return "", err
-	}
-
-	sum := hash.Sum(nil)
-
-	return fmt.Sprintf("%x", sum), nil
-}
-
-func (api *api) OCR(c echo.Context) error {
-	buf := &bytes.Buffer{}
-	r := io.TeeReader(c.Request().Body, buf)
-
-	sum, err := Hash(r)
-	if err != nil {
-		log.Println("could not process ocr request:", err)
-		return c.NoContent(http.StatusInternalServerError)
-	}
-
-	if response, ok := api.ocrCache.Get(sum); ok {
-		return c.String(http.StatusOK, string(response))
-	}
-
-	res, err := api.ocr.Do(c.Request().Context(), buf)
-	if err != nil {
-		log.Println("could not process ocr request:", err)
-		return c.NoContent(http.StatusInternalServerError)
-	}
-
-	api.ocrCache.Put(sum, res)
-
-	return c.String(http.StatusOK, string(res))
+func (api *api) CloudVision() controllers.CloudVisionAPI {
+	return api.cloudvision
 }

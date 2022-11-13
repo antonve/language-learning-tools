@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	_ "embed"
 	"fmt"
 	"net/http"
 

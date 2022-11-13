@@ -1,10 +1,8 @@
 package controllers
 
 import (
-	_ "embed"
 	"net/http"
 
-	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 
