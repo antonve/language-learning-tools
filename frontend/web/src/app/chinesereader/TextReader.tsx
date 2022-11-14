@@ -1,9 +1,11 @@
 import type { NextPage } from 'next'
 import {
   exportWordToAnki,
+  GetTextResponse,
   textAnalyse,
   TextAnalyseResponse,
   TextAnalyseToken,
+  updateLastPositionText,
 } from '@app/chinesereader/domain'
 import { useEffect, useState } from 'react'
 import Button from '@app/anki/components/Button'
@@ -16,15 +18,12 @@ import {
 import FocusWordPanel from './FocusWordPanel'
 
 interface Props {
-  text: string
-  initialReadingPosition: number | undefined
+  text: GetTextResponse
 }
 
-const TextReader: NextPage<Props> = ({ text, initialReadingPosition }) => {
+const TextReader: NextPage<Props> = ({ text }) => {
   const [analyse, setAnalyse] = useState<TextAnalyseResponse>()
-  const [lineIndex, setLineIndex] = useState<number>(
-    initialReadingPosition ?? 0,
-  )
+  const [lineIndex, setLineIndex] = useState<number>(text.last_position ?? 0)
   const [focusWord, setFocusWord] = useState<TextAnalyseToken | undefined>()
   const [defs, setDefs] = useState<CedictResultCollection>({})
 
@@ -56,8 +55,17 @@ const TextReader: NextPage<Props> = ({ text, initialReadingPosition }) => {
   useKeyPress('ArrowRight', onNextSentence)
 
   useEffect(() => {
-    textAnalyse(text).then(res => setAnalyse(res))
+    textAnalyse(text.content).then(res => setAnalyse(res))
   }, [text])
+
+  useEffect(() => {
+    if (!text.id || lineIndex <= (text.last_position ?? 0)) {
+      return
+    }
+    updateLastPositionText(text.id, lineIndex).then(() =>
+      console.log('new position saved', lineIndex),
+    )
+  }, [text, lineIndex])
 
   if (!analyse) {
     return <p>Loading...</p>

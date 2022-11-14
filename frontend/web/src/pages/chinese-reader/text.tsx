@@ -84,7 +84,7 @@ const TextReader: NextPage<{}> = () => {
         </>
       )}
     >
-      <Reader text={text.content} initialReadingPosition={text.last_position} />
+      <Reader text={text} />
     </Layout>
   )
 }
