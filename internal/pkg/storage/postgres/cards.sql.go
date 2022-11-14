@@ -90,6 +90,7 @@ select
   language_code,
   title,
   content,
+  last_position,
   created_at,
   updated_at
 from texts
@@ -102,6 +103,7 @@ type GetTextRow struct {
 	LanguageCode string
 	Title        string
 	Content      string
+	LastPosition int32
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 }
@@ -114,6 +116,7 @@ func (q *Queries) GetText(ctx context.Context, id int64) (GetTextRow, error) {
 		&i.LanguageCode,
 		&i.Title,
 		&i.Content,
+		&i.LastPosition,
 		&i.CreatedAt,
 		&i.UpdatedAt,
 	)

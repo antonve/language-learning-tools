@@ -63,6 +63,7 @@ type Text struct {
 	LanguageCode string `json:"language_code"`
 	Title        string `json:"title"`
 	Content      string `json:"content,omitempty"`
+	LastPosition int32  `json:"last_position,omitempty"`
 }
 
 type ListTextsResponse struct {
@@ -128,12 +129,12 @@ func (api *textsAPI) GetText(c echo.Context) error {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-	intId, err := strconv.Atoi(id)
+	intID, err := strconv.Atoi(id)
 	if err != nil {
 		return c.NoContent(http.StatusBadRequest)
 	}
 
-	row, err := api.queries.GetText(c.Request().Context(), int64(intId))
+	row, err := api.queries.GetText(c.Request().Context(), int64(intID))
 	if err != nil {
 		log.Println("could not process request:", err)
 		return c.NoContent(http.StatusInternalServerError)
@@ -144,6 +145,7 @@ func (api *textsAPI) GetText(c echo.Context) error {
 		LanguageCode: row.LanguageCode,
 		Title:        row.Title,
 		Content:      row.Content,
+		LastPosition: row.LastPosition,
 	})
 }
 

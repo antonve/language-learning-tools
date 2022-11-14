@@ -75,6 +75,7 @@ select
   language_code,
   title,
   content,
+  last_position,
   created_at,
   updated_at
 from texts
