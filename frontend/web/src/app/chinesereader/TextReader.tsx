@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
 import {
   exportWordToAnki,
-  GetTextResponse,
+  Text,
   textAnalyse,
   TextAnalyseResponse,
   TextAnalyseToken,
@@ -18,7 +18,7 @@ import {
 import FocusWordPanel from './FocusWordPanel'
 
 interface Props {
-  text: GetTextResponse
+  text: Text
 }
 
 const TextReader: NextPage<Props> = ({ text }) => {

@@ -5,10 +5,10 @@ import Button from '@app/anki/components/Button'
 import TextInput from '@app/chinesereader/TextInput'
 import Reader from '@app/chinesereader/TextReader'
 import { useRouter } from 'next/router'
-import { createText, getText, GetTextResponse } from '@app/chinesereader/domain'
+import { createText, getText, Text } from '@app/chinesereader/domain'
 
 const TextReader: NextPage<{}> = () => {
-  const [text, setText] = useState<GetTextResponse | undefined>()
+  const [text, setText] = useState<Text | undefined>()
   const router = useRouter()
   const id = router.query['id']
 

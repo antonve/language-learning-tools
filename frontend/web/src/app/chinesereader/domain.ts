@@ -325,8 +325,8 @@ export const listTexts = async (
 }
 
 export interface GetTextResponse {
-  id?: number
-  title?: string
+  id: number
+  title: string
   content: string
   last_position?: number
 }
@@ -359,4 +359,11 @@ export const updateLastPositionText = async (
   if (response.status !== 200) {
     return Promise.reject()
   }
+}
+
+export interface Text {
+  id?: number
+  title?: string
+  content: string
+  last_position?: number
 }

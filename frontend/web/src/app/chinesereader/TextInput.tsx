@@ -2,10 +2,10 @@ import type { NextPage } from 'next'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { TextArea } from '@app/anki/components/Form'
 import Button from '@app/anki/components/Button'
-import { GetTextResponse } from './domain'
+import { Text } from './domain'
 
 interface Props {
-  submitText: Dispatch<SetStateAction<GetTextResponse | undefined>>
+  submitText: Dispatch<SetStateAction<Text | undefined>>
   saveText: (text: string) => void
 }
 
