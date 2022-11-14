@@ -17,11 +17,14 @@ import FocusWordPanel from './FocusWordPanel'
 
 interface Props {
   text: string
+  initialReadingPosition: number | undefined
 }
 
-const TextReader: NextPage<Props> = ({ text }) => {
+const TextReader: NextPage<Props> = ({ text, initialReadingPosition }) => {
   const [analyse, setAnalyse] = useState<TextAnalyseResponse>()
-  const [lineIndex, setLineIndex] = useState<number>(0)
+  const [lineIndex, setLineIndex] = useState<number>(
+    initialReadingPosition ?? 0,
+  )
   const [focusWord, setFocusWord] = useState<TextAnalyseToken | undefined>()
   const [defs, setDefs] = useState<CedictResultCollection>({})
 

@@ -5,10 +5,10 @@ import Button from '@app/anki/components/Button'
 import TextInput from '@app/chinesereader/TextInput'
 import Reader from '@app/chinesereader/TextReader'
 import { useRouter } from 'next/router'
-import { createText, getText } from '@app/chinesereader/domain'
+import { createText, getText, GetTextResponse } from '@app/chinesereader/domain'
 
 const TextReader: NextPage<{}> = () => {
-  const [text, setText] = useState<string | undefined>()
+  const [text, setText] = useState<GetTextResponse | undefined>()
   const router = useRouter()
   const id = router.query['id']
 
@@ -17,7 +17,7 @@ const TextReader: NextPage<{}> = () => {
       return
     }
 
-    getText(id.toString()).then(t => setText(t?.content))
+    getText(id.toString()).then(t => setText(t))
   }, [id])
 
   if (!text && id) {
@@ -84,7 +84,7 @@ const TextReader: NextPage<{}> = () => {
         </>
       )}
     >
-      <Reader text={text} />
+      <Reader text={text.content} initialReadingPosition={text.last_position} />
     </Layout>
   )
 }

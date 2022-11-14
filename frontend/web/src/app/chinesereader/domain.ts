@@ -325,9 +325,10 @@ export const listTexts = async (
 }
 
 export interface GetTextResponse {
-  id: number
-  title: string
+  id?: number
+  title?: string
   content: string
+  last_position?: number
 }
 
 export const getText = async (
@@ -343,4 +344,19 @@ export const getText = async (
   const body = await response.json()
 
   return body
+}
+
+export const updateLastPositionText = async (
+  id: number,
+  last_position: number,
+): Promise<void> => {
+  const url = `${root}/texts/${id}/last_position`
+  const response = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify({ last_position }),
+  })
+
+  if (response.status !== 200) {
+    return Promise.reject()
+  }
 }

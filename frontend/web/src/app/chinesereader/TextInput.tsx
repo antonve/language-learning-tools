@@ -2,9 +2,10 @@ import type { NextPage } from 'next'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { TextArea } from '@app/anki/components/Form'
 import Button from '@app/anki/components/Button'
+import { GetTextResponse } from './domain'
 
 interface Props {
-  submitText: Dispatch<SetStateAction<string | undefined>>
+  submitText: Dispatch<SetStateAction<GetTextResponse | undefined>>
   saveText: (text: string) => void
 }
 
@@ -15,7 +16,7 @@ const TextInput: NextPage<Props> = ({ submitText, saveText }) => {
     <form
       onSubmit={e => {
         e.preventDefault()
-        submitText(text)
+        submitText({ content: text ?? '' })
       }}
     >
       <div className="mb-4">
