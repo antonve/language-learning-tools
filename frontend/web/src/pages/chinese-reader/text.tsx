@@ -70,7 +70,7 @@ const TextReader: NextPage<{}> = () => {
       bodyClassName={`flex-grow flex px-10 pb-10`}
       navigation={() => (
         <>
-          <PageTitle>Chinese Text Reader</PageTitle>
+          <PageTitle>{text.title ?? 'Chinese Text Reader'}</PageTitle>
           <Button
             onClick={() => {
               router.replace('/chinese-reader/text', undefined, {

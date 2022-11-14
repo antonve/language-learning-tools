@@ -28,7 +28,9 @@ const Layout: FC<Props> = ({
       <NavLink href="/chinese-reader/">Chinese Text Reader</NavLink>
     </div>
     {navigation && (
-      <header className={`hero-background p-10 flex justify-between`}>
+      <header
+        className={`hero-background m-10 flex justify-between items-center`}
+      >
         {navigation()}
       </header>
     )}
@@ -52,7 +54,7 @@ const NavLink = ({
 )
 
 export const PageTitle = ({ children }: { children?: ReactNode }) => (
-  <h1 className="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl dark:text-gray-100">
+  <h1 className="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl dark:text-gray-100 capitalize">
     {children}
   </h1>
 )
