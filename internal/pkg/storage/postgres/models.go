@@ -28,4 +28,5 @@ type Text struct {
 	Content      string
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
+	LastPosition int32
 }

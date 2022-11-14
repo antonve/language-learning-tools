@@ -18,6 +18,7 @@ type TextsAPI interface {
 	CreateText(c echo.Context) error
 	ListTexts(c echo.Context) error
 	GetText(c echo.Context) error
+	UpdateReadingPosition(c echo.Context) error
 }
 
 type textsAPI struct {
@@ -144,4 +145,43 @@ func (api *textsAPI) GetText(c echo.Context) error {
 		Title:        row.Title,
 		Content:      row.Content,
 	})
+}
+
+type UpdateReadingPositionRequest struct {
+	LastPosition int64 `json:"last_position"`
+}
+
+func (api *textsAPI) UpdateReadingPosition(c echo.Context) error {
+	id := c.Param("id")
+	if id == "" {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	intID, err := strconv.Atoi(id)
+	if err != nil {
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	body, err := io.ReadAll(c.Request().Body)
+	if err != nil {
+		log.Println("could not process request:", err)
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	req := &UpdateReadingPositionRequest{}
+	if err := json.Unmarshal(body, req); err != nil {
+		log.Println("could not process request:", err)
+		return c.NoContent(http.StatusBadRequest)
+	}
+
+	err = api.queries.UpdateReadingPositionOfText(c.Request().Context(), postgres.UpdateReadingPositionOfTextParams{
+		ID:           int64(intID),
+		LastPosition: int32(req.LastPosition),
+	})
+	if err != nil {
+		log.Println("could not process request:", err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	return c.NoContent(http.StatusOK)
 }

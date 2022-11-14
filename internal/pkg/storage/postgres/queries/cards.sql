@@ -80,3 +80,10 @@ select
 from texts
 where
   id = sqlc.arg('id');
+
+-- name: UpdateReadingPositionOfText :exec
+update texts
+set last_position = sqlc.arg('last_position')
+where
+  id = sqlc.arg('id')
+  and last_position < sqlc.arg('last_position');

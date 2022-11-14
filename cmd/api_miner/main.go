@@ -46,6 +46,7 @@ func main() {
 	e.GET("/texts", api.Texts().ListTexts)
 	e.POST("/texts", api.Texts().CreateText)
 	e.GET("/texts/:id", api.Texts().GetText)
+	e.POST("/texts/:id/last_position", api.Texts().UpdateReadingPosition)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", api.Config().Port)))
 }

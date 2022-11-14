@@ -97,9 +97,18 @@ where
   id = $1
 `
 
-func (q *Queries) GetText(ctx context.Context, id int64) (Text, error) {
+type GetTextRow struct {
+	ID           int64
+	LanguageCode string
+	Title        string
+	Content      string
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
+}
+
+func (q *Queries) GetText(ctx context.Context, id int64) (GetTextRow, error) {
 	row := q.db.QueryRowContext(ctx, getText, id)
-	var i Text
+	var i GetTextRow
 	err := row.Scan(
 		&i.ID,
 		&i.LanguageCode,
@@ -243,5 +252,23 @@ type UpdateCardParams struct {
 
 func (q *Queries) UpdateCard(ctx context.Context, arg UpdateCardParams) error {
 	_, err := q.db.ExecContext(ctx, updateCard, arg.Meta, arg.ID)
+	return err
+}
+
+const updateReadingPositionOfText = `-- name: UpdateReadingPositionOfText :exec
+update texts
+set last_position = $1
+where
+  id = $2
+  and last_position < $1
+`
+
+type UpdateReadingPositionOfTextParams struct {
+	LastPosition int32
+	ID           int64
+}
+
+func (q *Queries) UpdateReadingPositionOfText(ctx context.Context, arg UpdateReadingPositionOfTextParams) error {
+	_, err := q.db.ExecContext(ctx, updateReadingPositionOfText, arg.LastPosition, arg.ID)
 	return err
 }
