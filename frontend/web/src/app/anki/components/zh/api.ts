@@ -26,7 +26,7 @@ export interface ZdicResult {
 export const getCedictDefinition = async (
   word: string,
 ): Promise<CedictResult> => {
-  const url = `${root}/zh/cedict`
+  const url = `${root}/zh_TW/cedict`
   const response = await fetch(url, {
     method: 'POST',
     body: JSON.stringify({
@@ -49,7 +49,7 @@ export const getCedictDefinition = async (
 export const getCedictDefinitions = async (
   words: string[],
 ): Promise<CedictResultCollection> => {
-  const url = `${root}/zh/cedict`
+  const url = `${root}/zh_TW/cedict`
   const response = await fetch(url, {
     method: 'POST',
     body: JSON.stringify({
@@ -66,7 +66,7 @@ export const getCedictDefinitions = async (
 }
 
 export const getZdicDefinition = async (word: string): Promise<ZdicResult> => {
-  const url = `${root}/zh/zdic/${encodeURI(word)}`
+  const url = `${root}/zh_TW/zdic/${encodeURI(word)}`
   const response = await fetch(url)
 
   if (response.status !== 200) {

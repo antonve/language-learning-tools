@@ -26,7 +26,7 @@ export interface TextAnalyseResponse {
 export const textAnalyse = async (
   text: string,
 ): Promise<TextAnalyseResponse> => {
-  const url = `${root}/zh/text-analyse`
+  const url = `${root}/zh_TW/text-analyse`
   const response = await fetch(url, {
     method: 'POST',
     body: JSON.stringify({ text }),

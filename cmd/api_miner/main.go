@@ -31,9 +31,9 @@ func main() {
 	e.GET("/jp/jisho/:token", api.Japanese().JishoProxy)
 	e.GET("/jp/goo/:token", api.Japanese().GooProxy)
 
-	e.POST("/zh/cedict", api.Chinese().Cedict)
-	e.GET("/zh/zdic/:token", api.Chinese().Zdic)
-	e.POST("/zh/text-analyse", api.Chinese().TextAnalyse)
+	e.POST("/zh_TW/cedict", api.Chinese().Cedict)
+	e.GET("/zh_TW/zdic/:token", api.Chinese().Zdic)
+	e.POST("/zh_TW/text-analyse", api.Chinese().TextAnalyse)
 
 	e.POST("/ocr", api.CloudVision().OCR)
 
