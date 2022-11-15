@@ -8,6 +8,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type PendingCard struct {
@@ -29,4 +31,15 @@ type Text struct {
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	LastPosition int32
+}
+
+type WordToken struct {
+	ID           uuid.UUID
+	LanguageCode string
+	Token        string
+	Notes        sql.NullString
+	Meta         json.RawMessage
+	Rating       sql.NullInt16
+	CreatedAt    time.Time
+	UpdatedAt    time.Time
 }
