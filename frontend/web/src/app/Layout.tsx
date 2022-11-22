@@ -4,6 +4,7 @@ import { FC, ReactNode } from 'react'
 interface Props {
   navigation?: () => any
   bodyClassName?: string
+  headerClassName?: string
   darkMode?: boolean
 }
 
@@ -11,6 +12,7 @@ const Layout: FC<Props> = ({
   children,
   navigation,
   bodyClassName = 'px-10',
+  headerClassName = '',
   darkMode = false,
 }) => (
   <div
@@ -29,7 +31,7 @@ const Layout: FC<Props> = ({
     </div>
     {navigation && (
       <header
-        className={`hero-background m-10 flex justify-between items-center`}
+        className={`hero-background m-10 flex justify-between items-center ${headerClassName}`}
       >
         {navigation()}
       </header>

@@ -67,7 +67,8 @@ const TextReader: NextPage<{}> = () => {
   return (
     <Layout
       darkMode={true}
-      bodyClassName={`flex-grow flex px-10 pb-10`}
+      bodyClassName={`flex-grow flex pb-5 md:mt-5 md:pb-0`}
+      headerClassName={`md:hidden`}
       navigation={() => (
         <>
           <PageTitle>{text.title ?? 'Chinese Text Reader'}</PageTitle>

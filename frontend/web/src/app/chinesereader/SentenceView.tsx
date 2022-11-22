@@ -39,7 +39,7 @@ const SentenceView = ({ sentence, focusWord, setFocusWord, addDef }: Props) => {
   }, [range])
 
   return (
-    <p className="text-center text-4xl m-8">
+    <p className="text-center text-4xl m-8 md:m-0">
       {sentence.tokens.map((w, i) => (
         <span
           className={`group hover:bg-yellow-100 dark:hover:bg-green-800 cursor-pointer ${

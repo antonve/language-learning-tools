@@ -77,15 +77,15 @@ const TextReader: NextPage<Props> = ({ text }) => {
     .reduce((prev, cur) => cur + prev, 0)
 
   return (
-    <div className="flex justify-between space-x-10 flex-grow">
+    <div className="flex justify-between space-x-10 md:space-x-2 flex-grow">
       <Button
         onClick={onPrevSentence}
         disabled={lineIndex <= 0}
-        overrides={`dark:border-none dark:bg-gray-900 w-32 text-4xl shrink-0`}
+        overrides={`dark:border-none dark:bg-gray-900 w-32 text-4xl shrink-0 md:w-20`}
       >
         &larr;
       </Button>
-      <div className="flex flex-col flex-grow">
+      <div className="flex flex-col flex-grow pt-5">
         {lineIndex < analyse.lines.length ? (
           <>
             <SentenceView
@@ -94,7 +94,7 @@ const TextReader: NextPage<Props> = ({ text }) => {
               setFocusWord={setFocusWord}
               addDef={def => setDefs({ ...defs, [def.source]: def })}
             />
-            <div className="flex-grow">
+            <div className="flex-grow md:py-5">
               <FocusWordPanel
                 word={focusWord}
                 exportWord={async (cardType, def) => {
@@ -140,7 +140,7 @@ const TextReader: NextPage<Props> = ({ text }) => {
       <Button
         onClick={onNextSentence}
         disabled={lineIndex > analyse.lines.length - 1}
-        overrides={`dark:border-none dark:bg-gray-900 w-32 text-4xl shrink-0`}
+        overrides={`dark:border-none dark:bg-gray-900 w-32 text-4xl shrink-0 md:w-20`}
       >
         &rarr;
       </Button>

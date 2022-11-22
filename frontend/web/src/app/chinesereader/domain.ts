@@ -43,7 +43,7 @@ export const textAnalyse = async (
 
 export const exportWordToAnki = (
   cardType: CardType,
-  def: CedictResultEntry,
+  def: CedictResultEntry | undefined,
   focusWord: TextAnalyseToken,
   sentence: string,
   source_image?: string | undefined,
@@ -58,9 +58,9 @@ export const exportWordToAnki = (
       card_type: cardType,
       hanzi_traditional: focusWord.hanzi_traditional,
       hanzi_simplified: focusWord.hanzi_simplified,
-      pinyin: def.pinyin.toLowerCase(),
-      pinyin_tones: def.pinyin_tones.toLowerCase(),
-      meanings: def.meanings ?? [],
+      pinyin: def?.pinyin.toLowerCase(),
+      pinyin_tones: def?.pinyin_tones.toLowerCase(),
+      meanings: def?.meanings ?? [],
     },
   })
 }

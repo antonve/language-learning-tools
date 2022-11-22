@@ -12,7 +12,10 @@ import {
 
 interface Props {
   word: TextAnalyseToken | undefined
-  exportWord: (cardType: CardType, def: CedictResultEntry) => Promise<void>
+  exportWord: (
+    cardType: CardType,
+    def: CedictResultEntry | undefined,
+  ) => Promise<void>
   resetFocusWord: () => void
   defs: CedictResultCollection
 }
@@ -42,6 +45,16 @@ const FocusWordPanel = ({ word, exportWord, resetFocusWord, defs }: Props) => {
           </span>
         ) : null}
 
+        <Button
+          onClick={() =>
+            exportWord('sentence', undefined)
+              .then(() => resetFocusWord())
+              .catch(reason => window.alert('could not export word: ' + reason))
+          }
+          className="bg-pink-100 text-pink-500 hover:bg-pink-200 hover:text-pink-50 dark:bg-pink-900 dark:text-pink-300 dark:hover:bg-pink-700 dark:hover:text-pink-100"
+        >
+          Export
+        </Button>
         <ButtonLink
           href={`https://www.mdbg.net/chinese/dictionary?page=worddict&wdrst=1&wdqb=${word.hanzi_traditional}`}
           target="_blank"
@@ -52,9 +65,9 @@ const FocusWordPanel = ({ word, exportWord, resetFocusWord, defs }: Props) => {
       </div>
 
       {dict.results.length > 0 ? (
-        <div className="divide-y-2 divide-yellow-400 divide-opacity-30 space-y-5 dark:divide-gray-800">
+        <div className="divide-y-2 divide-yellow-400 divide-opacity-30 space-y-2 dark:divide-gray-800">
           {dict.results.map(d => (
-            <div className="flex pt-5" key={JSON.stringify(d)}>
+            <div className="flex pt-2" key={JSON.stringify(d)}>
               <Reading entry={d} />
               <ol className="list-decimal pl-5 flex-grow">
                 {d.meanings.map((m, i) => (
@@ -62,7 +75,7 @@ const FocusWordPanel = ({ word, exportWord, resetFocusWord, defs }: Props) => {
                 ))}
               </ol>
 
-              <div className="flex flex-row space-x-4">
+              <div className="flex flex-col space-y-2">
                 <Button
                   onClick={() =>
                     exportWord('sentence', d)
