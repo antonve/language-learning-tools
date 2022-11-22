@@ -39,7 +39,10 @@ const ChineseMangaReader: NextPage<{}> = () => {
     ).then(res => setDefs(res))
   }, [transcript])
 
-  const exportWord = (cardType: CardType, def: CedictResultEntry) => {
+  const exportWord = (
+    cardType: CardType,
+    def: CedictResultEntry | undefined,
+  ) => {
     if (!focusWord) {
       return Promise.reject()
     }
