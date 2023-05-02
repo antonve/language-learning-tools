@@ -39,12 +39,12 @@ const Index: NextPage<{}> = () => {
     >
       <div className="w-full">
         <h2 className="text-2xl mb-4 font-bold">Saved texts</h2>
-        <ul className="list-disc ml-4 w-full">
+        <ul className="w-full">
           {texts.texts.map(t => (
             <li key={t.id} className={`my-2`}>
               <a
                 href={`/chinese-reader/text?id=${t.id}`}
-                className="block hover:bg-gray-900"
+                className="block hover:bg-gray-900 py-3 bg-gray-700 rounded-lg px-4"
               >
                 {t.title}
               </a>
