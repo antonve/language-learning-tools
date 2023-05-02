@@ -77,7 +77,7 @@ const TextReader: NextPage<Props> = ({ text }) => {
     .reduce((prev, cur) => cur + prev, 0)
 
   return (
-    <div className="flex justify-between space-x-10 md:space-x-2 flex-grow">
+    <div className="flex justify-between space-x-10 md:space-x-2 flex-grow mt-10">
       <Button
         onClick={onPrevSentence}
         disabled={lineIndex <= 0}
