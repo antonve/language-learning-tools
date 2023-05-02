@@ -16,7 +16,7 @@ const Sidebar = ({
   const doneCount = Object.values(words).filter(w => w.done).length
 
   return (
-    <ul className="pr-6">
+    <ul className="pr-6 max-h-[600px] overflow-y-auto">
       {Object.entries(words).map(([id, w]) => (
         <SidebarItem
           key={id}
