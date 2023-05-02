@@ -3,7 +3,6 @@ package controllers
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -56,7 +55,7 @@ func (api *chineseAPI) Cedict(c echo.Context) error {
 			continue
 		}
 
-		fmt.Println(token)
+		c.Echo().Logger.Infof("cedict: %w", token)
 
 		defs := api.cedict.GetAllByHanzi(token)
 
@@ -99,9 +98,11 @@ type CedictResponse struct {
 func (api *chineseAPI) Zdic(c echo.Context) error {
 	token := c.Param("token")
 
+	c.Echo().Logger.Infof("zdic: %w", token)
+
 	res, err := api.zdic.Search(token)
 	if err != nil {
-		fmt.Println(err)
+		c.Echo().Logger.Error(err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 

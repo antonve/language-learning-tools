@@ -37,6 +37,7 @@ func NewJapaneseAPI() JapaneseAPI {
 
 func (api *japaneseAPI) JishoProxy(c echo.Context) error {
 	token := c.Param("token")
+	c.Echo().Logger.Infof("jisho for %w", token)
 
 	if response, ok := api.jishoCache[token]; ok {
 		return c.JSON(http.StatusOK, response)
@@ -74,6 +75,7 @@ type JishoProxyDefinition struct {
 func (api *japaneseAPI) GooProxy(c echo.Context) error {
 	token := c.Param("token")
 
+	c.Echo().Logger.Infof("goo for %w", token)
 	if response, ok := api.gooCache[token]; ok {
 		return c.JSON(http.StatusOK, response)
 	}
