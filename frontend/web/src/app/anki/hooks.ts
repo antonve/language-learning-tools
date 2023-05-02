@@ -161,10 +161,22 @@ export const useWordCollection = (languageCode: string) => {
   }
 
   const importWords = (words: Word[]) => {
-    const newCollection: WordCollection = words.reduce((collection, word) => {
-      collection[uuidv4()] = word
-      return collection
-    }, {} as WordCollection)
+    const existingExternalIds = new Set(
+      Object.values(collection.words)
+        .map(it => it.meta.externalId)
+        .filter(it => it != undefined),
+    )
+    const filtered = words.filter(
+      it => !existingExternalIds.has(it.meta.externalId),
+    )
+
+    const newCollection: WordCollection = filtered.reduce(
+      (collection, word) => {
+        collection[uuidv4()] = word
+        return collection
+      },
+      {} as WordCollection,
+    )
 
     setWords({ ...collection.words, ...newCollection })
   }
