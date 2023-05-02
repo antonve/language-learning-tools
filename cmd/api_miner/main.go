@@ -13,12 +13,14 @@ import (
 	"github.com/antonve/language-learning-tools/cmd/api_miner/controllers"
 	"github.com/antonve/language-learning-tools/internal/pkg/corpus"
 	"github.com/antonve/language-learning-tools/internal/pkg/persistedcache"
+	"github.com/labstack/gommon/log"
 )
 
 func main() {
 	api := NewAPI()
 
 	e := echo.New()
+	e.Logger.SetLevel(log.DEBUG)
 	e.Use(middleware.CORS())
 	e.Use(middleware.Recover())
 	e.Use(middleware.Logger())

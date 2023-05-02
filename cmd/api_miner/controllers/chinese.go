@@ -55,7 +55,7 @@ func (api *chineseAPI) Cedict(c echo.Context) error {
 			continue
 		}
 
-		c.Echo().Logger.Infof("cedict: %w", token)
+		c.Echo().Logger.Infof("cedict: %s", token)
 
 		defs := api.cedict.GetAllByHanzi(token)
 
@@ -98,7 +98,7 @@ type CedictResponse struct {
 func (api *chineseAPI) Zdic(c echo.Context) error {
 	token := c.Param("token")
 
-	c.Echo().Logger.Infof("zdic: %w", token)
+	c.Echo().Logger.Infof("zdic: %s", token)
 
 	res, err := api.zdic.Search(token)
 	if err != nil {

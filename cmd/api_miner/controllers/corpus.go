@@ -40,7 +40,7 @@ func (api *corpusAPI) getCorpus(lang string) (corpus.Corpus, error) {
 
 func (api *corpusAPI) Search(c echo.Context) error {
 	token := c.Param("token")
-	c.Echo().Logger.Infof("starting corpus search for %w in %w", token, c.Param("lang"))
+	c.Echo().Logger.Infof("starting corpus search for %s in %s", token, c.Param("lang"))
 	cor, err := api.getCorpus(c.Param("lang"))
 	if err != nil {
 		return err
@@ -60,7 +60,7 @@ func (api *corpusAPI) Search(c echo.Context) error {
 	}
 
 	response := SearchCorpusResponse{Results: results}
-	c.Echo().Logger.Infof("finished corpus search for %w in %w", token, c.Param("lang"))
+	c.Echo().Logger.Infof("finished corpus search for %s in %s", token, c.Param("lang"))
 
 	return c.JSON(http.StatusOK, response)
 }
