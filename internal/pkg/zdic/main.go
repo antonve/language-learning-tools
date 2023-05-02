@@ -45,6 +45,9 @@ func (z *zdic) Search(word string) (*Result, error) {
 
 func (z *zdic) getDefinition(doc *html.Node) string {
 	def := htmlquery.FindOne(doc, "//*[@class=\"nr-box nr-box-shiyi jbjs\"][1]//*[contains(@class, \"jnr\")][1]")
+	if def == nil {
+		return ""
+	}
 	return htmlquery.InnerText(def)
 }
 
