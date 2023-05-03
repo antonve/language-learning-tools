@@ -24,7 +24,7 @@ const JapaneseApp: NextPage = () => {
     <Layout
       navigation={() => (
         <>
-          <h1 className="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl">
+          <h1 className="text-gray-900 no-underline hover:no-underline font-extrabold text-xl">
             Anki Miner
           </h1>
           <LanguageToggle
@@ -38,7 +38,7 @@ const JapaneseApp: NextPage = () => {
       )}
     >
       <div className="flex">
-        <div className="w-1/6">
+        <div className="w-1/6 mr-4">
           <Sidebar
             activeId={selectedWordId}
             updateActiveId={setSelectedWordId}

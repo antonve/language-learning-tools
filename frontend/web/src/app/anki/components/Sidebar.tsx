@@ -16,18 +16,26 @@ const Sidebar = ({
   const doneCount = Object.values(words).filter(w => w.done).length
 
   return (
-    <ul className="pr-6 max-h-[600px] overflow-y-auto">
-      {Object.entries(words).map(([id, w]) => (
-        <SidebarItem
-          key={id}
-          id={id}
-          word={w}
-          isActive={activeId === id}
-          updateActiveId={updateActiveId}
+    <>
+      {showDelete && (
+        <CleanWordsLink
+          onClick={cleanWords}
+          count={doneCount}
+          total={Object.entries(words).length}
         />
-      ))}
-      {showDelete && <CleanWordsLink onClick={cleanWords} count={doneCount} />}
-    </ul>
+      )}
+      <ul className="max-h-[600px] overflow-y-auto no-scrollbar">
+        {Object.entries(words).map(([id, w]) => (
+          <SidebarItem
+            key={id}
+            id={id}
+            word={w}
+            isActive={activeId === id}
+            updateActiveId={updateActiveId}
+          />
+        ))}
+      </ul>
+    </>
   )
 }
 
@@ -45,10 +53,13 @@ const SidebarItem = ({
   <li className="mb-1">
     <a
       className={classNames(
-        'px-2 -mx-2 py-1 transition duration-200 ease-in-out relative block font-medium',
+        'px-2 py-1 transition duration-200 ease-in-out block font-medium rounded bg-purple-200',
         {
           'text-purple-600': isActive,
           'hover:translate-x-2px hover:text-gray-900 text-gray-600': !isActive,
+          'bg-opacity-25': isActive,
+          'bg-opacity-0': !isActive,
+          'line-through': word.done,
         },
       )}
       onClick={e => {
@@ -57,19 +68,7 @@ const SidebarItem = ({
       }}
       href="#"
     >
-      <span
-        className={classNames('rounded absolute inset-0 bg-purple-200', {
-          'opacity-25': isActive,
-          'opacity-0': !isActive,
-        })}
-      ></span>
-      <span
-        className={classNames('relative', {
-          'line-through opacity-40': word.done,
-        })}
-      >
-        {word.value}
-      </span>
+      {word.value}
     </a>
   </li>
 )
@@ -77,21 +76,25 @@ const SidebarItem = ({
 const CleanWordsLink = ({
   onClick,
   count,
+  total,
 }: {
   onClick: () => void
   count: number
+  total: number
 }) => (
-  <li className="mt-4 pt-3 border-t-2">
+  <div className="mb-4">
     <a
       className={classNames(
-        'px-2 -mx-2 transition duration-200 ease-in-out relative block font-medium hover:translate-x-2px hover:opacity-70 text-red-700 uppercase text-xs',
+        'py-4 rounded transition duration-200 ease-in-out relative block font-medium hover:translate-x-2px hover:opacity-70 bg-red-100 text-red-800 text-center uppercase text-xs',
       )}
       onClick={onClick}
       href="#"
     >
-      <span className="relative">Clean up ({count})</span>
+      <span className="relative">
+        Clean up ({count}/{total})
+      </span>
     </a>
-  </li>
+  </div>
 )
 
 export default Sidebar
