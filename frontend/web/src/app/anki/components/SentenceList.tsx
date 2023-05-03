@@ -27,7 +27,7 @@ const SentenceList = ({
 
   return (
     <ul>
-      {sentences.results.map(s => (
+      {sentences.results.map((s, i) => (
         <SentenceListItem
           sentence={s}
           word={word}
@@ -37,7 +37,7 @@ const SentenceList = ({
               : compareSentences(activeSentence, s)
           }
           onSelect={onSelect}
-          key={JSON.stringify(s)}
+          key={i}
         />
       ))}
     </ul>
