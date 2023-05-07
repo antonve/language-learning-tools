@@ -90,7 +90,7 @@ const BookPage = ({
       ref={containerRef}
       className={`${fitToScreen ? 'flex-grow' : ''} relative`}
     >
-      <div className="absolute left-0 top-0 bottom-0 right-0 flex z-50">
+      <div className="absolute left-0 top-0 bottom-0 right-0 flex z-40">
         <div className="w-1/5 cursor-w-resize" onClick={onNextPage} />
         <div
           className={`w-3/5 ${
