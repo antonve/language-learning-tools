@@ -39,7 +39,7 @@ const BookNavigation = ({
           }
         }}
         className="cursor-pointer text-center"
-        style={{ lineHeight: 0.7 }}
+        style={{ lineHeight: 1.2 }}
       >
         {book.title}
         <br />

@@ -97,7 +97,7 @@ const ChineseMangaReader: NextPage<{}> = () => {
 
   return (
     <div className="w-screen h-screen flex">
-      <div className="w-1/2 h-screen flex flex-col overflow-auto relative">
+      <div className="w-4/5 h-screen flex flex-col overflow-auto relative">
         <div className="absolute left-20 top-20 right-20 z-50">
           <FocusWordPanel
             word={focusWord?.word}
@@ -114,7 +114,7 @@ const ChineseMangaReader: NextPage<{}> = () => {
           onPrevPage={onPrevPage}
         />
       </div>
-      <div className="w-1/2 flex-1 border-l-2 border-gray-200 flex flex-col">
+      <div className="w-1/5 flex-1 border-l-2 border-gray-200 flex flex-col">
         <BookNavigation
           book={book}
           page={page}
