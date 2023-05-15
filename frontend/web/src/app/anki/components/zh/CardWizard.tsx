@@ -245,9 +245,14 @@ const CardWizard = ({
           <div className="flex justify-end gap-x-4">
             <Button
               onClick={() => {
+                const ids = Object.entries(words)
+                  .filter(([_, word]) => !word.done)
+                  .map(([id, _]) => id)
+                const nextIndex = ids.indexOf(id) + 1
+
                 const newWord: Word = { ...word }
                 newWord.done = !word.done
-                updateWord(newWord, id)
+                updateWord(newWord, id, ids[nextIndex])
 
                 if (word.meta.externalId && newWord.done) {
                   markCardAsExported(word.meta.externalId)
