@@ -4,6 +4,7 @@ import getConfig from 'next/config'
 const { publicRuntimeConfig } = getConfig()
 
 export const root = publicRuntimeConfig.API_ROOT || 'http://localhost:8080'
+// export const root = 'https://tools.tadoku.app/api'
 
 export const getChapter = async (
   lang: string,

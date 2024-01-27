@@ -26,8 +26,9 @@ const Layout: FC<Props> = ({
     <div className="flex bg-gray-100 absolute dark:bg-gray-900">
       <NavLink href="/anki/ja">Anki Miner</NavLink>
       <NavLink href="/mined-words">Mined Words</NavLink>
-      <NavLink href="/chinese-reader/manga">Chinese Manga Reader</NavLink>
-      <NavLink href="/chinese-reader/">Chinese Text Reader</NavLink>
+      <NavLink href="/chinese-reader/manga">ZH Manga</NavLink>
+      <NavLink href="/chinese-reader/">ZH Text</NavLink>
+      <NavLink href="/german-reader/manga">DE Manga</NavLink>
     </div>
     {navigation && (
       <header
