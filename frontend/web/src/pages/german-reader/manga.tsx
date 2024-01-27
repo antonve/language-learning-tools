@@ -10,10 +10,12 @@ import Layout from '@app/Layout'
 import { useKeyPress, useWindowSize } from '@app/germanreader/hooks'
 import usePanZoom from 'use-pan-and-zoom'
 
-const GermanMangaReader: NextPage<{}> = () => {
+const GermanMangaReader: NextPage<{ useVertical: boolean }> = ({
+  useVertical = false,
+}) => {
   const [book, setBook] = useState<Book>()
   const [page, setPage] = useState(0)
-  const [ocr, setOCR] = useState<any | undefined>()
+  const [words, setWords] = useState<any | undefined>()
   const {
     transform,
     container,
@@ -43,7 +45,7 @@ const GermanMangaReader: NextPage<{}> = () => {
   useKeyPress('ArrowRight', onPrevPage)
   useKeyPress(' ', loadOCR)
 
-  useEffect(() => setOCR(undefined), [page])
+  useEffect(() => setWords(undefined), [page])
 
   useEffect(() => {
     centerFitPage()
@@ -74,8 +76,8 @@ const GermanMangaReader: NextPage<{}> = () => {
       return
     }
 
-    const ocr = await fetchDetectTexts(book.pages[page])
-    setOCR(ocr)
+    const texts = await fetchDetectTexts(book.pages[page])
+    setWords(texts)
   }
 
   if (!book) {
@@ -111,7 +113,7 @@ const GermanMangaReader: NextPage<{}> = () => {
       {...panZoomHandlers}
     >
       <div style={{ transform }} className="relative">
-        <Overlays words={ocr} />
+        <Overlays words={words} useVertical={useVertical} />
         <div className="z-10 relative">
           <img
             src={imageUrl}
@@ -127,7 +129,13 @@ const GermanMangaReader: NextPage<{}> = () => {
 
 export default GermanMangaReader
 
-function Overlays({ words }: { words: any[] | undefined }) {
+function Overlays({
+  words,
+  useVertical,
+}: {
+  words: any[] | undefined
+  useVertical: boolean
+}) {
   if (!words) {
     return null
   }
@@ -142,7 +150,8 @@ function Overlays({ words }: { words: any[] | undefined }) {
         const bottom = Math.max(...y)
         const left = Math.min(...x)
         const right = Math.max(...x)
-        const height = bottom - top + 4
+        const height = bottom - top
+        const width = right - left
 
         return (
           <div
@@ -153,10 +162,11 @@ function Overlays({ words }: { words: any[] | undefined }) {
               top: `${top}px`,
               left: `${left}px`,
               minHeight: `${height}px`,
-              minWidth: `${right - left}px`,
-              fontSize: `${height}px`,
+              minWidth: `${width}px`,
+              fontSize: useVertical ? `${width}px` : `${height}px`,
               lineHeight: '1',
               fontFamily: '"Comic Neue", cursive',
+              writingMode: useVertical ? 'vertical-rl' : 'sideways-lr',
             }}
           >
             {word.description}
