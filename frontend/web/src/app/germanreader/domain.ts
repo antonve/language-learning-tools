@@ -164,3 +164,18 @@ export const fetchOcr = async (image: Uint8Array): Promise<OcrResult> => {
 
   return body
 }
+
+export const fetchDetectTexts = async (
+  image: Uint8Array,
+): Promise<OcrResult> => {
+  const url = `${root}/detect-texts`
+  const response = await fetch(url, { method: 'POST', body: image })
+
+  if (response.status !== 200) {
+    throw new Error('not found')
+  }
+
+  const body = await response.json()
+
+  return body
+}

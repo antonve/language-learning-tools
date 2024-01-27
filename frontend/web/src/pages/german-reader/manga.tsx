@@ -1,8 +1,11 @@
 import type { NextPage } from 'next'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import BookImporter from '@app/germanreader/BookImporter'
-import BookPage from '@app/germanreader/BookPage'
-import { Book, arrayBufferToBase64, fetchOcr } from '@app/germanreader/domain'
+import {
+  Book,
+  arrayBufferToBase64,
+  fetchDetectTexts,
+} from '@app/germanreader/domain'
 import Layout from '@app/Layout'
 import { useKeyPress, useWindowSize } from '@app/germanreader/hooks'
 import usePanZoom from 'use-pan-and-zoom'
@@ -38,6 +41,7 @@ const GermanMangaReader: NextPage<{}> = () => {
 
   useKeyPress('ArrowLeft', onNextPage)
   useKeyPress('ArrowRight', onPrevPage)
+  useKeyPress(' ', loadOCR)
 
   useEffect(() => setOCR(undefined), [page])
 
@@ -65,12 +69,12 @@ const GermanMangaReader: NextPage<{}> = () => {
     }, 1)
   }
 
-  const loadOCR = async () => {
+  async function loadOCR() {
     if (!book) {
       return
     }
 
-    const ocr = await fetchOcr(book.pages[page])
+    const ocr = await fetchDetectTexts(book.pages[page])
     setOCR(ocr)
   }
 
@@ -106,16 +110,59 @@ const GermanMangaReader: NextPage<{}> = () => {
       style={{ touchAction: 'none' }}
       {...panZoomHandlers}
     >
-      <div style={{ transform }}>
-        <img
-          src={imageUrl}
-          className="max-h-full max-w-full block m-8 select-none"
-          draggable={false}
-          ref={imageRef}
-        />
+      <div style={{ transform }} className="relative">
+        <Overlays words={ocr} />
+        <div className="z-10 relative">
+          <img
+            src={imageUrl}
+            className="block select-none"
+            draggable={false}
+            ref={imageRef}
+          />
+        </div>
       </div>
     </div>
   )
 }
 
 export default GermanMangaReader
+
+function Overlays({ words }: { words: any[] | undefined }) {
+  if (!words) {
+    return null
+  }
+
+  return (
+    <>
+      {words.slice(1).map((word, i) => {
+        const { vertices } = word.bounding_poly
+        const y = vertices.map((it: { y: number }) => it.y)
+        const x = vertices.map((it: { x: number }) => it.x)
+        const top = Math.min(...y)
+        const bottom = Math.max(...y)
+        const left = Math.min(...x)
+        const right = Math.max(...x)
+        const height = bottom - top + 4
+
+        return (
+          <div
+            key={i}
+            className="absolute z-50 block opacity-0 hover:opacity-100 font-bold"
+            style={{
+              backgroundColor: 'white',
+              top: `${top}px`,
+              left: `${left}px`,
+              minHeight: `${height}px`,
+              minWidth: `${right - left}px`,
+              fontSize: `${height}px`,
+              lineHeight: '1',
+              fontFamily: '"Comic Neue", cursive',
+            }}
+          >
+            {word.description}
+          </div>
+        )
+      })}
+    </>
+  )
+}
