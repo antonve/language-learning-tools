@@ -40,6 +40,7 @@ func main() {
 	e.POST("/zh_TW/text-analyse", api.Chinese().TextAnalyse)
 
 	e.POST("/ocr", api.CloudVision().OCR)
+	e.POST("/detect-texts", api.CloudVision().DetectTexts)
 
 	e.GET("/pending_cards", api.Mining().ListPendingCards)
 	e.POST("/pending_cards", api.Mining().CreatePendingCard)

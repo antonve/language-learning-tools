@@ -15,6 +15,7 @@ import (
 
 type CloudVisionAPI interface {
 	OCR(c echo.Context) error
+	DetectTexts(c echo.Context) error
 }
 
 type cloudVisionAPI struct {
@@ -59,13 +60,40 @@ func (api *cloudVisionAPI) OCR(c echo.Context) error {
 		return c.String(http.StatusOK, string(response))
 	}
 
-	res, err := api.client.Do(c.Request().Context(), buf)
+	res, err := api.client.DetectDocumentText(c.Request().Context(), buf)
 	if err != nil {
 		log.Println("could not process ocr request:", err)
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
 	api.cache.Put(sum, res)
+
+	return c.String(http.StatusOK, string(res))
+}
+
+func (api *cloudVisionAPI) DetectTexts(c echo.Context) error {
+	buf := &bytes.Buffer{}
+	r := io.TeeReader(c.Request().Body, buf)
+
+	sum, err := api.Hash(r)
+	if err != nil {
+		log.Println("could not process ocr request:", err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	key := "dt_" + sum
+
+	if response, ok := api.cache.Get(key); ok {
+		return c.String(http.StatusOK, string(response))
+	}
+
+	res, err := api.client.DetectTexts(c.Request().Context(), buf)
+	if err != nil {
+		log.Println("could not process ocr request:", err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	api.cache.Put(key, res)
 
 	return c.String(http.StatusOK, string(res))
 }

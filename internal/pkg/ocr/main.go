@@ -9,7 +9,8 @@ import (
 )
 
 type Client interface {
-	Do(ctx context.Context, image io.Reader) ([]byte, error)
+	DetectDocumentText(ctx context.Context, image io.Reader) ([]byte, error)
+	DetectTexts(ctx context.Context, image io.Reader) ([]byte, error)
 }
 
 type client struct {
@@ -27,7 +28,7 @@ func New() (*client, error) {
 	return &client{service: service}, nil
 }
 
-func (c *client) Do(ctx context.Context, image io.Reader) ([]byte, error) {
+func (c *client) DetectDocumentText(ctx context.Context, image io.Reader) ([]byte, error) {
 	img, err := vision.NewImageFromReader(image)
 	if err != nil {
 		return nil, err
@@ -46,5 +47,21 @@ func (c *client) Do(ctx context.Context, image io.Reader) ([]byte, error) {
 	return json, nil
 }
 
-type Result struct {
+func (c *client) DetectTexts(ctx context.Context, image io.Reader) ([]byte, error) {
+	img, err := vision.NewImageFromReader(image)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := c.service.DetectTexts(ctx, img, nil, 100)
+	if err != nil {
+		return nil, err
+	}
+
+	json, err := json.MarshalIndent(res, "", "  ")
+	if err != nil {
+		return nil, err
+	}
+
+	return json, nil
 }
