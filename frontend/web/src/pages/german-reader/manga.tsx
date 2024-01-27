@@ -3,19 +3,26 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import BookImporter from '@app/germanreader/BookImporter'
 import {
   Book,
+  VisionText,
   arrayBufferToBase64,
   fetchDetectTexts,
 } from '@app/germanreader/domain'
 import Layout from '@app/Layout'
 import { useKeyPress, useWindowSize } from '@app/germanreader/hooks'
 import usePanZoom from 'use-pan-and-zoom'
+import classNames from 'classnames'
+
+interface Words {
+  selectedIndices: Map<number, boolean>
+  tokens: VisionText[]
+}
 
 const GermanMangaReader: NextPage<{ useVertical: boolean }> = ({
   useVertical = false,
 }) => {
   const [book, setBook] = useState<Book>()
   const [page, setPage] = useState(0)
-  const [words, setWords] = useState<any | undefined>()
+  const [words, setWords] = useState<Words | undefined>()
   const {
     transform,
     container,
@@ -76,8 +83,8 @@ const GermanMangaReader: NextPage<{ useVertical: boolean }> = ({
       return
     }
 
-    const texts = await fetchDetectTexts(book.pages[page])
-    setWords(texts)
+    const words = await fetchDetectTexts(book.pages[page])
+    setWords({ selectedIndices: new Map(), tokens: words })
   }
 
   if (!book) {
@@ -104,6 +111,28 @@ const GermanMangaReader: NextPage<{ useVertical: boolean }> = ({
     setPage(page - 1)
   }
 
+  function selectIndex(i: number | undefined) {
+    if (!words) {
+      return
+    }
+
+    if (!i) {
+      setWords({
+        tokens: words.tokens,
+        selectedIndices: new Map(),
+      })
+
+      return
+    }
+
+    const selectedIndices = new Map(words.selectedIndices)
+    selectedIndices.set(i, true)
+    setWords({
+      tokens: words.tokens,
+      selectedIndices,
+    })
+  }
+
   return (
     <div
       ref={el => setContainer(el)}
@@ -113,13 +142,18 @@ const GermanMangaReader: NextPage<{ useVertical: boolean }> = ({
       {...panZoomHandlers}
     >
       <div style={{ transform }} className="relative">
-        <Overlays words={words} useVertical={useVertical} />
+        <Overlays
+          words={words}
+          useVertical={useVertical}
+          selectIndex={selectIndex}
+        />
         <div className="z-10 relative">
           <img
             src={imageUrl}
             className="block select-none"
             draggable={false}
             ref={imageRef}
+            onClick={() => selectIndex(undefined)}
           />
         </div>
       </div>
@@ -132,9 +166,11 @@ export default GermanMangaReader
 function Overlays({
   words,
   useVertical,
+  selectIndex,
 }: {
-  words: any[] | undefined
+  words: Words | undefined
   useVertical: boolean
+  selectIndex: (i: number) => void
 }) {
   if (!words) {
     return null
@@ -142,23 +178,29 @@ function Overlays({
 
   return (
     <>
-      {words.slice(1).map((word, i) => {
+      {words.tokens.slice(1).map((word, i) => {
         const { vertices } = word.bounding_poly
-        const y = vertices.map((it: { y: number }) => it.y)
-        const x = vertices.map((it: { x: number }) => it.x)
+        const y = vertices.map(it => it.y)
+        const x = vertices.map(it => it.x)
         const top = Math.min(...y)
         const bottom = Math.max(...y)
         const left = Math.min(...x)
         const right = Math.max(...x)
         const height = bottom - top
         const width = right - left
+        const isSelected = words.selectedIndices.has(i)
 
         return (
           <div
             key={i}
-            className="absolute z-50 block opacity-0 hover:opacity-100 font-bold"
+            className={classNames(
+              'absolute z-50 block font-bold cursor-pointer',
+              {
+                'bg-green-500/20': isSelected,
+                '': !isSelected,
+              },
+            )}
             style={{
-              backgroundColor: 'white',
               top: `${top}px`,
               left: `${left}px`,
               minHeight: `${height}px`,
@@ -168,9 +210,8 @@ function Overlays({
               fontFamily: '"Comic Neue", cursive',
               writingMode: useVertical ? 'vertical-rl' : 'sideways-lr',
             }}
-          >
-            {word.description}
-          </div>
+            onClick={() => selectIndex(i)}
+          ></div>
         )
       })}
     </>

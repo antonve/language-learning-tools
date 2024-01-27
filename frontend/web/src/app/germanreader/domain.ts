@@ -165,9 +165,17 @@ export const fetchOcr = async (image: Uint8Array): Promise<OcrResult> => {
   return body
 }
 
+export interface VisionText {
+  locale: string
+  description: string
+  bounding_poly: {
+    vertices: { x: number; y: number }[]
+  }
+}
+
 export const fetchDetectTexts = async (
   image: Uint8Array,
-): Promise<OcrResult> => {
+): Promise<VisionText[]> => {
   const url = `${root}/detect-texts`
   const response = await fetch(url, { method: 'POST', body: image })
 
