@@ -23,10 +23,11 @@ interface PopupComponentProps {
 
 function GermanPopupEditor({ defaultToken }: { defaultToken: string }) {
   const [token, setToken] = useState(defaultToken)
+
   return (
     <input
       type="text"
-      className="w-full border-0 border-b p-0 !ring-offset-0 !ring-0"
+      className="w-full text-2xl border-0 border-b p-0 !ring-offset-0 !ring-0"
       defaultValue={token}
       onChange={e => setToken(e.currentTarget.value.trim())}
     />
@@ -41,11 +42,10 @@ function GermanPopup({ tokens, parentSize }: PopupComponentProps) {
   const selectedTokens = Array.from(tokens.selectedIndices.keys())
     .sort()
     .map(i => tokens.list[i])
+
   if (selectedTokens.length === 0) {
     return null
   }
-
-  console.log(selectedTokens)
 
   const position = selectedTokens
     .map(it => it.bounding_poly.vertices)
@@ -64,6 +64,7 @@ function GermanPopup({ tokens, parentSize }: PopupComponentProps) {
     .map(it => it.description)
     .join(' ')
     .trim()
+    .toLowerCase()
 
   return (
     <div

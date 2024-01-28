@@ -214,3 +214,27 @@ export function getPosition(vertices: VisionText['bounding_poly']['vertices']) {
     width,
   }
 }
+
+export const getTranslation = async (
+  input: string,
+  sourceLanguageCode: string,
+  targetLanguageCode: string,
+): Promise<string> => {
+  const url = `${root}/translate`
+  const response = await fetch(url, {
+    method: 'POST',
+    body: JSON.stringify({
+      input,
+      source_language_code: sourceLanguageCode,
+      target_language_code: targetLanguageCode,
+    }),
+  })
+
+  if (response.status !== 200) {
+    throw new Error('not found')
+  }
+
+  const body = await response.json()
+
+  return body.translation
+}
