@@ -1,6 +1,9 @@
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import '../app/globals.css'
+
+const queryClient = new QueryClient()
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
@@ -18,7 +21,9 @@ function MyApp({ Component, pageProps }: AppProps) {
           rel="stylesheet"
         ></link>
       </Head>
-      <Component {...pageProps} />
+      <QueryClientProvider client={queryClient}>
+        <Component {...pageProps} />
+      </QueryClientProvider>
     </>
   )
 }

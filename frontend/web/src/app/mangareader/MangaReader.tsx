@@ -7,7 +7,9 @@ import {
   arrayBufferToBase64,
   fetchDetectTexts,
   getPosition,
+  useTranslation,
 } from '@app/mangareader/domain'
+import { useDebounce } from '@uidotdev/usehooks'
 import Layout from '@app/Layout'
 import { useKeyPress, useWindowSize } from '@app/mangareader/hooks'
 import usePanZoom from 'use-pan-and-zoom'
@@ -23,14 +25,19 @@ interface PopupComponentProps {
 
 function GermanPopupEditor({ defaultToken }: { defaultToken: string }) {
   const [token, setToken] = useState(defaultToken)
+  const debouncedToken = useDebounce(token, 500)
+  const translation = useTranslation(debouncedToken, 'deu', 'eng', 500)
 
   return (
-    <input
-      type="text"
-      className="w-full text-2xl border-0 border-b p-0 !ring-offset-0 !ring-0"
-      defaultValue={token}
-      onChange={e => setToken(e.currentTarget.value.trim())}
-    />
+    <>
+      <input
+        type="text"
+        className="w-full text-2xl border-0 border-b p-0 !ring-offset-0 !ring-0"
+        defaultValue={token}
+        onChange={e => setToken(e.currentTarget.value.trim())}
+      />
+      <div>{translation.data ?? 'no data'}</div>
+    </>
   )
 }
 

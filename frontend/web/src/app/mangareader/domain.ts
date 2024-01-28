@@ -1,5 +1,7 @@
 import { unzipSync } from 'fflate'
+import { z } from 'zod'
 import getConfig from 'next/config'
+import { useMutation, useQuery } from '@tanstack/react-query'
 
 const { publicRuntimeConfig } = getConfig()
 
@@ -215,26 +217,41 @@ export function getPosition(vertices: VisionText['bounding_poly']['vertices']) {
   }
 }
 
-export const getTranslation = async (
+const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
+
+const TranslationResponse = z.object({
+  translation: z.string(),
+})
+
+export type TranslationResponse = z.infer<typeof TranslationResponse>
+
+export const useTranslation = (
   input: string,
   sourceLanguageCode: string,
   targetLanguageCode: string,
-): Promise<string> => {
-  const url = `${root}/translate`
-  const response = await fetch(url, {
-    method: 'POST',
-    body: JSON.stringify({
-      input,
-      source_language_code: sourceLanguageCode,
-      target_language_code: targetLanguageCode,
-    }),
+  waitInMillis: number = 0,
+) =>
+  useQuery({
+    queryKey: ['translate', sourceLanguageCode, targetLanguageCode, input],
+    queryFn: async () => {
+      await sleep(waitInMillis)
+
+      const url = `${root}/translate`
+      const response = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify({
+          input,
+          source_language_code: sourceLanguageCode,
+          target_language_code: targetLanguageCode,
+        }),
+      })
+
+      if (response.status !== 200) {
+        throw new Error('not found')
+      }
+
+      const body = await response.json()
+
+      return TranslationResponse.parse(body).translation
+    },
   })
-
-  if (response.status !== 200) {
-    throw new Error('not found')
-  }
-
-  const body = await response.json()
-
-  return body.translation
-}
