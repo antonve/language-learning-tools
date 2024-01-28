@@ -39,6 +39,8 @@ func main() {
 	e.GET("/zh_TW/zdic/:token", api.Chinese().Zdic)
 	e.POST("/zh_TW/text-analyse", api.Chinese().TextAnalyse)
 
+	e.GET("/de/lemma/:token", api.German().Lemma)
+
 	e.POST("/ocr", api.CloudVision().OCR)
 	e.POST("/detect-texts", api.CloudVision().DetectTexts)
 
@@ -72,6 +74,7 @@ type API interface {
 	Corpus() controllers.CorpusAPI
 	Japanese() controllers.JapaneseAPI
 	Chinese() controllers.ChineseAPI
+	German() controllers.GermanAPI
 	Mining() controllers.MiningAPI
 	CloudVision() controllers.CloudVisionAPI
 	Texts() controllers.TextsAPI
@@ -85,6 +88,7 @@ type api struct {
 	corpus      controllers.CorpusAPI
 	japanese    controllers.JapaneseAPI
 	chinese     controllers.ChineseAPI
+	german      controllers.GermanAPI
 	mining      controllers.MiningAPI
 	cloudvision controllers.CloudVisionAPI
 	texts       controllers.TextsAPI
@@ -116,6 +120,7 @@ func NewAPI() API {
 		corpus:      controllers.NewCorpusAPI(cjp, czh),
 		japanese:    controllers.NewJapaneseAPI(),
 		chinese:     controllers.NewChineseAPI(),
+		german:      controllers.NewGermanAPI(),
 		mining:      controllers.NewMiningAPI(psql),
 		cloudvision: controllers.NewCloudVisionAPI(ocrCache),
 		texts:       controllers.NewTextsAPI(psql),
@@ -154,6 +159,10 @@ func (api *api) Japanese() controllers.JapaneseAPI {
 
 func (api *api) Chinese() controllers.ChineseAPI {
 	return api.chinese
+}
+
+func (api *api) German() controllers.GermanAPI {
+	return api.german
 }
 
 func (api *api) Mining() controllers.MiningAPI {
