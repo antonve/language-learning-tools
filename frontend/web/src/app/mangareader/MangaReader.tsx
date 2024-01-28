@@ -6,13 +6,65 @@ import {
   Tokens,
   arrayBufferToBase64,
   fetchDetectTexts,
+  getPosition,
 } from '@app/mangareader/domain'
 import Layout from '@app/Layout'
 import { useKeyPress, useWindowSize } from '@app/mangareader/hooks'
 import usePanZoom from 'use-pan-and-zoom'
 import classNames from 'classnames'
 
-const MangaReader: NextPage<{ useVertical: boolean }> = ({ useVertical }) => {
+interface PopupComponentProps {
+  tokens: Tokens | undefined
+  parentSize: {
+    width: number
+    height: number
+  }
+}
+
+function GermanPopup({ tokens, parentSize }: PopupComponentProps) {
+  if (!tokens) {
+    return null
+  }
+
+  const selectedTokens = Array.from(tokens.selectedIndices.keys()).map(
+    i => tokens.list[i],
+  )
+  if (selectedTokens.length === 0) {
+    return null
+  }
+
+  console.log(selectedTokens)
+
+  const position = selectedTokens
+    .map(it => it.bounding_poly.vertices)
+    .reduce(
+      (position, vertices) => {
+        const { left, bottom, height } = getPosition(vertices)
+        return {
+          top: Math.max(position.top, bottom + height),
+          left: Math.min(position.left, left),
+        }
+      },
+      { top: 0, left: parentSize.width },
+    )
+
+  return (
+    <div
+      className={classNames(
+        'bg-white border-2 border-black absolute z-20 p-2 text-xl shadow-md rounded',
+        {},
+      )}
+      style={{ left: `${position.left + 5}px`, top: `${position.top + 5}px` }}
+    >
+      test
+    </div>
+  )
+}
+
+const MangaReader: NextPage<{
+  useVertical: boolean
+  PopupComponent: React.FC<PopupComponentProps>
+}> = ({ useVertical, PopupComponent = GermanPopup }) => {
   const [book, setBook] = useState<Book>()
   const [page, setPage] = useState(0)
   const [tokens, setTokens] = useState<Tokens | undefined>()
@@ -36,9 +88,7 @@ const MangaReader: NextPage<{ useVertical: boolean }> = ({ useVertical }) => {
   }, [book?.pages, page])
 
   const imageRef = useRef<HTMLImageElement>(null)
-
   const containerSize = useWindowSize(container)
-  const imageSize = useWindowSize(imageRef.current)
 
   useKeyPress('ArrowLeft', onNextPage)
   useKeyPress('ArrowRight', onPrevPage)
@@ -73,7 +123,7 @@ const MangaReader: NextPage<{ useVertical: boolean }> = ({ useVertical }) => {
     }
 
     const list = await fetchDetectTexts(book.pages[page])
-    setTokens({ selectedIndices: new Map(), list })
+    setTokens({ selectedIndices: new Map(), list: list.slice(1) })
   }
 
   if (!book) {
@@ -131,6 +181,7 @@ const MangaReader: NextPage<{ useVertical: boolean }> = ({ useVertical }) => {
       {...panZoomHandlers}
     >
       <div style={{ transform }} className="relative">
+        <PopupComponent tokens={tokens} parentSize={containerSize} />
         <Overlays
           tokens={tokens}
           useVertical={useVertical}
@@ -167,23 +218,16 @@ function Overlays({
 
   return (
     <>
-      {tokens.list.slice(1).map((token, i) => {
+      {tokens.list.map((token, i) => {
         const { vertices } = token.bounding_poly
-        const y = vertices.map(it => it.y)
-        const x = vertices.map(it => it.x)
-        const top = Math.min(...y)
-        const bottom = Math.max(...y)
-        const left = Math.min(...x)
-        const right = Math.max(...x)
-        const height = bottom - top
-        const width = right - left
+        const { top, left, height, width } = getPosition(vertices)
         const isSelected = tokens.selectedIndices.has(i)
 
         return (
           <div
             key={i}
             className={classNames(
-              'absolute z-50 block font-bold cursor-pointer',
+              'absolute z-30 block font-bold cursor-pointer',
               {
                 'bg-green-500/20': isSelected,
                 '': !isSelected,

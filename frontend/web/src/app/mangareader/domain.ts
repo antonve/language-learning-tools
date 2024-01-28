@@ -192,3 +192,25 @@ export const fetchDetectTexts = async (
 
   return body
 }
+
+export function getPosition(vertices: VisionText['bounding_poly']['vertices']) {
+  const y = vertices.map(it => it.y)
+  const x = vertices.map(it => it.x)
+
+  const top = Math.min(...y)
+  const bottom = Math.max(...y)
+  const left = Math.min(...x)
+  const right = Math.max(...x)
+
+  const height = bottom - top
+  const width = right - left
+
+  return {
+    top,
+    bottom,
+    left,
+    right,
+    height,
+    width,
+  }
+}
