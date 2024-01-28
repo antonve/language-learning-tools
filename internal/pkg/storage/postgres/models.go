@@ -33,6 +33,15 @@ type Text struct {
 	LastPosition int32
 }
 
+type Translation struct {
+	ID                 uuid.UUID
+	SourceLanguageCode string
+	TargetLanguageCode string
+	Input              string
+	Translation        string
+	TranslatedAt       time.Time
+}
+
 type WordToken struct {
 	ID           uuid.UUID
 	LanguageCode string

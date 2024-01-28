@@ -9,4 +9,4 @@ create table translations (
 );
 
 create index all_translations_idx on translations (source_language_code, input);
-create index translations_idx on translations (source_language_code, target_language_code, input);
+create unique index translations_idx on translations (source_language_code, target_language_code, input);
