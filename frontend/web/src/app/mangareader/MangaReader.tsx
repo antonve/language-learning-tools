@@ -21,14 +21,26 @@ interface PopupComponentProps {
   }
 }
 
+function GermanPopupEditor({ defaultToken }: { defaultToken: string }) {
+  const [token, setToken] = useState(defaultToken)
+  return (
+    <input
+      type="text"
+      className="w-full border-0 border-b p-0 !ring-offset-0 !ring-0"
+      defaultValue={token}
+      onChange={e => setToken(e.currentTarget.value.trim())}
+    />
+  )
+}
+
 function GermanPopup({ tokens, parentSize }: PopupComponentProps) {
   if (!tokens) {
     return null
   }
 
-  const selectedTokens = Array.from(tokens.selectedIndices.keys()).map(
-    i => tokens.list[i],
-  )
+  const selectedTokens = Array.from(tokens.selectedIndices.keys())
+    .sort()
+    .map(i => tokens.list[i])
   if (selectedTokens.length === 0) {
     return null
   }
@@ -48,15 +60,21 @@ function GermanPopup({ tokens, parentSize }: PopupComponentProps) {
       { top: 0, left: parentSize.width },
     )
 
+  const selectedText = selectedTokens
+    .map(it => it.description)
+    .join(' ')
+    .trim()
+
   return (
     <div
       className={classNames(
-        'bg-white border-2 border-black absolute z-20 p-2 text-xl shadow-md rounded',
+        'bg-white border-2 border-black absolute z-20 px-2 pb-2 text-xl shadow-md rounded',
         {},
       )}
       style={{ left: `${position.left + 5}px`, top: `${position.top + 5}px` }}
+      key={selectedText}
     >
-      test
+      <GermanPopupEditor defaultToken={selectedText} />
     </div>
   )
 }
