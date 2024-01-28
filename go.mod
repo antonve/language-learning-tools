@@ -20,6 +20,8 @@ require (
 require (
 	cloud.google.com/go v0.102.1 // indirect
 	cloud.google.com/go/compute v1.10.0 // indirect
+	github.com/aaaton/golem/v4 v4.0.0 // indirect
+	github.com/aaaton/golem/v4/dicts/de v1.0.1 // indirect
 	github.com/antchfx/xpath v1.2.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
