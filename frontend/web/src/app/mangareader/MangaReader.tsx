@@ -59,9 +59,6 @@ const MangaReader: NextPage<{ useVertical: boolean }> = ({ useVertical }) => {
     // hack to make sure image is rendered before rendering page
     setTimeout(() => {
       const verticalZoomLevel = containerSize.height / imageHeight
-      console.log(
-        `container height: ${containerSize.height}, image height: ${imageSize.height}, zoom: ${verticalZoomLevel}`,
-      )
       setPan({ x: 0, y: 0 })
 
       if (!isNaN(verticalZoomLevel)) {
