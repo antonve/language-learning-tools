@@ -6,6 +6,11 @@ const { publicRuntimeConfig } = getConfig()
 const root = publicRuntimeConfig.API_ROOT || 'http://localhost:8080'
 // const root = 'https://tools.tadoku.app/api'
 
+export interface Tokens {
+  selectedIndices: Map<number, boolean>
+  list: VisionText[]
+}
+
 export interface OcrBoundingBox {
   vertices: {
     x: number

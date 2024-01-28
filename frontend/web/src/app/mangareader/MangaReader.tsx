@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import BookImporter from '@app/mangareader/BookImporter'
 import {
   Book,
-  VisionText,
+  Tokens,
   arrayBufferToBase64,
   fetchDetectTexts,
 } from '@app/mangareader/domain'
@@ -12,15 +12,10 @@ import { useKeyPress, useWindowSize } from '@app/mangareader/hooks'
 import usePanZoom from 'use-pan-and-zoom'
 import classNames from 'classnames'
 
-interface Words {
-  selectedIndices: Map<number, boolean>
-  tokens: VisionText[]
-}
-
 const MangaReader: NextPage<{ useVertical: boolean }> = ({ useVertical }) => {
   const [book, setBook] = useState<Book>()
   const [page, setPage] = useState(0)
-  const [words, setWords] = useState<Words | undefined>()
+  const [tokens, setTokens] = useState<Tokens | undefined>()
   const {
     transform,
     container,
@@ -28,7 +23,6 @@ const MangaReader: NextPage<{ useVertical: boolean }> = ({ useVertical }) => {
     panZoomHandlers,
     setPan,
     setZoom,
-    center,
   } = usePanZoom({
     maxZoom: 2,
     minZoom: 0.3,
@@ -50,7 +44,7 @@ const MangaReader: NextPage<{ useVertical: boolean }> = ({ useVertical }) => {
   useKeyPress('ArrowRight', onPrevPage)
   useKeyPress(' ', loadOCR)
 
-  useEffect(() => setWords(undefined), [page])
+  useEffect(() => setTokens(undefined), [page])
 
   useEffect(() => {
     centerFitPage()
@@ -81,8 +75,8 @@ const MangaReader: NextPage<{ useVertical: boolean }> = ({ useVertical }) => {
       return
     }
 
-    const words = await fetchDetectTexts(book.pages[page])
-    setWords({ selectedIndices: new Map(), tokens: words })
+    const list = await fetchDetectTexts(book.pages[page])
+    setTokens({ selectedIndices: new Map(), list })
   }
 
   if (!book) {
@@ -110,23 +104,23 @@ const MangaReader: NextPage<{ useVertical: boolean }> = ({ useVertical }) => {
   }
 
   function selectIndex(i: number | undefined) {
-    if (!words) {
+    if (!tokens) {
       return
     }
 
     if (!i) {
-      setWords({
-        tokens: words.tokens,
+      setTokens({
+        list: tokens.list,
         selectedIndices: new Map(),
       })
 
       return
     }
 
-    const selectedIndices = new Map(words.selectedIndices)
+    const selectedIndices = new Map(tokens.selectedIndices)
     selectedIndices.set(i, true)
-    setWords({
-      tokens: words.tokens,
+    setTokens({
+      list: tokens.list,
       selectedIndices,
     })
   }
@@ -141,7 +135,7 @@ const MangaReader: NextPage<{ useVertical: boolean }> = ({ useVertical }) => {
     >
       <div style={{ transform }} className="relative">
         <Overlays
-          words={words}
+          tokens={tokens}
           useVertical={useVertical}
           selectIndex={selectIndex}
         />
@@ -162,22 +156,22 @@ const MangaReader: NextPage<{ useVertical: boolean }> = ({ useVertical }) => {
 export default MangaReader
 
 function Overlays({
-  words,
+  tokens,
   useVertical,
   selectIndex,
 }: {
-  words: Words | undefined
+  tokens: Tokens | undefined
   useVertical: boolean
   selectIndex: (i: number) => void
 }) {
-  if (!words) {
+  if (!tokens) {
     return null
   }
 
   return (
     <>
-      {words.tokens.slice(1).map((word, i) => {
-        const { vertices } = word.bounding_poly
+      {tokens.list.slice(1).map((token, i) => {
+        const { vertices } = token.bounding_poly
         const y = vertices.map(it => it.y)
         const x = vertices.map(it => it.x)
         const top = Math.min(...y)
@@ -186,7 +180,7 @@ function Overlays({
         const right = Math.max(...x)
         const height = bottom - top
         const width = right - left
-        const isSelected = words.selectedIndices.has(i)
+        const isSelected = tokens.selectedIndices.has(i)
 
         return (
           <div
