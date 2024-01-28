@@ -12,6 +12,7 @@ import (
 
 	"github.com/antonve/language-learning-tools/cmd/api_miner/controllers"
 	"github.com/antonve/language-learning-tools/internal/pkg/corpus"
+	"github.com/antonve/language-learning-tools/internal/pkg/gtranslate"
 	"github.com/antonve/language-learning-tools/internal/pkg/persistedcache"
 	"github.com/labstack/gommon/log"
 )
@@ -55,6 +56,8 @@ func main() {
 	e.GET("/texts/:id", api.Texts().GetText)
 	e.POST("/texts/:id/last_position", api.Texts().UpdateReadingPosition)
 
+	e.POST("/translate", api.Translation().Translate)
+
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", api.Config().Port)))
 }
 
@@ -78,6 +81,7 @@ type API interface {
 	Mining() controllers.MiningAPI
 	CloudVision() controllers.CloudVisionAPI
 	Texts() controllers.TextsAPI
+	Translation() controllers.TranslateAPI
 
 	Config() Config
 }
@@ -92,6 +96,7 @@ type api struct {
 	mining      controllers.MiningAPI
 	cloudvision controllers.CloudVisionAPI
 	texts       controllers.TextsAPI
+	translation controllers.TranslateAPI
 }
 
 func NewAPI() API {
@@ -115,6 +120,8 @@ func NewAPI() API {
 
 	psql := initPostgres(cfg)
 
+	translate := gtranslate.NewGTranslate(psql)
+
 	return &api{
 		config:      cfg,
 		corpus:      controllers.NewCorpusAPI(cjp, czh),
@@ -124,6 +131,7 @@ func NewAPI() API {
 		mining:      controllers.NewMiningAPI(psql),
 		cloudvision: controllers.NewCloudVisionAPI(ocrCache),
 		texts:       controllers.NewTextsAPI(psql),
+		translation: controllers.NewTranslateAPI(translate),
 	}
 }
 
@@ -175,4 +183,8 @@ func (api *api) CloudVision() controllers.CloudVisionAPI {
 
 func (api *api) Texts() controllers.TextsAPI {
 	return api.texts
+}
+
+func (api *api) Translation() controllers.TranslateAPI {
+	return api.translation
 }

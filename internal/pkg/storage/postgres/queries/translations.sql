@@ -1,4 +1,4 @@
--- name: GetTranslation :many
+-- name: GetTranslation :one
 select
   id,
   translation

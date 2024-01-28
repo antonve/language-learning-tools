@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const getTranslation = `-- name: GetTranslation :many
+const getTranslation = `-- name: GetTranslation :one
 select
   id,
   translation
@@ -34,27 +34,11 @@ type GetTranslationRow struct {
 	Translation string
 }
 
-func (q *Queries) GetTranslation(ctx context.Context, arg GetTranslationParams) ([]GetTranslationRow, error) {
-	rows, err := q.db.QueryContext(ctx, getTranslation, arg.SourceLanguageCode, arg.TargetLanguageCode, arg.Input)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []GetTranslationRow
-	for rows.Next() {
-		var i GetTranslationRow
-		if err := rows.Scan(&i.ID, &i.Translation); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) GetTranslation(ctx context.Context, arg GetTranslationParams) (GetTranslationRow, error) {
+	row := q.db.QueryRowContext(ctx, getTranslation, arg.SourceLanguageCode, arg.TargetLanguageCode, arg.Input)
+	var i GetTranslationRow
+	err := row.Scan(&i.ID, &i.Translation)
+	return i, err
 }
 
 const storeTranslation = `-- name: StoreTranslation :one

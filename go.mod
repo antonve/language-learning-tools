@@ -19,7 +19,7 @@ require (
 	github.com/yanyiwu/gojieba v1.2.0
 	golang.org/x/net v0.17.0
 	golang.org/x/sync v0.4.0
-	golang.org/x/text v0.13.0
+	golang.org/x/text v0.14.0
 )
 
 require (
@@ -27,6 +27,7 @@ require (
 	cloud.google.com/go/compute v1.23.1 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
 	cloud.google.com/go/longrunning v0.5.2 // indirect
+	cloud.google.com/go/translate v1.10.0 // indirect
 	cloud.google.com/go/vision/v2 v2.7.3 // indirect
 	github.com/antchfx/xpath v1.2.0 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
