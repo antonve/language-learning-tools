@@ -19,7 +19,7 @@
     "next": "12.3.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "use-pan-and-zoom": "^0.6.5",
+    "react-zoom-pan-pinch": "^3.3.0",
     "uuid": "^8.3.2",
     "yarn": "^1.22.21",
     "zod": "^3.22.4"

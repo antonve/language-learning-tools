@@ -1,5 +1,5 @@
 import type { NextPage } from 'next'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import BookImporter from '@app/mangareader/BookImporter'
 import {
   Book,
@@ -12,8 +12,12 @@ import {
 import { useDebounce } from '@uidotdev/usehooks'
 import Layout from '@app/Layout'
 import { useKeyPress, useWindowSize } from '@app/mangareader/hooks'
-import usePanZoom from 'use-pan-and-zoom'
 import classNames from 'classnames'
+import {
+  TransformWrapper,
+  TransformComponent,
+  useControls,
+} from 'react-zoom-pan-pinch'
 
 interface PopupComponentProps {
   tokens: Tokens | undefined
@@ -95,17 +99,6 @@ const MangaReader: NextPage<{
   const [book, setBook] = useState<Book>()
   const [page, setPage] = useState(5)
   const [tokens, setTokens] = useState<Tokens | undefined>()
-  const {
-    transform,
-    container,
-    setContainer,
-    panZoomHandlers,
-    setPan,
-    setZoom,
-  } = usePanZoom({
-    maxZoom: 2,
-    minZoom: 0.3,
-  })
 
   const imageUrl = useMemo(() => {
     if (!book) {
@@ -114,60 +107,14 @@ const MangaReader: NextPage<{
     return `data:image/jpeg;base64,${arrayBufferToBase64(book.pages[page])}`
   }, [book?.pages, page])
 
-  const imageRef = useRef<HTMLImageElement>(null)
-  // const containerRef = useCallback(setContainer, [])
-  const containerRef = useCallback((it: HTMLDivElement) => {
-    setContainer(it)
-    if (it != undefined) {
-      setRefSet(true)
-    }
-  }, [])
-  const containerSize = useWindowSize(container)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const containerSize = useWindowSize(containerRef.current)
 
   useKeyPress('ArrowLeft', onNextPage)
   useKeyPress('ArrowRight', onPrevPage)
   useKeyPress(' ', loadOCR)
 
   useEffect(() => setTokens(undefined), [page])
-
-  useEffect(() => {
-    const imageHeight = imageRef.current?.height
-    if (
-      !book ||
-      !imageHeight ||
-      containerSize.height === 0 ||
-      containerSize.width === 0
-    ) {
-      console.log(
-        'skipping',
-        book,
-        imageHeight,
-        containerSize,
-        container?.offsetWidth,
-        container?.offsetHeight,
-      )
-      return
-    }
-
-    // hack to make sure image is rendered before rendering page
-    const verticalZoomLevel = containerSize.height / imageHeight
-
-    if (!isNaN(verticalZoomLevel)) {
-      console.log('zooming', containerSize, imageHeight, verticalZoomLevel)
-      setZoom(verticalZoomLevel)
-    }
-
-    console.log('panning', containerSize, imageHeight, verticalZoomLevel)
-    setPan({ x: 0, y: 0 })
-
-    if (page === 5) {
-      loadOCR()
-    }
-  }, [book?.pages, page, containerSize, refSet])
-
-  useEffect(() => console.log(transform), [transform])
-
-  function centerFitPage() {}
 
   async function loadOCR() {
     if (!book) {
@@ -225,35 +172,60 @@ const MangaReader: NextPage<{
   }
 
   return (
-    <div
-      ref={containerRef}
-      className="w-screen h-screen flex items-center justify-center overflow-hidden"
-      contentEditable={false}
-      style={{ touchAction: 'none' }}
-      {...panZoomHandlers}
-    >
-      <div style={{ transform }} className="relative">
-        <PopupComponent tokens={tokens} parentSize={containerSize} />
-        <Overlays
-          tokens={tokens}
-          useVertical={useVertical}
-          selectIndex={selectIndex}
-        />
-        <div className="z-10 relative">
-          <img
-            src={imageUrl}
-            className="block select-none"
-            draggable={false}
-            ref={imageRef}
-            onClick={() => selectIndex(undefined)}
-          />
-        </div>
-      </div>
+    <div ref={containerRef}>
+      <TransformWrapper
+        centerOnInit={true}
+        smooth={true}
+        maxScale={4}
+        minScale={0.1}
+        wheel={{
+          smoothStep: 0.01,
+        }}
+        pinch={{ step: 0.01 }}
+        limitToBounds={false}
+        centerZoomedOut={true}
+        zoomAnimation={{ disabled: true }}
+        doubleClick={{ disabled: true }}
+      >
+        <TransformComponent wrapperClass="!w-screen !h-screen">
+          <PageFocusControl page={page} />
+          <div className="relative">
+            <PopupComponent tokens={tokens} parentSize={containerSize} />
+            <Overlays
+              tokens={tokens}
+              useVertical={useVertical}
+              selectIndex={selectIndex}
+            />
+            <div
+              className="z-10 relative"
+              onClick={() => {
+                selectIndex(undefined)
+              }}
+            >
+              <img
+                src={imageUrl}
+                className="block select-none"
+                draggable={false}
+                id="page"
+              />
+            </div>
+          </div>
+        </TransformComponent>
+      </TransformWrapper>
     </div>
   )
 }
 
 export default MangaReader
+
+function PageFocusControl({ page }: { page: number }) {
+  const { zoomToElement } = useControls()
+  useEffect(() => {
+    zoomToElement('page', undefined, 50)
+  }, [page])
+
+  return null
+}
 
 function Overlays({
   tokens,
