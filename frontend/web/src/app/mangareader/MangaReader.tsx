@@ -1,5 +1,5 @@
 import type { NextPage } from 'next'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import BookImporter from '@app/mangareader/BookImporter'
 import {
   Book,
@@ -91,8 +91,9 @@ const MangaReader: NextPage<{
   useVertical: boolean
   PopupComponent: React.FC<PopupComponentProps>
 }> = ({ useVertical, PopupComponent = GermanPopup }) => {
+  const [refSet, setRefSet] = useState(false)
   const [book, setBook] = useState<Book>()
-  const [page, setPage] = useState(0)
+  const [page, setPage] = useState(5)
   const [tokens, setTokens] = useState<Tokens | undefined>()
   const {
     transform,
@@ -114,6 +115,13 @@ const MangaReader: NextPage<{
   }, [book?.pages, page])
 
   const imageRef = useRef<HTMLImageElement>(null)
+  // const containerRef = useCallback(setContainer, [])
+  const containerRef = useCallback((it: HTMLDivElement) => {
+    setContainer(it)
+    if (it != undefined) {
+      setRefSet(true)
+    }
+  }, [])
   const containerSize = useWindowSize(container)
 
   useKeyPress('ArrowLeft', onNextPage)
@@ -123,25 +131,43 @@ const MangaReader: NextPage<{
   useEffect(() => setTokens(undefined), [page])
 
   useEffect(() => {
-    centerFitPage()
-  }, [book?.pages, page, imageRef.current?.height, containerSize])
-
-  function centerFitPage() {
     const imageHeight = imageRef.current?.height
-    if (!book || !imageHeight) {
+    if (
+      !book ||
+      !imageHeight ||
+      containerSize.height === 0 ||
+      containerSize.width === 0
+    ) {
+      console.log(
+        'skipping',
+        book,
+        imageHeight,
+        containerSize,
+        container?.offsetWidth,
+        container?.offsetHeight,
+      )
       return
     }
 
     // hack to make sure image is rendered before rendering page
-    setTimeout(() => {
-      const verticalZoomLevel = containerSize.height / imageHeight
-      setPan({ x: 0, y: 0 })
+    const verticalZoomLevel = containerSize.height / imageHeight
 
-      if (!isNaN(verticalZoomLevel)) {
-        setZoom(verticalZoomLevel)
-      }
-    }, 1)
-  }
+    if (!isNaN(verticalZoomLevel)) {
+      console.log('zooming', containerSize, imageHeight, verticalZoomLevel)
+      setZoom(verticalZoomLevel)
+    }
+
+    console.log('panning', containerSize, imageHeight, verticalZoomLevel)
+    setPan({ x: 0, y: 0 })
+
+    if (page === 5) {
+      loadOCR()
+    }
+  }, [book?.pages, page, containerSize, refSet])
+
+  useEffect(() => console.log(transform), [transform])
+
+  function centerFitPage() {}
 
   async function loadOCR() {
     if (!book) {
@@ -200,7 +226,7 @@ const MangaReader: NextPage<{
 
   return (
     <div
-      ref={el => setContainer(el)}
+      ref={containerRef}
       className="w-screen h-screen flex items-center justify-center overflow-hidden"
       contentEditable={false}
       style={{ touchAction: 'none' }}

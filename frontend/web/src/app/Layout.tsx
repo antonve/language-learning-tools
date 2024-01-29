@@ -6,6 +6,7 @@ interface Props {
   bodyClassName?: string
   headerClassName?: string
   darkMode?: boolean
+  children: React.ReactElement
 }
 
 const Layout: FC<Props> = ({
