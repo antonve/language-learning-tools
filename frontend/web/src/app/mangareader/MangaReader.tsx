@@ -18,7 +18,6 @@ import {
   TransformComponent,
   useControls,
 } from 'react-zoom-pan-pinch'
-import { useImageSize } from 'react-image-size'
 
 interface PopupComponentProps {
   tokens: Tokens | undefined
@@ -107,9 +106,6 @@ const MangaReader: NextPage<{
     return `data:image/jpeg;base64,${arrayBufferToBase64(book.pages[page])}`
   }, [book?.pages, page])
 
-  const [dimensions, { loading: imageSizeLoading, error: imageSizeError }] =
-    useImageSize(imageUrl ?? '')
-
   const containerRef = useRef<HTMLDivElement>(null)
   const containerSize = useWindowSize(containerRef.current)
 
@@ -191,44 +187,32 @@ const MangaReader: NextPage<{
         doubleClick={{ disabled: true }}
       >
         <TransformComponent wrapperClass="!w-screen !h-screen">
-          {imageSizeLoading ? 'loading...' : null}
-          {/* {imageSizeError ? `error: ${imageSizeError}` : null} */}
-          {dimensions ? (
-            <>
-              <PageFocusControl page={page} />
-              <div
-                className="relative"
-                onClick={() => console.log('div.relative clicked')}
-              >
-                <PopupComponent tokens={tokens} parentSize={containerSize} />
-                <Overlays
-                  tokens={tokens}
-                  useVertical={useVertical}
-                  selectIndex={selectIndex}
-                />
-                <div
-                  className="z-10 relative"
-                  onClick={() => {
-                    console.log('div.img clicked')
-                    selectIndex(undefined)
-                  }}
-                >
-                  <img
-                    src={imageUrl}
-                    className="select-none max-w-none w-auto h-auto max-h-none"
-                    style={
-                      {
-                        // width: `${dimensions.width}px`,
-                        // height: `${dimensions.height}px`,
-                      }
-                    }
-                    draggable={false}
-                    id="page"
-                  />
-                </div>
-              </div>
-            </>
-          ) : null}
+          <PageFocusControl page={page} />
+          <div
+            className="relative"
+            onClick={() => console.log('div.relative clicked')}
+          >
+            <PopupComponent tokens={tokens} parentSize={containerSize} />
+            <Overlays
+              tokens={tokens}
+              useVertical={useVertical}
+              selectIndex={selectIndex}
+            />
+            <div
+              className="z-10 relative"
+              onClick={() => {
+                console.log('div.img clicked')
+                selectIndex(undefined)
+              }}
+            >
+              <img
+                src={imageUrl}
+                className="select-none max-w-none w-auto h-auto max-h-none"
+                draggable={false}
+                id="page"
+              />
+            </div>
+          </div>
         </TransformComponent>
       </TransformWrapper>
     </div>
