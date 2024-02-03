@@ -24,15 +24,31 @@ import {
   ChevronRightIcon,
 } from '@heroicons/react/24/solid'
 
+type InitCardCreationFlow = (
+  sourceText: string,
+  targetText: string | undefined,
+  sourceLanguage: string,
+  targetLanguage: string,
+) => void
+
 interface PopupComponentProps {
   tokens: Tokens | undefined
   parentSize: {
     width: number
     height: number
   }
+  initCardCreationFlow: InitCardCreationFlow
 }
 
-function GermanPopupEditor({ defaultToken }: { defaultToken: string }) {
+type ViewMode = 'default' | 'crop'
+
+function GermanPopupEditor({
+  defaultToken,
+  initCardCreationFlow,
+}: {
+  defaultToken: string
+  initCardCreationFlow: InitCardCreationFlow
+}) {
   const [token, setToken] = useState(defaultToken)
   const debouncedToken = useDebounce(token, 500)
   const translation = useTranslation(debouncedToken, 'deu', 'eng', 500)
@@ -45,12 +61,22 @@ function GermanPopupEditor({ defaultToken }: { defaultToken: string }) {
         defaultValue={token}
         onChange={e => setToken(e.currentTarget.value.trim())}
       />
-      <div>{translation.data ?? 'no data'}</div>
+      <div
+        onClick={() => {
+          initCardCreationFlow(token, translation.data, 'deu', 'eng')
+        }}
+      >
+        {translation.data ?? 'no data'}
+      </div>
     </>
   )
 }
 
-function GermanPopup({ tokens, parentSize }: PopupComponentProps) {
+function GermanPopup({
+  tokens,
+  parentSize,
+  initCardCreationFlow,
+}: PopupComponentProps) {
   if (!tokens) {
     return null
   }
@@ -94,7 +120,10 @@ function GermanPopup({ tokens, parentSize }: PopupComponentProps) {
         e.stopPropagation()
       }}
     >
-      <GermanPopupEditor defaultToken={selectedText} />
+      <GermanPopupEditor
+        defaultToken={selectedText}
+        initCardCreationFlow={initCardCreationFlow}
+      />
     </div>
   )
 }
@@ -106,6 +135,7 @@ const MangaReader: NextPage<{
   const [book, setBook] = useState<Book>()
   const [page, setPage] = useState(5)
   const [tokens, setTokens] = useState<Tokens | undefined>()
+  const [viewMode, setViewMode] = useState<ViewMode>('default')
 
   const imageUrl = useMemo(() => {
     if (!book) {
@@ -140,6 +170,15 @@ const MangaReader: NextPage<{
         </div>
       </Layout>
     )
+  }
+
+  const initCardCreationFlow: InitCardCreationFlow = (
+    sourceText,
+    targetText,
+    sourceLanguage,
+    targetLanguage,
+  ) => {
+    setViewMode('crop')
   }
 
   function setPageSafely(newPage: number) {
@@ -205,7 +244,7 @@ const MangaReader: NextPage<{
         centerZoomedOut={true}
         zoomAnimation={{ disabled: true }}
         doubleClick={{ disabled: true }}
-        panning={{ excluded: ['input'] }}
+        panning={{ excluded: ['input'], disabled: viewMode === 'crop' }}
       >
         <Navigation book={book} page={page} setPage={setPageSafely} />
         <TransformComponent
@@ -218,12 +257,25 @@ const MangaReader: NextPage<{
         >
           <PageFocusControl page={page} />
           <div className="relative">
-            <PopupComponent tokens={tokens} parentSize={containerSize} />
-            <Overlays
-              tokens={tokens}
-              useVertical={useVertical}
-              selectIndex={selectIndex}
-            />
+            {viewMode === 'default' ? (
+              <>
+                <PopupComponent
+                  tokens={tokens}
+                  parentSize={containerSize}
+                  initCardCreationFlow={initCardCreationFlow}
+                />
+                <Overlays
+                  tokens={tokens}
+                  useVertical={useVertical}
+                  selectIndex={selectIndex}
+                />
+              </>
+            ) : null}
+            {viewMode === 'crop' ? (
+              <>
+                <Cropper />
+              </>
+            ) : null}
             <div className="z-10 relative">
               <img
                 src={imageUrl}
@@ -240,6 +292,15 @@ const MangaReader: NextPage<{
 }
 
 export default MangaReader
+
+function Cropper() {
+  return (
+    <div
+      className="bg-black/30 absolute border border-dashed z-50"
+      style={{ top: '40px', left: '450px', right: '30px', bottom: '40px' }}
+    ></div>
+  )
+}
 
 function Navigation({
   book,
