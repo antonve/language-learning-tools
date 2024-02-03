@@ -299,7 +299,6 @@ const MangaReader: NextPage<{
             href="#"
             className="flex bg-white hover:bg-gray-200 rounded shadow-lg absolute top-5 right-5 z-50 px-4 py-2 items-center"
             onClick={() => {
-              // setViewMode('default')
               if (!imageRef.current) {
                 return
               }
@@ -320,8 +319,29 @@ const MangaReader: NextPage<{
                 canvas.height,
               )
 
+              console.log(tokens)
+              tokens?.list
+                .filter((token, i) => {
+                  const isSelected = tokens.selectedIndices.has(i)
+                  return isSelected
+                })
+                .map(token => {
+                  const { vertices } = token.bounding_poly
+                  const { top, left, height, width } = getPosition(vertices)
+                  context!.fillStyle = 'rgba(34, 197, 94, 0.2)'
+                  console.log(left, top, width, height)
+                  context!.fillRect(
+                    left - cropPosition.left,
+                    top - cropPosition.top,
+                    width,
+                    height,
+                  )
+                })
+
               const panel = canvas.toDataURL('image/png')
               window.open(panel, '_blank')
+              setViewMode('default')
+              selectIndex(undefined)
             }}
           >
             Crop panel
@@ -332,7 +352,9 @@ const MangaReader: NextPage<{
           wrapperClass="!w-screen !h-screen bg-gray-200"
           wrapperProps={{
             onClick: () => {
-              selectIndex(undefined)
+              if (viewMode === 'default') {
+                selectIndex(undefined)
+              }
             },
           }}
         >
@@ -345,11 +367,6 @@ const MangaReader: NextPage<{
                   parentSize={containerSize}
                   initCardCreationFlow={initCardCreationFlow}
                 />
-                <Overlays
-                  tokens={tokens}
-                  useVertical={useVertical}
-                  selectIndex={selectIndex}
-                />
               </>
             ) : null}
             {viewMode === 'crop' ? (
@@ -361,6 +378,11 @@ const MangaReader: NextPage<{
                 />
               </>
             ) : null}
+            <Overlays
+              tokens={tokens}
+              useVertical={useVertical}
+              selectIndex={selectIndex}
+            />
             <div className="z-10 relative">
               <img
                 src={imageUrl}
@@ -415,6 +437,7 @@ function Cropper({
       className="absolute top-0 bottom-0 left-0 right-0 z-40"
       onMouseLeave={() => setMoveMode('idle')}
       onMouseMove={e => {
+        e.stopPropagation()
         if (moveMode === 'idle') {
           return
         }
@@ -515,8 +538,12 @@ function Cropper({
           height: `${position.bottom - position.top}px`,
           boxShadow: `0 0 0 99999px rgba(0, 0, 0, .6)`,
         }}
-        onMouseDown={() => {
+        onMouseDown={e => {
+          e.stopPropagation()
           setMoveMode('move')
+        }}
+        onClick={e => {
+          e.stopPropagation()
         }}
       >
         <div
@@ -650,7 +677,7 @@ function Overlays({
             className={classNames(
               'absolute z-30 block font-bold cursor-pointer',
               {
-                'bg-green-500/20': isSelected,
+                'bg-green-500/10': isSelected,
                 '': !isSelected,
               },
             )}
