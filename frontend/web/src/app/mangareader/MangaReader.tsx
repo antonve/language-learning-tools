@@ -18,6 +18,7 @@ import {
   TransformComponent,
   useControls,
 } from 'react-zoom-pan-pinch'
+import { useImageSize } from 'react-image-size'
 
 interface PopupComponentProps {
   tokens: Tokens | undefined
@@ -106,6 +107,9 @@ const MangaReader: NextPage<{
     return `data:image/jpeg;base64,${arrayBufferToBase64(book.pages[page])}`
   }, [book?.pages, page])
 
+  const [dimensions, { loading: imageSizeLoading, error: imageSizeError }] =
+    useImageSize(imageUrl ?? '')
+
   const containerRef = useRef<HTMLDivElement>(null)
   const containerSize = useWindowSize(containerRef.current)
 
@@ -186,30 +190,45 @@ const MangaReader: NextPage<{
         zoomAnimation={{ disabled: true }}
         doubleClick={{ disabled: true }}
       >
-        <TransformComponent wrapperClass="relative !w-screen !h-screen">
-          <PageFocusControl page={page} />
-          <div className="" onClick={() => console.log('div.relative clicked')}>
-            <PopupComponent tokens={tokens} parentSize={containerSize} />
-            <Overlays
-              tokens={tokens}
-              useVertical={useVertical}
-              selectIndex={selectIndex}
-            />
-            <div
-              className="z-10 relative"
-              onClick={() => {
-                console.log('div.img clicked')
-                selectIndex(undefined)
-              }}
-            >
-              <img
-                src={imageUrl}
-                className="select-none w-auto h-auto max-w-full max-h-full"
-                draggable={false}
-                id="page"
-              />
-            </div>
-          </div>
+        <TransformComponent wrapperClass="!w-screen !h-screen">
+          {imageSizeLoading ? 'loading...' : null}
+          {/* {imageSizeError ? `error: ${imageSizeError}` : null} */}
+          {dimensions ? (
+            <>
+              <PageFocusControl page={page} />
+              <div
+                className="relative"
+                onClick={() => console.log('div.relative clicked')}
+              >
+                <PopupComponent tokens={tokens} parentSize={containerSize} />
+                <Overlays
+                  tokens={tokens}
+                  useVertical={useVertical}
+                  selectIndex={selectIndex}
+                />
+                <div
+                  className="z-10 relative"
+                  onClick={() => {
+                    console.log('div.img clicked')
+                    selectIndex(undefined)
+                  }}
+                >
+                  <img
+                    src={imageUrl}
+                    className="select-none max-w-none w-auto h-auto max-h-none"
+                    style={
+                      {
+                        // width: `${dimensions.width}px`,
+                        // height: `${dimensions.height}px`,
+                      }
+                    }
+                    draggable={false}
+                    id="page"
+                  />
+                </div>
+              </div>
+            </>
+          ) : null}
         </TransformComponent>
       </TransformWrapper>
     </div>
@@ -221,7 +240,8 @@ export default MangaReader
 function PageFocusControl({ page }: { page: number }) {
   const { zoomToElement } = useControls()
   useEffect(() => {
-    zoomToElement('page', undefined, 50)
+    const timer = setTimeout(() => zoomToElement('page', undefined, 50), 100)
+    return () => clearTimeout(timer)
   }, [page])
 
   return null
@@ -243,6 +263,9 @@ function Overlays({
   return (
     <>
       {tokens.list.map((token, i) => {
+        if (token.description != 'MACHST') {
+          return null
+        }
         const { vertices } = token.bounding_poly
         const { top, left, height, width } = getPosition(vertices)
         const isSelected = tokens.selectedIndices.has(i)

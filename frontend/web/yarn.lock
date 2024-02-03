@@ -1792,6 +1792,11 @@ react-dom@18.2.0:
     loose-envify "^1.1.0"
     scheduler "^0.23.0"
 
+react-image-size@^2.3.2:
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/react-image-size/-/react-image-size-2.3.2.tgz#e99ee6919e0b9584d58a7ab00f376188e170b69f"
+  integrity sha512-0kRdhVlsZ1fEBOQZM4KK8uQEWkQUBJj38npDqCI4WSJEM/C1I6qzvYhbw2gM6vfy/ZFwLWxiJcncONMIg1sm4Q==
+
 react-is@^16.13.1:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
