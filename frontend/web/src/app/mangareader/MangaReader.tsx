@@ -17,6 +17,7 @@ import {
   TransformWrapper,
   TransformComponent,
   useControls,
+  useTransformContext,
 } from 'react-zoom-pan-pinch'
 import {
   XMarkIcon,
@@ -24,11 +25,19 @@ import {
   ChevronRightIcon,
 } from '@heroicons/react/24/solid'
 
+type Position = {
+  left: number
+  right: number
+  top: number
+  bottom: number
+}
+
 type InitCardCreationFlow = (
   sourceText: string,
   targetText: string | undefined,
   sourceLanguage: string,
   targetLanguage: string,
+  initialCropArea: Position,
 ) => void
 
 interface PopupComponentProps {
@@ -45,9 +54,11 @@ type ViewMode = 'default' | 'crop'
 function GermanPopupEditor({
   defaultToken,
   initCardCreationFlow,
+  initialCropArea,
 }: {
   defaultToken: string
   initCardCreationFlow: InitCardCreationFlow
+  initialCropArea: Position
 }) {
   const [token, setToken] = useState(defaultToken)
   const debouncedToken = useDebounce(token, 500)
@@ -63,7 +74,13 @@ function GermanPopupEditor({
       />
       <div
         onClick={() => {
-          initCardCreationFlow(token, translation.data, 'deu', 'eng')
+          initCardCreationFlow(
+            token,
+            translation.data,
+            'deu',
+            'eng',
+            initialCropArea,
+          )
         }}
       >
         {translation.data ?? 'no data'}
@@ -108,6 +125,25 @@ function GermanPopup({
     .trim()
     .toLowerCase()
 
+  const selectedTextCropArea = selectedTokens
+    .map(it => getPosition(it.bounding_poly.vertices))
+    .reduce(
+      (prev, current) => {
+        return {
+          top: Math.min(prev.top, current.top),
+          bottom: Math.max(prev.bottom, current.bottom),
+          left: Math.min(prev.left, current.left),
+          right: Math.max(prev.right, current.right),
+        }
+      },
+      {
+        top: parentSize.height,
+        bottom: 0,
+        left: parentSize.width,
+        right: 0,
+      },
+    )
+
   return (
     <div
       className={classNames(
@@ -123,6 +159,7 @@ function GermanPopup({
       <GermanPopupEditor
         defaultToken={selectedText}
         initCardCreationFlow={initCardCreationFlow}
+        initialCropArea={selectedTextCropArea}
       />
     </div>
   )
@@ -136,6 +173,12 @@ const MangaReader: NextPage<{
   const [page, setPage] = useState(5)
   const [tokens, setTokens] = useState<Tokens | undefined>()
   const [viewMode, setViewMode] = useState<ViewMode>('default')
+  const [cropPosition, setCropPosition] = useState<Position>({
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  })
 
   const imageUrl = useMemo(() => {
     if (!book) {
@@ -177,7 +220,9 @@ const MangaReader: NextPage<{
     targetText,
     sourceLanguage,
     targetLanguage,
+    initialCropArea,
   ) => {
+    setCropPosition(initialCropArea)
     setViewMode('crop')
   }
 
@@ -273,7 +318,11 @@ const MangaReader: NextPage<{
             ) : null}
             {viewMode === 'crop' ? (
               <>
-                <Cropper />
+                <Cropper
+                  position={cropPosition}
+                  setCropPosition={setCropPosition}
+                  parentSize={containerSize}
+                />
               </>
             ) : null}
             <div className="z-10 relative">
@@ -293,12 +342,129 @@ const MangaReader: NextPage<{
 
 export default MangaReader
 
-function Cropper() {
+function clamp(n: number, [min, max]: number[]) {
+  return Math.min(Math.max(n, min), max)
+}
+
+type CropMoveMode =
+  | 'idle'
+  | 'drag'
+  | 'resize-sw' // south west
+  | 'resize-se' // south east
+  | 'resize-nw' // north west
+  | 'resize-ne' // north east
+
+function Cropper({
+  position,
+  setCropPosition,
+  parentSize,
+}: {
+  position: Position
+  setCropPosition: (position: Position) => void
+  parentSize: {
+    width: number
+    height: number
+  }
+}) {
+  const {
+    transformState: { scale },
+  } = useTransformContext()
+  const [moveMode, setMoveMode] = useState<CropMoveMode>('idle')
+
+  useEffect(() => console.log(moveMode), [moveMode])
+
   return (
     <div
-      className="bg-black/30 absolute border border-dashed z-50"
-      style={{ top: '40px', left: '450px', right: '30px', bottom: '40px' }}
-    ></div>
+      className="absolute top-0 bottom-0 left-0 right-0 z-40"
+      onMouseMove={e => {
+        if (moveMode === 'idle') {
+          return
+        }
+        let newPos = { ...position }
+        const bounds = e.currentTarget.getBoundingClientRect()
+        switch (moveMode) {
+          case 'resize-nw':
+            newPos.left = (e.pageX - bounds.left) / scale
+            newPos.top = (e.pageY - bounds.top) / scale
+
+            newPos.left = clamp(newPos.left, [0, newPos.right - 10])
+            newPos.top = clamp(newPos.top, [0, newPos.bottom - 10])
+            break
+          case 'resize-ne':
+            newPos.right = (e.pageX - bounds.left) / scale
+            newPos.top = (e.pageY - bounds.top) / scale
+
+            newPos.right = clamp(newPos.right, [
+              newPos.left + 10,
+              parentSize.width / scale,
+            ])
+            newPos.top = clamp(newPos.top, [0, newPos.bottom - 10])
+            break
+          case 'resize-se':
+            newPos.right = (e.pageX - bounds.left) / scale
+            newPos.bottom = (e.pageY - bounds.top) / scale
+
+            newPos.right = clamp(newPos.right, [
+              newPos.left + 10,
+              parentSize.width / scale,
+            ])
+            newPos.bottom = clamp(newPos.bottom, [
+              newPos.top + 10,
+              parentSize.height / scale,
+            ])
+
+            break
+          case 'resize-sw':
+            newPos.left = (e.pageX - bounds.left) / scale
+            newPos.bottom = (e.pageY - bounds.top) / scale
+
+            newPos.left = clamp(newPos.left, [0, newPos.right - 10])
+            newPos.bottom = clamp(newPos.bottom, [
+              newPos.top + 10,
+              parentSize.height / scale,
+            ])
+            break
+        }
+
+        newPos.left = clamp(newPos.left, [0, newPos.right - 10])
+        // newPos.bottom = clamp(newPos.bottom, [
+        //   newPos.top + 10,
+        //   parentSize.height,
+        // ])
+
+        setCropPosition(newPos)
+        console.log(newPos)
+      }}
+      onMouseUp={() => setMoveMode('idle')}
+    >
+      <div
+        className="bg-transparent relative border border-dashed border-black z-50"
+        style={{
+          top: `${position.top}px`,
+          left: `${position.left}px`,
+          width: `${position.right - position.left}px`,
+          height: `${position.bottom - position.top}px`,
+          boxShadow: `0 0 0 99999px rgba(0, 0, 0, .6)`,
+        }}
+      >
+        <div
+          className="w-2 h-2 bg-white border border-black absolute -top-1 -left-1 cursor-nwse-resize"
+          onMouseDown={() => setMoveMode('resize-nw')}
+        ></div>
+        <div
+          className="w-2 h-2 bg-white border border-black absolute -top-1 -right-1 cursor-nesw-resize"
+          onMouseDown={() => setMoveMode('resize-ne')}
+        ></div>
+        <div
+          className="w-2 h-2 bg-white border border-black absolute -bottom-1 -right-1 cursor-nwse-resize"
+          onMouseDown={() => setMoveMode('resize-se')}
+        ></div>
+        <div
+          className="w-2 h-2 bg-white border border-black absolute -bottom-1 -left-1 cursor-nesw-resize"
+          onMouseDown={() => setMoveMode('resize-sw')}
+        ></div>
+      </div>
+    </div>
   )
 }
 
