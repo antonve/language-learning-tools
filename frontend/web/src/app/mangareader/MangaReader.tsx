@@ -18,6 +18,11 @@ import {
   TransformComponent,
   useControls,
 } from 'react-zoom-pan-pinch'
+import {
+  XMarkIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from '@heroicons/react/24/solid'
 
 interface PopupComponentProps {
   tokens: Tokens | undefined
@@ -137,18 +142,30 @@ const MangaReader: NextPage<{
     )
   }
 
-  function onNextPage() {
-    if (!book || book.pages.length - 1 <= page) {
+  function setPageSafely(newPage: number) {
+    if (!book) {
       return
     }
-    setPage(page + 1)
+
+    if (book.pages.length <= newPage) {
+      setPage(book.pages.length - 1)
+      return
+    }
+
+    if (0 > newPage) {
+      setPage(0)
+      return
+    }
+
+    setPage(newPage)
+  }
+
+  function onNextPage() {
+    setPageSafely(page + 1)
   }
 
   function onPrevPage() {
-    if (page <= 0) {
-      return
-    }
-    setPage(page - 1)
+    setPageSafely(page - 1)
   }
 
   function selectIndex(i: number | undefined) {
@@ -190,8 +207,9 @@ const MangaReader: NextPage<{
         doubleClick={{ disabled: true }}
         panning={{ excluded: ['input'] }}
       >
+        <Navigation book={book} page={page} setPage={setPageSafely} />
         <TransformComponent
-          wrapperClass="!w-screen !h-screen"
+          wrapperClass="!w-screen !h-screen bg-gray-200"
           wrapperProps={{
             onClick: () => {
               selectIndex(undefined)
@@ -222,6 +240,68 @@ const MangaReader: NextPage<{
 }
 
 export default MangaReader
+
+function Navigation({
+  book,
+  page,
+  setPage,
+}: {
+  book: Book
+  page: number
+  setPage: (p: number) => void
+}) {
+  const [hidden, setHidden] = useState(false)
+  const [pageValue, setPageValue] = useState(page)
+
+  useEffect(() => {
+    setPageValue(page)
+  }, [page])
+
+  return (
+    <div
+      className="absolute top-5 left-5 bg-white shadow-lg z-50 rounded flex overflow-hidden items-center justify-center space-x-2"
+      style={{ opacity: hidden ? 0 : 100 }}
+    >
+      <a
+        href="#"
+        onClick={() => setHidden(!hidden)}
+        className="hover:bg-gray-100 block p-2"
+      >
+        <XMarkIcon className="h-5 w-5" />
+      </a>
+      {!hidden ? (
+        <>
+          <a
+            href="#"
+            onClick={() => setPage(page - 1)}
+            className="hover:bg-gray-100 block p-2"
+          >
+            <ChevronLeftIcon className="h-5 w-5" />
+          </a>
+          <a
+            href="#"
+            onClick={() => setPage(page + 1)}
+            className="hover:bg-gray-100 block p-2"
+          >
+            <ChevronRightIcon className="h-5 w-5" />
+          </a>
+          <div className="pr-2">
+            <input
+              type="number"
+              value={pageValue + 1}
+              min={1}
+              max={book.pages.length}
+              onChange={e => setPageValue(e.currentTarget.valueAsNumber - 1)}
+              onBlur={e => setPage(e.currentTarget.valueAsNumber - 1)}
+              className="text-right w-14 border-none focus:outline-none focus:ring-0 focus:bg-gray-100 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />{' '}
+            / {book.pages.length}
+          </div>
+        </>
+      ) : null}
+    </div>
+  )
+}
 
 function PageFocusControl({ page }: { page: number }) {
   const { zoomToElement } = useControls()
