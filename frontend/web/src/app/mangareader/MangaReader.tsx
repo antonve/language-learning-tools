@@ -95,7 +95,6 @@ const MangaReader: NextPage<{
   useVertical: boolean
   PopupComponent: React.FC<PopupComponentProps>
 }> = ({ useVertical, PopupComponent = GermanPopup }) => {
-  const [refSet, setRefSet] = useState(false)
   const [book, setBook] = useState<Book>()
   const [page, setPage] = useState(5)
   const [tokens, setTokens] = useState<Tokens | undefined>()
@@ -187,9 +186,9 @@ const MangaReader: NextPage<{
         zoomAnimation={{ disabled: true }}
         doubleClick={{ disabled: true }}
       >
-        <TransformComponent wrapperClass="!w-screen !h-screen">
+        <TransformComponent wrapperClass="relative !w-screen !h-screen">
           <PageFocusControl page={page} />
-          <div className="relative">
+          <div className="" onClick={() => console.log('div.relative clicked')}>
             <PopupComponent tokens={tokens} parentSize={containerSize} />
             <Overlays
               tokens={tokens}
@@ -199,12 +198,13 @@ const MangaReader: NextPage<{
             <div
               className="z-10 relative"
               onClick={() => {
+                console.log('div.img clicked')
                 selectIndex(undefined)
               }}
             >
               <img
                 src={imageUrl}
-                className="block select-none"
+                className="select-none w-auto h-auto max-w-full max-h-full"
                 draggable={false}
                 id="page"
               />
@@ -260,15 +260,17 @@ function Overlays({
             style={{
               top: `${top}px`,
               left: `${left}px`,
-              minHeight: `${height}px`,
-              minWidth: `${width}px`,
+              height: `${height}px`,
+              width: `${width}px`,
               fontSize: useVertical ? `${width}px` : `${height}px`,
               lineHeight: '1',
               fontFamily: '"Comic Neue", cursive',
-              writingMode: useVertical ? 'vertical-rl' : 'sideways-lr',
+              writingMode: useVertical ? 'vertical-rl' : 'horizontal-tb',
             }}
             onClick={() => selectIndex(i)}
-          ></div>
+          >
+            {token.description}
+          </div>
         )
       })}
     </>
