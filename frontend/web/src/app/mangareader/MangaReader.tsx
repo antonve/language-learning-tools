@@ -188,6 +188,7 @@ const MangaReader: NextPage<{
         centerZoomedOut={true}
         zoomAnimation={{ disabled: true }}
         doubleClick={{ disabled: true }}
+        panning={{ excluded: ['input'] }}
       >
         <TransformComponent
           wrapperClass="!w-screen !h-screen"
