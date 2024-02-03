@@ -23,6 +23,7 @@ import {
   XMarkIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  CheckIcon,
 } from '@heroicons/react/24/solid'
 
 type Position = {
@@ -188,6 +189,7 @@ const MangaReader: NextPage<{
   }, [book?.pages, page])
 
   const containerRef = useRef<HTMLDivElement>(null)
+  const imageRef = useRef<HTMLImageElement>(null)
   const containerSize = useWindowSize(containerRef.current)
 
   useKeyPress('ArrowLeft', onNextPage)
@@ -292,6 +294,40 @@ const MangaReader: NextPage<{
         panning={{ excluded: ['input'], disabled: viewMode === 'crop' }}
       >
         <Navigation book={book} page={page} setPage={setPageSafely} />
+        {viewMode === 'crop' ? (
+          <a
+            href="#"
+            className="flex bg-white hover:bg-gray-200 rounded shadow-lg absolute top-5 right-5 z-50 px-4 py-2 items-center"
+            onClick={() => {
+              // setViewMode('default')
+              if (!imageRef.current) {
+                return
+              }
+              const canvas = document.createElement('canvas')
+              canvas.width = cropPosition.right - cropPosition.left
+              canvas.height = cropPosition.bottom - cropPosition.top
+              const context = canvas.getContext('2d')
+
+              context?.drawImage(
+                imageRef.current,
+                cropPosition.left,
+                cropPosition.top,
+                canvas.width,
+                canvas.height,
+                0,
+                0,
+                canvas.width,
+                canvas.height,
+              )
+
+              const panel = canvas.toDataURL('image/png')
+              window.open(panel, '_blank')
+            }}
+          >
+            Crop panel
+            <CheckIcon className="w-5 h-5 text-green-700 ml-2" />
+          </a>
+        ) : null}
         <TransformComponent
           wrapperClass="!w-screen !h-screen bg-gray-200"
           wrapperProps={{
@@ -331,6 +367,7 @@ const MangaReader: NextPage<{
                 className="select-none max-w-none w-auto h-auto max-h-none"
                 draggable={false}
                 id="page"
+                ref={imageRef}
               />
             </div>
           </div>
