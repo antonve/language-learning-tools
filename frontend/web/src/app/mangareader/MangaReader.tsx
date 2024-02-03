@@ -156,7 +156,7 @@ const MangaReader: NextPage<{
       return
     }
 
-    if (!i) {
+    if (i === undefined) {
       setTokens({
         list: tokens.list,
         selectedIndices: new Map(),
