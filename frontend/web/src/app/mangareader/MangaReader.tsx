@@ -273,14 +273,14 @@ function Navigation({
         <>
           <a
             href="#"
-            onClick={() => setPage(page - 1)}
+            onClick={() => setPage(page + 1)}
             className="hover:bg-gray-100 block p-2"
           >
             <ChevronLeftIcon className="h-5 w-5" />
           </a>
           <a
             href="#"
-            onClick={() => setPage(page + 1)}
+            onClick={() => setPage(page - 1)}
             className="hover:bg-gray-100 block p-2"
           >
             <ChevronRightIcon className="h-5 w-5" />
