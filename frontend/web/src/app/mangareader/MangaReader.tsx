@@ -85,6 +85,9 @@ function GermanPopup({ tokens, parentSize }: PopupComponentProps) {
       )}
       style={{ left: `${position.left + 5}px`, top: `${position.top + 5}px` }}
       key={selectedText}
+      onClick={e => {
+        e.stopPropagation()
+      }}
     >
       <GermanPopupEditor defaultToken={selectedText} />
     </div>
@@ -186,25 +189,23 @@ const MangaReader: NextPage<{
         zoomAnimation={{ disabled: true }}
         doubleClick={{ disabled: true }}
       >
-        <TransformComponent wrapperClass="!w-screen !h-screen">
+        <TransformComponent
+          wrapperClass="!w-screen !h-screen"
+          wrapperProps={{
+            onClick: () => {
+              selectIndex(undefined)
+            },
+          }}
+        >
           <PageFocusControl page={page} />
-          <div
-            className="relative"
-            onClick={() => console.log('div.relative clicked')}
-          >
+          <div className="relative">
             <PopupComponent tokens={tokens} parentSize={containerSize} />
             <Overlays
               tokens={tokens}
               useVertical={useVertical}
               selectIndex={selectIndex}
             />
-            <div
-              className="z-10 relative"
-              onClick={() => {
-                console.log('div.img clicked')
-                selectIndex(undefined)
-              }}
-            >
+            <div className="z-10 relative">
               <img
                 src={imageUrl}
                 className="select-none max-w-none w-auto h-auto max-h-none"
@@ -247,9 +248,6 @@ function Overlays({
   return (
     <>
       {tokens.list.map((token, i) => {
-        if (token.description != 'MACHST') {
-          return null
-        }
         const { vertices } = token.bounding_poly
         const { top, left, height, width } = getPosition(vertices)
         const isSelected = tokens.selectedIndices.has(i)
@@ -274,10 +272,11 @@ function Overlays({
               fontFamily: '"Comic Neue", cursive',
               writingMode: useVertical ? 'vertical-rl' : 'horizontal-tb',
             }}
-            onClick={() => selectIndex(i)}
-          >
-            {token.description}
-          </div>
+            onClick={e => {
+              e.stopPropagation()
+              selectIndex(i)
+            }}
+          ></div>
         )
       })}
     </>
