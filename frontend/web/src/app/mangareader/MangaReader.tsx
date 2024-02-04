@@ -1,12 +1,5 @@
 import type { NextPage } from 'next'
-import {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import BookImporter from '@app/mangareader/BookImporter'
 import {
   Book,
@@ -35,6 +28,7 @@ import {
   ArrowPathIcon,
 } from '@heroicons/react/24/solid'
 import { TokenOverlays } from './Overlays'
+import { usePersistedTargetLanguage, LanguageSelect } from './LanguageSelect'
 
 type Position = {
   left: number
@@ -72,55 +66,6 @@ interface PopupComponentProps {
 }
 
 type ViewMode = 'default' | 'crop'
-
-export const usePersistedTargetLanguage = (
-  sourceLanguageCode: string,
-  defaultLanguageCode: string,
-) => {
-  const [targetLanguage, setTargetLanguage] = useState(defaultLanguageCode)
-
-  const key = `target_language_${sourceLanguageCode}`
-  const persist = (newTargetLanguage: string) => {
-    localStorage.setItem(key, newTargetLanguage)
-    setTargetLanguage(newTargetLanguage)
-  }
-
-  useEffect(() => {
-    const persistedTargetLanguage = localStorage.getItem(key)
-    if (persistedTargetLanguage !== null) {
-      setTargetLanguage(persistedTargetLanguage)
-    }
-  }, [])
-
-  return [targetLanguage, persist] as [string, Dispatch<SetStateAction<string>>]
-}
-
-interface Language {
-  code: string
-  description: string
-}
-
-function LanguageSelect({
-  availableLanguages,
-  targetLanguage,
-  setTargetLanguage,
-}: {
-  availableLanguages: Language[]
-  targetLanguage: string
-  setTargetLanguage: (lang: string) => void
-}) {
-  return (
-    <select
-      className="border-none bg-gray-100 h-10"
-      value={targetLanguage}
-      onChange={e => setTargetLanguage(e.currentTarget.value)}
-    >
-      {availableLanguages.map(lang => (
-        <option value={lang.code}>{lang.description}</option>
-      ))}
-    </select>
-  )
-}
 
 function GermanPopupEditor({
   defaultToken,
