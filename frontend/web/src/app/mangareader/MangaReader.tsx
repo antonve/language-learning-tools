@@ -10,7 +10,6 @@ import {
 } from '@app/mangareader/domain'
 import Layout from '@app/Layout'
 import { useKeyPress, useWindowSize } from '@app/mangareader/hooks'
-import classNames from 'classnames'
 import {
   TransformWrapper,
   TransformComponent,
@@ -23,9 +22,10 @@ import {
   ArrowRightEndOnRectangleIcon,
   ArrowPathIcon,
 } from '@heroicons/react/24/solid'
-import { TokenOverlays } from './Overlays'
-import { Navigation } from './Navigation'
-import { Cropper } from './Cropper'
+import { TokenOverlays } from '@app/mangareader/Overlays'
+import { Navigation } from '@app/mangareader/Navigation'
+import { Cropper } from '@app/mangareader/Cropper'
+import { Popup } from '@app/mangareader/Popup'
 
 export type Position = {
   left: number
@@ -34,7 +34,7 @@ export type Position = {
   bottom: number
 }
 
-type InitCardCreationFlow = (params: {
+export type InitCardCreationFlow = (params: {
   sourceText: string
   meta: object
   sourceLanguage: string
@@ -52,7 +52,7 @@ interface CardData {
   meta: object
 }
 
-export interface PopupEditorComponentProps {
+export interface PopupEditorProps {
   defaultToken: string
   initCardCreationFlow: InitCardCreationFlow
   initialCropArea: Position
@@ -61,99 +61,11 @@ export interface PopupEditorComponentProps {
 
 type ViewMode = 'default' | 'crop'
 
-function PopupComponent({
-  tokens,
-  parentSize,
-  initCardCreationFlow,
-  close,
-  PopupEditorComponent,
-}: {
-  tokens: Tokens | undefined
-  parentSize: {
-    width: number
-    height: number
-  }
-  initCardCreationFlow: InitCardCreationFlow
-  close: () => void
-  PopupEditorComponent: React.FC<PopupEditorComponentProps>
-}) {
-  if (!tokens) {
-    return null
-  }
-
-  const selectedTokens = Array.from(tokens.selectedIndices.keys())
-    .sort()
-    .map(i => tokens.list[i])
-
-  if (selectedTokens.length === 0) {
-    return null
-  }
-
-  const position = selectedTokens
-    .map(it => it.bounding_poly.vertices)
-    .reduce(
-      (position, vertices) => {
-        const { left, bottom, height } = getPosition(vertices)
-        return {
-          top: Math.max(position.top, bottom + height),
-          left: Math.min(position.left, left),
-        }
-      },
-      { top: 0, left: parentSize.width },
-    )
-
-  const selectedText = selectedTokens
-    .map(it => it.description)
-    .join(' ')
-    .trim()
-    .toLowerCase()
-
-  const selectedTextCropArea = selectedTokens
-    .map(it => getPosition(it.bounding_poly.vertices))
-    .reduce(
-      (prev, current) => {
-        return {
-          top: Math.min(prev.top, current.top),
-          bottom: Math.max(prev.bottom, current.bottom),
-          left: Math.min(prev.left, current.left),
-          right: Math.max(prev.right, current.right),
-        }
-      },
-      {
-        top: parentSize.height,
-        bottom: 0,
-        left: parentSize.width,
-        right: 0,
-      },
-    )
-
-  return (
-    <div
-      className={classNames(
-        'bg-white border-2 border-black absolute z-50 p-2 text-xl shadow-md rounded min-w-[300px]',
-        {},
-      )}
-      style={{ left: `${position.left + 5}px`, top: `${position.top + 5}px` }}
-      key={selectedText}
-      onClick={e => {
-        e.stopPropagation()
-      }}
-    >
-      <PopupEditorComponent
-        defaultToken={selectedText}
-        initCardCreationFlow={initCardCreationFlow}
-        initialCropArea={selectedTextCropArea}
-        close={close}
-      />
-    </div>
-  )
-}
-
 const MangaReader: NextPage<{
   useVertical: boolean
-  PopupEditorComponent: React.FC<PopupEditorComponentProps>
+  PopupEditor: React.FC<PopupEditorProps>
   createCard: CreateCard
-}> = ({ createCard, useVertical, PopupEditorComponent }) => {
+}> = ({ createCard, useVertical, PopupEditor }) => {
   const [book, setBook] = useState<Book>()
   const [page, setPage] = useState(5)
   const [tokens, setTokens] = useState<Tokens | undefined>()
@@ -390,12 +302,12 @@ const MangaReader: NextPage<{
           <div className="relative">
             {viewMode === 'default' ? (
               <>
-                <PopupComponent
+                <Popup
                   tokens={tokens}
                   parentSize={containerSize}
                   initCardCreationFlow={initCardCreationFlow}
                   close={() => selectIndex(undefined)}
-                  PopupEditorComponent={PopupEditorComponent}
+                  PopupEditor={PopupEditor}
                 />
               </>
             ) : null}

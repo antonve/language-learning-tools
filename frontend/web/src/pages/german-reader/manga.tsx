@@ -1,7 +1,5 @@
 import type { NextPage } from 'next'
-import MangaReader, {
-  PopupEditorComponentProps,
-} from '@app/mangareader/MangaReader'
+import MangaReader, { PopupEditorProps } from '@app/mangareader/MangaReader'
 import {
   usePersistedTargetLanguage,
   LanguageSelect,
@@ -17,7 +15,7 @@ function GermanPopupEditor({
   initCardCreationFlow,
   initialCropArea,
   close,
-}: PopupEditorComponentProps) {
+}: PopupEditorProps) {
   const [token, setToken] = useState(defaultToken)
   const debouncedToken = useDebounce(token, 500)
   const sourceLanguageCode = 'deu'
@@ -93,7 +91,7 @@ const GermanMangaReader: NextPage<{}> = () => {
   return (
     <MangaReader
       useVertical={false}
-      PopupEditorComponent={GermanPopupEditor}
+      PopupEditor={GermanPopupEditor}
       createCard={async ({ token, image, meta }) =>
         await createPendingCard({
           id: undefined,
