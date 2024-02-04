@@ -40,13 +40,23 @@ type Position = {
   bottom: number
 }
 
-type InitCardCreationFlow = (
-  sourceText: string,
-  targetText: string | undefined,
-  sourceLanguage: string,
-  targetLanguage: string,
-  initialCropArea: Position,
-) => void
+type InitCardCreationFlow = (params: {
+  sourceText: string
+  meta: object
+  sourceLanguage: string
+  initialCropArea: Position
+}) => void
+
+type CreateCard = (params: {
+  token: string
+  image: string
+  meta: object
+}) => void
+
+interface CardData {
+  sourceText: string
+  meta: object
+}
 
 interface PopupComponentProps {
   tokens: Tokens | undefined
@@ -155,13 +165,15 @@ function GermanPopupEditor({
       <a
         href="#"
         onClick={() => {
-          initCardCreationFlow(
-            token,
-            translation.data,
-            'deu',
-            'eng',
+          initCardCreationFlow({
+            sourceText: token,
+            meta: {
+              sentence: '',
+              meaning: translation.data,
+            },
+            sourceLanguage: 'deu',
             initialCropArea,
-          )
+          })
         }}
         className="flex justify-between items-center p-2 mt-2 hover:bg-gray-100"
       >
@@ -267,11 +279,13 @@ function GermanPopup({
 const MangaReader: NextPage<{
   useVertical: boolean
   PopupComponent: React.FC<PopupComponentProps>
-}> = ({ useVertical, PopupComponent = GermanPopup }) => {
+  createCard: CreateCard
+}> = ({ createCard, useVertical, PopupComponent = GermanPopup }) => {
   const [book, setBook] = useState<Book>()
   const [page, setPage] = useState(5)
   const [tokens, setTokens] = useState<Tokens | undefined>()
   const [viewMode, setViewMode] = useState<ViewMode>('default')
+  const [cardData, setCardData] = useState<CardData | undefined>(undefined)
   const [cropPosition, setCropPosition] = useState<Position>({
     left: 0,
     right: 0,
@@ -315,14 +329,9 @@ const MangaReader: NextPage<{
     )
   }
 
-  const initCardCreationFlow: InitCardCreationFlow = (
-    sourceText,
-    targetText,
-    sourceLanguage,
-    targetLanguage,
-    initialCropArea,
-  ) => {
-    setCropPosition(initialCropArea)
+  const initCardCreationFlow: InitCardCreationFlow = params => {
+    setCardData(params)
+    setCropPosition(params.initialCropArea)
     setViewMode('crop')
   }
 
@@ -374,6 +383,58 @@ const MangaReader: NextPage<{
     })
   }
 
+  function exportCard() {
+    if (!imageRef.current || !cardData) {
+      return
+    }
+    const canvas = document.createElement('canvas')
+    canvas.width = cropPosition.right - cropPosition.left
+    canvas.height = cropPosition.bottom - cropPosition.top
+    const context = canvas.getContext('2d')
+
+    context?.drawImage(
+      imageRef.current,
+      cropPosition.left,
+      cropPosition.top,
+      canvas.width,
+      canvas.height,
+      0,
+      0,
+      canvas.width,
+      canvas.height,
+    )
+
+    console.log(tokens)
+    tokens?.list
+      .filter((token, i) => {
+        const isSelected = tokens.selectedIndices.has(i)
+        return isSelected
+      })
+      .map(token => {
+        const { vertices } = token.bounding_poly
+        const { top, left, height, width } = getPosition(vertices)
+        context!.fillStyle = 'rgba(34, 197, 94, 0.2)'
+        console.log(left, top, width, height)
+        context!.fillRect(
+          left - cropPosition.left,
+          top - cropPosition.top,
+          width,
+          height,
+        )
+      })
+
+    const prefix = 'data:image/jpeg;base64,'
+    const panel = canvas.toDataURL('image/jpeg').slice(prefix.length)
+
+    setViewMode('default')
+    selectIndex(undefined)
+    createCard({
+      token: cardData.sourceText,
+      image: panel,
+      meta: cardData.meta,
+    })
+  }
+
   return (
     <div ref={containerRef}>
       <TransformWrapper
@@ -411,51 +472,7 @@ const MangaReader: NextPage<{
               <a
                 href="#"
                 className="hover:bg-gray-200 px-4 py-2 items-center flex"
-                onClick={() => {
-                  if (!imageRef.current) {
-                    return
-                  }
-                  const canvas = document.createElement('canvas')
-                  canvas.width = cropPosition.right - cropPosition.left
-                  canvas.height = cropPosition.bottom - cropPosition.top
-                  const context = canvas.getContext('2d')
-
-                  context?.drawImage(
-                    imageRef.current,
-                    cropPosition.left,
-                    cropPosition.top,
-                    canvas.width,
-                    canvas.height,
-                    0,
-                    0,
-                    canvas.width,
-                    canvas.height,
-                  )
-
-                  console.log(tokens)
-                  tokens?.list
-                    .filter((token, i) => {
-                      const isSelected = tokens.selectedIndices.has(i)
-                      return isSelected
-                    })
-                    .map(token => {
-                      const { vertices } = token.bounding_poly
-                      const { top, left, height, width } = getPosition(vertices)
-                      context!.fillStyle = 'rgba(34, 197, 94, 0.2)'
-                      console.log(left, top, width, height)
-                      context!.fillRect(
-                        left - cropPosition.left,
-                        top - cropPosition.top,
-                        width,
-                        height,
-                      )
-                    })
-
-                  const panel = canvas.toDataURL('image/png')
-                  window.open(panel, '_blank')
-                  setViewMode('default')
-                  selectIndex(undefined)
-                }}
+                onClick={exportCard}
               >
                 Export
                 <ArrowRightEndOnRectangleIcon className="w-5 h-5 ml-2" />

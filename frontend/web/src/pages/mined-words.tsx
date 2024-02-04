@@ -16,7 +16,7 @@ const MinedWords: NextPage<{}> = () => {
   const [metaCache, setMetaCache] = useState({} as { [key: string]: string })
 
   const fetchCards = () =>
-    getPendingCards('zho').then(res => {
+    getPendingCards('deu').then(res => {
       setMetaCache({})
       setWords(res.cards)
     })
