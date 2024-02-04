@@ -55,6 +55,7 @@ interface PopupComponentProps {
     height: number
   }
   initCardCreationFlow: InitCardCreationFlow
+  close: () => void
 }
 
 type ViewMode = 'default' | 'crop'
@@ -112,10 +113,12 @@ function GermanPopupEditor({
   defaultToken,
   initCardCreationFlow,
   initialCropArea,
+  close,
 }: {
   defaultToken: string
   initCardCreationFlow: InitCardCreationFlow
   initialCropArea: Position
+  close: () => void
 }) {
   const [token, setToken] = useState(defaultToken)
   const debouncedToken = useDebounce(token, 500)
@@ -171,6 +174,14 @@ function GermanPopupEditor({
         </span>
         <ArrowRightEndOnRectangleIcon className="h-7 w-7" />
       </a>
+
+      <a
+        href="#"
+        onClick={close}
+        className="text-red-900 hover:bg-gray-100 border flex justify-center items-center px-4 py-2 mt-4"
+      >
+        <span>Close</span>
+      </a>
     </>
   )
 }
@@ -179,6 +190,7 @@ function GermanPopup({
   tokens,
   parentSize,
   initCardCreationFlow,
+  close,
 }: PopupComponentProps) {
   if (!tokens) {
     return null
@@ -246,6 +258,7 @@ function GermanPopup({
         defaultToken={selectedText}
         initCardCreationFlow={initCardCreationFlow}
         initialCropArea={selectedTextCropArea}
+        close={close}
       />
     </div>
   )
@@ -373,7 +386,7 @@ const MangaReader: NextPage<{
         }}
         pinch={{ step: 0.01 }}
         limitToBounds={false}
-        centerZoomedOut={true}
+        centerZoomedOut={false}
         zoomAnimation={{ disabled: true }}
         doubleClick={{ disabled: true }}
         panning={{
@@ -450,16 +463,7 @@ const MangaReader: NextPage<{
             </div>
           </>
         ) : null}
-        <TransformComponent
-          wrapperClass="!w-screen !h-screen bg-gray-200"
-          wrapperProps={{
-            onClick: () => {
-              if (viewMode === 'default') {
-                selectIndex(undefined)
-              }
-            },
-          }}
-        >
+        <TransformComponent wrapperClass="!w-screen !h-screen bg-gray-200">
           <PageFocusControl page={page} />
           <div className="relative">
             {viewMode === 'default' ? (
@@ -468,6 +472,7 @@ const MangaReader: NextPage<{
                   tokens={tokens}
                   parentSize={containerSize}
                   initCardCreationFlow={initCardCreationFlow}
+                  close={() => selectIndex(undefined)}
                 />
               </>
             ) : null}
