@@ -23,7 +23,7 @@ import {
   XMarkIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
-  CheckIcon,
+  ArrowRightEndOnRectangleIcon,
 } from '@heroicons/react/24/solid'
 
 type Position = {
@@ -69,7 +69,7 @@ function GermanPopupEditor({
     <>
       <input
         type="text"
-        className="w-full text-2xl border-0 border-b p-0 !ring-offset-0 !ring-0"
+        className="text-gray-500 w-full text-2xl border-0 border-b p-0 !ring-offset-0 !ring-0 mb-2"
         defaultValue={token}
         onChange={e => setToken(e.currentTarget.value.trim())}
       />
@@ -83,8 +83,18 @@ function GermanPopupEditor({
             initialCropArea,
           )
         }}
+        className="flex justify-between items-center"
       >
-        {translation.data ?? 'no data'}
+        <span className="text-2xl group">
+          {translation.isLoading ? 'Loading' : null}
+          {translation.isError
+            ? `Error loading translation: ${translation.error.message}`
+            : null}
+          {translation.data ? translation.data : null}
+        </span>
+        <a href="#" className="">
+          <ArrowRightEndOnRectangleIcon className="h-7 w-7" />
+        </a>
       </div>
     </>
   )
@@ -295,58 +305,72 @@ const MangaReader: NextPage<{
       >
         <Navigation book={book} page={page} setPage={setPageSafely} />
         {viewMode === 'crop' ? (
-          <a
-            href="#"
-            className="flex bg-white hover:bg-gray-200 rounded shadow-lg absolute top-5 right-5 z-50 px-4 py-2 items-center"
-            onClick={() => {
-              if (!imageRef.current) {
-                return
-              }
-              const canvas = document.createElement('canvas')
-              canvas.width = cropPosition.right - cropPosition.left
-              canvas.height = cropPosition.bottom - cropPosition.top
-              const context = canvas.getContext('2d')
+          <>
+            <div className="flex bg-white rounded shadow-lg absolute top-5 right-5 z-50 overflow-hidden divide-x">
+              <a
+                href="#"
+                onClick={() => {
+                  setViewMode('default')
+                }}
+                className="text-red-800 hover:bg-gray-200 px-4 py-2 items-center flex"
+              >
+                Cancel
+                <XMarkIcon className="w-5 h-5 ml-2" />
+              </a>
+              <a
+                href="#"
+                className="hover:bg-gray-200 px-4 py-2 items-center flex"
+                onClick={() => {
+                  if (!imageRef.current) {
+                    return
+                  }
+                  const canvas = document.createElement('canvas')
+                  canvas.width = cropPosition.right - cropPosition.left
+                  canvas.height = cropPosition.bottom - cropPosition.top
+                  const context = canvas.getContext('2d')
 
-              context?.drawImage(
-                imageRef.current,
-                cropPosition.left,
-                cropPosition.top,
-                canvas.width,
-                canvas.height,
-                0,
-                0,
-                canvas.width,
-                canvas.height,
-              )
-
-              console.log(tokens)
-              tokens?.list
-                .filter((token, i) => {
-                  const isSelected = tokens.selectedIndices.has(i)
-                  return isSelected
-                })
-                .map(token => {
-                  const { vertices } = token.bounding_poly
-                  const { top, left, height, width } = getPosition(vertices)
-                  context!.fillStyle = 'rgba(34, 197, 94, 0.2)'
-                  console.log(left, top, width, height)
-                  context!.fillRect(
-                    left - cropPosition.left,
-                    top - cropPosition.top,
-                    width,
-                    height,
+                  context?.drawImage(
+                    imageRef.current,
+                    cropPosition.left,
+                    cropPosition.top,
+                    canvas.width,
+                    canvas.height,
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height,
                   )
-                })
 
-              const panel = canvas.toDataURL('image/png')
-              window.open(panel, '_blank')
-              setViewMode('default')
-              selectIndex(undefined)
-            }}
-          >
-            Crop panel
-            <CheckIcon className="w-5 h-5 text-green-700 ml-2" />
-          </a>
+                  console.log(tokens)
+                  tokens?.list
+                    .filter((token, i) => {
+                      const isSelected = tokens.selectedIndices.has(i)
+                      return isSelected
+                    })
+                    .map(token => {
+                      const { vertices } = token.bounding_poly
+                      const { top, left, height, width } = getPosition(vertices)
+                      context!.fillStyle = 'rgba(34, 197, 94, 0.2)'
+                      console.log(left, top, width, height)
+                      context!.fillRect(
+                        left - cropPosition.left,
+                        top - cropPosition.top,
+                        width,
+                        height,
+                      )
+                    })
+
+                  const panel = canvas.toDataURL('image/png')
+                  window.open(panel, '_blank')
+                  setViewMode('default')
+                  selectIndex(undefined)
+                }}
+              >
+                Export
+                <ArrowRightEndOnRectangleIcon className="w-5 h-5 ml-2" />
+              </a>
+            </div>
+          </>
         ) : null}
         <TransformComponent
           wrapperClass="!w-screen !h-screen bg-gray-200"
