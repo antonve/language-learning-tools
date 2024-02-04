@@ -1,5 +1,12 @@
 import type { NextPage } from 'next'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import BookImporter from '@app/mangareader/BookImporter'
 import {
   Book,
@@ -52,6 +59,49 @@ interface PopupComponentProps {
 
 type ViewMode = 'default' | 'crop'
 
+export const usePersistedTargetLanguage = (
+  sourceLanguageCode: string,
+  defaultLanguageCode: string,
+) => {
+  const [targetLanguage, setTargetLanguage] = useState(defaultLanguageCode)
+
+  const key = `target_language_${sourceLanguageCode}`
+  const persist = (newTargetLanguage: string) => {
+    localStorage.setItem(key, newTargetLanguage)
+    setTargetLanguage(newTargetLanguage)
+  }
+
+  useEffect(() => {
+    const persistedTargetLanguage = localStorage.getItem(key)
+    if (persistedTargetLanguage !== null) {
+      setTargetLanguage(persistedTargetLanguage)
+    }
+  }, [])
+
+  return [targetLanguage, persist] as [string, Dispatch<SetStateAction<string>>]
+}
+
+interface Language {
+  code: string
+  description: string
+}
+
+function LanguageSelect({
+  availableLanguages,
+}: {
+  availableLanguages: Language[]
+  targetLanguage: string
+  setTargetLanguage: (lang: string) => void
+}) {
+  return (
+    <select className="border-none bg-gray-100 h-10">
+      {availableLanguages.map(lang => (
+        <option value={lang.code}>{lang.description}</option>
+      ))}
+    </select>
+  )
+}
+
 function GermanPopupEditor({
   defaultToken,
   initCardCreationFlow,
@@ -64,16 +114,31 @@ function GermanPopupEditor({
   const [token, setToken] = useState(defaultToken)
   const debouncedToken = useDebounce(token, 500)
   const translation = useTranslation(debouncedToken, 'deu', 'eng', 500)
+  const [targetLanguage, setTargetLanguage] = usePersistedTargetLanguage(
+    'deu',
+    'eng',
+  )
 
   return (
     <>
-      <input
-        type="text"
-        className="text-gray-500 w-full text-2xl border-0 border-b p-0 !ring-offset-0 !ring-0 mb-2"
-        defaultValue={token}
-        onChange={e => setToken(e.currentTarget.value.trim())}
-      />
-      <div
+      <div className="flex justify-between items-center space-x-2">
+        <input
+          type="text"
+          className="bg-gray-100 w-full text-2xl border-0 h-10 !ring-offset-0 !ring-0w"
+          defaultValue={token}
+          onChange={e => setToken(e.currentTarget.value.trim())}
+        />
+        <LanguageSelect
+          targetLanguage={targetLanguage}
+          setTargetLanguage={setTargetLanguage}
+          availableLanguages={[
+            { code: 'eng', description: 'EN' },
+            { code: 'nld', description: 'NL' },
+          ]}
+        />
+      </div>
+      <a
+        href="#"
         onClick={() => {
           initCardCreationFlow(
             token,
@@ -83,7 +148,7 @@ function GermanPopupEditor({
             initialCropArea,
           )
         }}
-        className="flex justify-between items-center"
+        className="flex justify-between items-center p-2 mt-2 hover:bg-gray-100"
       >
         <span className="text-2xl group">
           {translation.isLoading ? 'Loading' : null}
@@ -92,10 +157,8 @@ function GermanPopupEditor({
             : null}
           {translation.data ? translation.data : null}
         </span>
-        <a href="#" className="">
-          <ArrowRightEndOnRectangleIcon className="h-7 w-7" />
-        </a>
-      </div>
+        <ArrowRightEndOnRectangleIcon className="h-7 w-7" />
+      </a>
     </>
   )
 }
@@ -158,7 +221,7 @@ function GermanPopup({
   return (
     <div
       className={classNames(
-        'bg-white border-2 border-black absolute z-20 px-2 pb-2 text-xl shadow-md rounded',
+        'bg-white border-2 border-black absolute z-20 p-2 text-xl shadow-md rounded min-w-[300px]',
         {},
       )}
       style={{ left: `${position.left + 5}px`, top: `${position.top + 5}px` }}
@@ -301,7 +364,10 @@ const MangaReader: NextPage<{
         centerZoomedOut={true}
         zoomAnimation={{ disabled: true }}
         doubleClick={{ disabled: true }}
-        panning={{ excluded: ['input'], disabled: viewMode === 'crop' }}
+        panning={{
+          excluded: ['input', 'select'],
+          disabled: viewMode === 'crop',
+        }}
       >
         <Navigation book={book} page={page} setPage={setPageSafely} />
         {viewMode === 'crop' ? (
