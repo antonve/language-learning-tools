@@ -65,7 +65,13 @@ const MangaReader: NextPage<{
   useVertical: boolean
   PopupEditor: React.FC<PopupEditorProps>
   createCard: CreateCard
-}> = ({ createCard, useVertical, PopupEditor }) => {
+  sentenceJoinCharacter?: string
+}> = ({
+  createCard,
+  useVertical,
+  PopupEditor,
+  sentenceJoinCharacter = ' ',
+}) => {
   const [book, setBook] = useState<Book>()
   const [page, setPage] = useState(5)
   const [tokens, setTokens] = useState<Tokens | undefined>()
@@ -169,6 +175,34 @@ const MangaReader: NextPage<{
     })
   }
 
+  function sentenceFromCropPosition() {
+    if (!cropPosition || !tokens) {
+      return undefined
+    }
+
+    const tokensWithinCropPosition = tokens.list.filter(token => {
+      const { left, right, top, bottom } = getPosition(
+        token.bounding_poly.vertices,
+      )
+
+      return (
+        left >= cropPosition.left &&
+        right <= cropPosition.right &&
+        top >= cropPosition.top &&
+        bottom <= cropPosition.bottom
+      )
+    })
+
+    return tokensWithinCropPosition
+      .map(it => it.description)
+      .join(sentenceJoinCharacter)
+      .toLocaleLowerCase()
+      .replaceAll(' ,', ',')
+      .replaceAll(' .', '.')
+      .replaceAll(' !', '!')
+      .replaceAll(' ?', '?')
+  }
+
   function exportCard() {
     if (!imageRef.current || !cardData) {
       return
@@ -217,9 +251,14 @@ const MangaReader: NextPage<{
     createCard({
       token: cardData.sourceText,
       image: panel,
-      meta: cardData.meta,
+      meta: {
+        sentence: sentenceFromCropPosition(),
+        ...cardData.meta,
+      },
     })
   }
+
+  const hasSelectedTokens = tokens && tokens.selectedIndices.size > 0
 
   return (
     <div ref={containerRef}>
@@ -266,7 +305,7 @@ const MangaReader: NextPage<{
             </div>
           </>
         ) : null}
-        {viewMode === 'default' ? (
+        {viewMode === 'default' && !hasSelectedTokens ? (
           <>
             <div
               className="bg-black/5 hover:bg-black/30 absolute z-10 top-0 bottom-0 left-0 w-20 cursor-pointer flex items-center justify-center text-white"

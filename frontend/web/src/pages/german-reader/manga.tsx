@@ -54,7 +54,6 @@ function GermanPopupEditor({
           initCardCreationFlow({
             sourceText: token,
             meta: {
-              sentence: '',
               meaning: translation.data,
             },
             sourceLanguage: 'deu',
