@@ -7,9 +7,7 @@ import {
   arrayBufferToBase64,
   fetchDetectTexts,
   getPosition,
-  useTranslation,
 } from '@app/mangareader/domain'
-import { useDebounce } from '@uidotdev/usehooks'
 import Layout from '@app/Layout'
 import { useKeyPress, useWindowSize } from '@app/mangareader/hooks'
 import classNames from 'classnames'
@@ -26,7 +24,6 @@ import {
   ArrowPathIcon,
 } from '@heroicons/react/24/solid'
 import { TokenOverlays } from './Overlays'
-import { usePersistedTargetLanguage, LanguageSelect } from './LanguageSelect'
 import { Navigation } from './Navigation'
 import { Cropper } from './Cropper'
 
@@ -55,7 +52,22 @@ interface CardData {
   meta: object
 }
 
-interface PopupComponentProps {
+export interface PopupEditorComponentProps {
+  defaultToken: string
+  initCardCreationFlow: InitCardCreationFlow
+  initialCropArea: Position
+  close: () => void
+}
+
+type ViewMode = 'default' | 'crop'
+
+function PopupComponent({
+  tokens,
+  parentSize,
+  initCardCreationFlow,
+  close,
+  PopupEditorComponent,
+}: {
   tokens: Tokens | undefined
   parentSize: {
     width: number
@@ -63,95 +75,8 @@ interface PopupComponentProps {
   }
   initCardCreationFlow: InitCardCreationFlow
   close: () => void
-}
-
-type ViewMode = 'default' | 'crop'
-
-function GermanPopupEditor({
-  defaultToken,
-  initCardCreationFlow,
-  initialCropArea,
-  close,
-}: {
-  defaultToken: string
-  initCardCreationFlow: InitCardCreationFlow
-  initialCropArea: Position
-  close: () => void
+  PopupEditorComponent: React.FC<PopupEditorComponentProps>
 }) {
-  const [token, setToken] = useState(defaultToken)
-  const debouncedToken = useDebounce(token, 500)
-  const sourceLanguageCode = 'deu'
-  const [targetLanguage, setTargetLanguage] = usePersistedTargetLanguage(
-    sourceLanguageCode,
-    'eng',
-  )
-  const translation = useTranslation(
-    debouncedToken,
-    sourceLanguageCode,
-    targetLanguage,
-    500,
-  )
-
-  return (
-    <>
-      <div className="flex justify-between items-center space-x-2">
-        <input
-          type="text"
-          className="bg-gray-100 w-full text-2xl border-0 h-10 !ring-offset-0 !ring-0w"
-          defaultValue={token}
-          onChange={e => setToken(e.currentTarget.value.trim())}
-        />
-        <LanguageSelect
-          targetLanguage={targetLanguage}
-          setTargetLanguage={setTargetLanguage}
-          availableLanguages={[
-            { code: 'eng', description: 'EN' },
-            { code: 'nld', description: 'NL' },
-          ]}
-        />
-      </div>
-      <a
-        href="#"
-        onClick={() => {
-          initCardCreationFlow({
-            sourceText: token,
-            meta: {
-              sentence: '',
-              meaning: translation.data,
-            },
-            sourceLanguage: 'deu',
-            initialCropArea,
-          })
-        }}
-        className="flex justify-between items-center p-2 mt-2 hover:bg-gray-100"
-      >
-        <span className="text-2xl group">
-          {translation.isLoading ? 'Loading' : null}
-          {translation.isError
-            ? `Error loading translation: ${translation.error.message}`
-            : null}
-          {translation.data ? translation.data : null}
-        </span>
-        <ArrowRightEndOnRectangleIcon className="h-7 w-7" />
-      </a>
-
-      <a
-        href="#"
-        onClick={close}
-        className="text-red-900 hover:bg-gray-100 border flex justify-center items-center px-4 py-2 mt-4"
-      >
-        <span>Close</span>
-      </a>
-    </>
-  )
-}
-
-function GermanPopup({
-  tokens,
-  parentSize,
-  initCardCreationFlow,
-  close,
-}: PopupComponentProps) {
   if (!tokens) {
     return null
   }
@@ -205,7 +130,7 @@ function GermanPopup({
   return (
     <div
       className={classNames(
-        'bg-white border-2 border-black absolute z-20 p-2 text-xl shadow-md rounded min-w-[300px]',
+        'bg-white border-2 border-black absolute z-50 p-2 text-xl shadow-md rounded min-w-[300px]',
         {},
       )}
       style={{ left: `${position.left + 5}px`, top: `${position.top + 5}px` }}
@@ -214,7 +139,7 @@ function GermanPopup({
         e.stopPropagation()
       }}
     >
-      <GermanPopupEditor
+      <PopupEditorComponent
         defaultToken={selectedText}
         initCardCreationFlow={initCardCreationFlow}
         initialCropArea={selectedTextCropArea}
@@ -226,9 +151,9 @@ function GermanPopup({
 
 const MangaReader: NextPage<{
   useVertical: boolean
-  PopupComponent: React.FC<PopupComponentProps>
+  PopupEditorComponent: React.FC<PopupEditorComponentProps>
   createCard: CreateCard
-}> = ({ createCard, useVertical, PopupComponent = GermanPopup }) => {
+}> = ({ createCard, useVertical, PopupEditorComponent }) => {
   const [book, setBook] = useState<Book>()
   const [page, setPage] = useState(5)
   const [tokens, setTokens] = useState<Tokens | undefined>()
@@ -470,6 +395,7 @@ const MangaReader: NextPage<{
                   parentSize={containerSize}
                   initCardCreationFlow={initCardCreationFlow}
                   close={() => selectIndex(undefined)}
+                  PopupEditorComponent={PopupEditorComponent}
                 />
               </>
             ) : null}
