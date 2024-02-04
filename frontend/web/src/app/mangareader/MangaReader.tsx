@@ -73,7 +73,7 @@ const MangaReader: NextPage<{
   sentenceJoinCharacter = ' ',
 }) => {
   const [book, setBook] = useState<Book>()
-  const [page, setPage] = useState(5)
+  const [page, setPage] = useState(0)
   const [tokens, setTokens] = useState<Tokens | undefined>()
   const [viewMode, setViewMode] = useState<ViewMode>('default')
   const [cardData, setCardData] = useState<CardData | undefined>(undefined)
