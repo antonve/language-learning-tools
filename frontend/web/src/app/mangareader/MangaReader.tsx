@@ -483,6 +483,22 @@ const MangaReader: NextPage<{
             </div>
           </>
         ) : null}
+        {viewMode === 'default' ? (
+          <>
+            <div
+              className="bg-black/5 hover:bg-black/30 absolute z-10 top-0 bottom-0 left-0 w-20 cursor-pointer flex items-center justify-center text-white"
+              onClick={onNextPage}
+            >
+              <ChevronLeftIcon className="w-10 h-10" />
+            </div>
+            <div
+              className="bg-black/5 hover:bg-black/30 absolute z-10 top-0 bottom-0 right-0 w-20 cursor-pointer flex items-center justify-center text-white"
+              onClick={onPrevPage}
+            >
+              <ChevronRightIcon className="w-10 h-10" />
+            </div>
+          </>
+        ) : null}
         {viewMode === 'default' && !tokens ? (
           <>
             <div className="flex bg-white rounded shadow-lg absolute top-5 right-5 z-50 overflow-hidden divide-x">
