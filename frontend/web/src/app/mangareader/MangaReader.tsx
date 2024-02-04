@@ -88,13 +88,19 @@ interface Language {
 
 function LanguageSelect({
   availableLanguages,
+  targetLanguage,
+  setTargetLanguage,
 }: {
   availableLanguages: Language[]
   targetLanguage: string
   setTargetLanguage: (lang: string) => void
 }) {
   return (
-    <select className="border-none bg-gray-100 h-10">
+    <select
+      className="border-none bg-gray-100 h-10"
+      value={targetLanguage}
+      onChange={e => setTargetLanguage(e.currentTarget.value)}
+    >
       {availableLanguages.map(lang => (
         <option value={lang.code}>{lang.description}</option>
       ))}
@@ -113,10 +119,16 @@ function GermanPopupEditor({
 }) {
   const [token, setToken] = useState(defaultToken)
   const debouncedToken = useDebounce(token, 500)
-  const translation = useTranslation(debouncedToken, 'deu', 'eng', 500)
+  const sourceLanguageCode = 'deu'
   const [targetLanguage, setTargetLanguage] = usePersistedTargetLanguage(
-    'deu',
+    sourceLanguageCode,
     'eng',
+  )
+  const translation = useTranslation(
+    debouncedToken,
+    sourceLanguageCode,
+    targetLanguage,
+    500,
   )
 
   return (
