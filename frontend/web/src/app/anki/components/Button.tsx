@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, ReactNode } from 'react'
 import classNames from 'classnames'
 
 interface Props {
@@ -7,6 +7,7 @@ interface Props {
   disabled?: boolean
   type?: 'button' | 'submit' | 'reset'
   overrides?: string
+  children?: ReactNode
 }
 
 const Button: FC<Props> = ({
@@ -41,6 +42,7 @@ export const ButtonLink: FC<{
   href: string
   primary?: boolean
   overrides?: string
+  children?: ReactNode
 }> = ({ children, href, primary, overrides }) => (
   <a
     className={classNames(

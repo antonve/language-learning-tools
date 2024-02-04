@@ -1,10 +1,11 @@
-import React, { FC } from 'react'
+import React, { FC, ReactNode } from 'react'
 import classNames from 'classnames'
 
 interface Props {
   title?: string
   isOpen: boolean
   closeModal: () => void
+  children?: ReactNode
 }
 
 const Modal: FC<Props> = ({ children, isOpen, closeModal, title }) =>

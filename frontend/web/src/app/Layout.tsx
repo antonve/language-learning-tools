@@ -6,7 +6,7 @@ interface Props {
   bodyClassName?: string
   headerClassName?: string
   darkMode?: boolean
-  children: React.ReactElement
+  children: ReactNode
 }
 
 const Layout: FC<Props> = ({
@@ -58,7 +58,7 @@ const NavLink = ({
 )
 
 export const PageTitle = ({ children }: { children?: ReactNode }) => (
-  <h1 className="text-gray-900 text-base no-underline hover:no-underline font-extrabold text-xl dark:text-gray-100 capitalize">
+  <h1 className="text-gray-900 no-underline hover:no-underline font-extrabold text-xl dark:text-gray-100 capitalize">
     {children}
   </h1>
 )

@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, ReactNode } from 'react'
 
 export const RadioButton: FC<{
   value: boolean
@@ -52,6 +52,7 @@ export const TextInput: FC<{
 
 export const Label: FC<{
   htmlFor: string | undefined
+  children?: ReactNode
 }> = ({ htmlFor, children }) => (
   <label htmlFor={htmlFor} className={'text-gray-700'}>
     {children}
