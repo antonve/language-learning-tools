@@ -31,6 +31,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ArrowRightEndOnRectangleIcon,
+  HomeIcon,
 } from '@heroicons/react/24/solid'
 
 type Position = {
@@ -755,10 +756,13 @@ function Navigation({
               max={book.pages.length}
               onChange={e => setPageValue(e.currentTarget.valueAsNumber - 1)}
               onBlur={e => setPage(e.currentTarget.valueAsNumber - 1)}
-              className="text-right w-14 border-none focus:outline-none focus:ring-0 focus:bg-gray-100 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="h-9 text-right w-14 border-none focus:outline-none focus:ring-0 focus:bg-gray-100 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />{' '}
             / {book.pages.length}
           </div>
+          <a href="/" className="hover:bg-gray-100 flex items-center p-2 h-9 ">
+            <HomeIcon className="h-4 w-4" />
+          </a>
         </>
       ) : null}
     </div>
