@@ -68,13 +68,9 @@ const SentenceListItem = ({
     >
       <Link
         href={`/${sentence.language}/chapter/${sentence.series}/${sentence.filename}`}
+        className="absolute bottom-0 right-0 uppercase text-white bg-black bg-opacity-text px-3 py-1 rounded-br text-xs hover:bg-purple-500"
       >
-        <a
-          href="#"
-          className="absolute bottom-0 right-0 uppercase text-white bg-black bg-opacity-text px-3 py-1 rounded-br text-xs hover:bg-purple-500"
-        >
-          Preview
-        </a>
+        Preview
       </Link>
       <a href="#" onClick={() => onSelect(sentence)}>
         <span className={'block px-4 py-3'}>
