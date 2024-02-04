@@ -43,7 +43,9 @@ export function LanguageSelect({
       onChange={e => setTargetLanguage(e.currentTarget.value)}
     >
       {availableLanguages.map(lang => (
-        <option value={lang.code}>{lang.description}</option>
+        <option key={lang.code} value={lang.code}>
+          {lang.description}
+        </option>
       ))}
     </select>
   )
