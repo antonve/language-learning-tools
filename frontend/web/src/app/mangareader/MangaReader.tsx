@@ -32,6 +32,7 @@ import {
   ChevronRightIcon,
   ArrowRightEndOnRectangleIcon,
   HomeIcon,
+  ArrowPathIcon,
 } from '@heroicons/react/24/solid'
 
 type Position = {
@@ -317,7 +318,8 @@ const MangaReader: NextPage<{
     }
 
     const list = await fetchDetectTexts(book.pages[page])
-    setTokens({ selectedIndices: new Map(), list: list.slice(1) })
+    const selectedIndices = new Map()
+    setTokens({ selectedIndices, list: list.slice(1) })
   }
 
   if (!book) {
@@ -477,6 +479,21 @@ const MangaReader: NextPage<{
               >
                 Export
                 <ArrowRightEndOnRectangleIcon className="w-5 h-5 ml-2" />
+              </a>
+            </div>
+          </>
+        ) : null}
+        {viewMode === 'default' && !tokens ? (
+          <>
+            <div className="flex bg-white rounded shadow-lg absolute top-5 right-5 z-50 overflow-hidden divide-x">
+              <a
+                href="#"
+                onClick={() => {
+                  loadOCR()
+                }}
+                className="bg-emerald-400 hover:bg-emerald-600 p-2 items-center flex"
+              >
+                <ArrowPathIcon className="w-5 h-5 text-white" />
               </a>
             </div>
           </>
