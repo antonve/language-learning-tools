@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
 
-import Layout from '@app/Layout'
-import { useChapter } from '@app/anki/hooks'
+import Layout from 'src/lib/Layout'
+import { useChapter } from 'src/lib/anki/hooks'
 import { useRouter } from 'next/dist/client/router'
 
 const Chapter: NextPage = () => {

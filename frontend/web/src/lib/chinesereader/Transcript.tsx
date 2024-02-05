@@ -1,11 +1,11 @@
 import {
   TextAnalyseResponse,
   TextAnalyseToken,
-} from '@app/chinesereader/domain'
-import SentenceView from '@app/chinesereader/SentenceView'
+} from 'src/lib/chinesereader/domain'
+import SentenceView from 'src/lib/chinesereader/SentenceView'
 import { Dispatch, SetStateAction } from 'react'
-import { FocusWordWithSentence } from '@app/chinesereader/domain'
-import { CedictResult } from '@app/anki/components/zh/api'
+import { FocusWordWithSentence } from 'src/lib/chinesereader/domain'
+import { CedictResult } from 'src/lib/anki/components/zh/api'
 
 interface Props {
   analyse: TextAnalyseResponse | undefined

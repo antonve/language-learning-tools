@@ -1,15 +1,15 @@
 import type { NextPage } from 'next'
 import { useEffect, useState } from 'react'
-import Layout from '@app/Layout'
+import Layout from 'src/lib/Layout'
 import {
   getPendingCardImageUrl,
   getPendingCards,
   markCardAsExported,
   PendingCardsResponse,
   updatePendingCard,
-} from '@app/anki/api'
-import { TextArea } from '@app/anki/components/Form'
-import Button from '@app/anki/components/Button'
+} from 'src/lib/anki/api'
+import { TextArea } from 'src/lib/anki/components/Form'
+import Button from 'src/lib/anki/components/Button'
 
 const MinedWords: NextPage<{}> = () => {
   const [words, setWords] = useState<PendingCardsResponse['cards']>([])

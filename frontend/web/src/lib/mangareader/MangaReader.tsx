@@ -1,15 +1,15 @@
 import type { NextPage } from 'next'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import BookImporter from '@app/mangareader/BookImporter'
+import BookImporter from 'src/lib/mangareader/BookImporter'
 import {
   Book,
   Tokens,
   arrayBufferToBase64,
   fetchDetectTexts,
   getPosition,
-} from '@app/mangareader/domain'
-import Layout from '@app/Layout'
-import { useKeyPress, useWindowSize } from '@app/mangareader/hooks'
+} from 'src/lib/mangareader/domain'
+import Layout from 'src/lib/Layout'
+import { useKeyPress, useWindowSize } from 'src/lib/mangareader/hooks'
 import {
   TransformWrapper,
   TransformComponent,
@@ -22,10 +22,10 @@ import {
   ArrowRightEndOnRectangleIcon,
   ArrowPathIcon,
 } from '@heroicons/react/24/solid'
-import { TokenOverlays } from '@app/mangareader/Overlays'
-import { Navigation } from '@app/mangareader/Navigation'
-import { Cropper } from '@app/mangareader/Cropper'
-import { Popup } from '@app/mangareader/Popup'
+import { TokenOverlays } from 'src/lib/mangareader/Overlays'
+import { Navigation } from 'src/lib/mangareader/Navigation'
+import { Cropper } from 'src/lib/mangareader/Cropper'
+import { Popup } from 'src/lib/mangareader/Popup'
 
 export type Position = {
   left: number

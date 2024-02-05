@@ -20,7 +20,7 @@
     "baseUrl": ".",
     "paths": {
       "@app/*": [
-        "./src/app/*"
+        "src/lib/*"
       ],
       "@pages/*": [
         "./src/pages/*"

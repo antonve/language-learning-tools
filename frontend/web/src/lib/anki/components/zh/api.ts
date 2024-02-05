@@ -1,4 +1,4 @@
-import { root } from '@app/anki/api'
+import { root } from 'src/lib/anki/api'
 
 export interface CedictResult {
   source: string

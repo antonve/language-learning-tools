@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import Button from '@app/anki/components/Button'
-import Modal from '@app/anki/components/Modal'
-import { TextArea, Label } from '@app/anki/components/Form'
-import { Language } from '@app/anki/domain'
+import Button from 'src/lib/anki/components/Button'
+import Modal from 'src/lib/anki/components/Modal'
+import { TextArea, Label } from 'src/lib/anki/components/Form'
+import { Language } from 'src/lib/anki/domain'
 
 interface Props {
   addWords: (words: string[]) => void

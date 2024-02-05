@@ -1,4 +1,4 @@
-import { Language } from '@app/anki/domain'
+import { Language } from 'src/lib/anki/domain'
 import Link from 'next/link'
 
 interface Props {

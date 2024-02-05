@@ -6,15 +6,15 @@ import {
   TextAnalyseResponse,
   TextAnalyseToken,
   updateLastPositionText,
-} from '@app/chinesereader/domain'
+} from 'src/lib/chinesereader/domain'
 import { useEffect, useState } from 'react'
-import Button from '@app/anki/components/Button'
+import Button from 'src/lib/anki/components/Button'
 import SentenceView from './SentenceView'
-import { useKeyPress } from '@app/chinesereader/hooks'
+import { useKeyPress } from 'src/lib/chinesereader/hooks'
 import {
   CedictResultCollection,
   getCedictDefinitions,
-} from '@app/anki/components/zh/api'
+} from 'src/lib/anki/components/zh/api'
 import FocusWordPanel from './FocusWordPanel'
 
 interface Props {

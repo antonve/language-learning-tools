@@ -1,6 +1,6 @@
 import { unzipSync } from 'fflate'
 import getConfig from 'next/config'
-import { CedictResultEntry } from '@app/anki/components/zh/api'
+import { CedictResultEntry } from 'src/lib/anki/components/zh/api'
 
 const { publicRuntimeConfig } = getConfig()
 

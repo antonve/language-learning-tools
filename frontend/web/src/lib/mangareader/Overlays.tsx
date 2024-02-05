@@ -1,4 +1,4 @@
-import { Tokens, getPosition } from '@app/mangareader/domain'
+import { Tokens, getPosition } from 'src/lib/mangareader/domain'
 import classNames from 'classnames'
 
 export function TokenOverlays({

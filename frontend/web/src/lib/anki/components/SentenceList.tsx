@@ -7,7 +7,7 @@ import {
   Sentence,
   compareSentences,
   sourceForSentence,
-} from '@app/anki/domain'
+} from 'src/lib/anki/domain'
 import { Fragment } from 'react'
 
 const SentenceList = ({

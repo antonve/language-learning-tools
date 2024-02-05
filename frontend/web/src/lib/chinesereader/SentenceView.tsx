@@ -1,5 +1,8 @@
-import { CedictResult, getCedictDefinitions } from '@app/anki/components/zh/api'
-import { TextAnalyseLine, TextAnalyseToken } from '@app/chinesereader/domain'
+import {
+  CedictResult,
+  getCedictDefinitions,
+} from 'src/lib/anki/components/zh/api'
+import { TextAnalyseLine, TextAnalyseToken } from 'src/lib/chinesereader/domain'
 import { useEffect } from 'react'
 import { useTextSelection } from './hooks'
 

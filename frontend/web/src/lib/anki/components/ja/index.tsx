@@ -4,30 +4,54 @@ import {
   sentenceWithFocusWord,
   sourceForSentence,
   Word,
-} from '@app/anki/domain'
+} from 'src/lib/anki/domain'
 import { useEffect, useState } from 'react'
-import { getCedictDefinition, getZdicDefinition } from './api'
+import { getGooDefinition, getJishoDefinition } from './api'
 
 export const dictionaries: { name: string; url: (word: string) => string }[] = [
   {
-    name: 'MDBG',
+    name: 'ALC',
+    url: word => `http://eow.alc.co.jp/search?q=${encodeURI(word)}`,
+  },
+  {
+    name: 'Jisho',
+    url: word => `https://jisho.org/search/${encodeURI(word)}`,
+  },
+  {
+    name: 'Goo',
+    url: word => `http://dictionary.goo.ne.jp/srch/all/${encodeURI(word)}/m0u/`,
+  },
+  {
+    name: 'Google',
+    url: word => `https://www.google.com/search?q=${encodeURI(word)}`,
+  },
+  {
+    name: 'Kotobank',
+    url: word => `https://kotobank.jp/gs/?q=${encodeURI(word)}`,
+  },
+  {
+    name: 'Weblio',
+    url: word => `https://www.weblio.jp/content/${encodeURI(word)}`,
+  },
+  {
+    name: 'Syosetu',
     url: word =>
-      `https://www.mdbg.net/chinese/dictionary?page=worddict&wdrst=1&wdqb=${encodeURI(
+      `https://www.google.com/search?q=site%3Ancode.syosetu.com%2F+%22${encodeURI(
         word,
-      )}`,
+      )}%22`,
+  },
+  {
+    name: 'Idioms',
+    url: word => `https://idiom-encyclopedia.com/?s=${encodeURI(word)}`,
+  },
+  {
+    name: 'Rei',
+    url: word => `http://yourei.jp/${encodeURI(word)}`,
   },
 ]
 
 interface EnglishDefinitionResult {
   word: string
-  pinyin: {
-    raw?: string
-    pretty?: string
-  }
-  hanzi: {
-    simplified?: string
-    traditional?: string
-  }
   definition: string | undefined
   finished: boolean
 }
@@ -45,31 +69,18 @@ export const useEnglishDefinition = (word: string | undefined) => {
 
     setDefinition({
       word,
-      pinyin: {},
-      hanzi: {},
       definition: undefined,
       finished: false,
     })
 
     const update = async () => {
-      const req = await getCedictDefinition(word)
-      const defs = req.results.flatMap(r =>
-        r.meanings.map(m => ({
-          meaning: m,
-        })),
-      )
-      const def = formatDefinitions(defs)
+      const req = await getJishoDefinition(word).catch(() => ({
+        definitions: [],
+      }))
+      const def = formatDefinitions(req.definitions)
 
       setDefinition({
         word,
-        pinyin: {
-          raw: req.results.map(r => r.pinyin).join(', '),
-          pretty: req.results.map(r => r.pinyin_tones).join(', '),
-        },
-        hanzi: {
-          simplified: req.results.map(r => r.hanzi_simplified).join(', '),
-          traditional: req.results.map(r => r.hanzi_traditional).join(', '),
-        },
         definition: def,
         finished: true,
       })
@@ -83,18 +94,16 @@ export const useEnglishDefinition = (word: string | undefined) => {
   }
 }
 
-interface ChineseDefinitionResult {
+interface JapaneseDefinitionResult {
   word: string
-  pinyin?: string
-  zhuyin?: string
-  audioUrl?: string
   definition: string | undefined
+  reading: string | undefined
   finished: boolean
 }
 
-export const useChineseDefinition = (word: string | undefined) => {
+export const useJapaneseDefinition = (word: string | undefined) => {
   const [definition, setDefinition] = useState(
-    undefined as ChineseDefinitionResult | undefined,
+    undefined as JapaneseDefinitionResult | undefined,
   )
 
   useEffect(() => {
@@ -106,18 +115,20 @@ export const useChineseDefinition = (word: string | undefined) => {
     setDefinition({
       word,
       definition: undefined,
+      reading: undefined,
       finished: false,
     })
 
     const update = async () => {
-      const req = await getZdicDefinition(word)
+      const req = await getGooDefinition(word).catch(() => ({
+        definition: undefined,
+        reading: undefined,
+      }))
 
       setDefinition({
         word,
-        pinyin: req.pinyin,
-        zhuyin: req.zhuyin,
-        audioUrl: req.audio_url,
         definition: req.definition,
+        reading: req.reading,
         finished: true,
       })
     }
@@ -130,21 +141,20 @@ export const useChineseDefinition = (word: string | undefined) => {
   }
 }
 
-const deckName = '2. Chinese::Mined'
+const deckName = '3. Japanese::3. Vocab'
 export const exportRequestForWord = (word: Word) => ({
   action: 'addNote',
   version: 6,
   params: {
     note: {
       deckName,
-      modelName: 'chinese native with focus word',
+      modelName: 'ankiminer_jp',
       fields: {
         Expression: sentenceWithFocusWord(word),
         Focus: word.value,
-        Pinyin: word.meta.reading,
-        Zhuyin: word.meta.zhuyin,
+        Reading: word.meta.reading,
         EnglishDefinition: nl2br(word.meta.definitionEnglish),
-        ChineseDefinition: nl2br(word.meta.definitionTargetLanguage),
+        JapaneseDefinition: nl2br(word.meta.definitionTargetLanguage),
         VocabOnlyCard: word.meta.vocabCard ? '1' : '',
         Source: sourceForSentence(word.meta.sentence),
       },
@@ -159,16 +169,11 @@ export const exportRequestForWord = (word: Word) => ({
       },
       tags: [
         'ankiminer',
-        'chinese',
+        'japanese',
         'mined',
         'native',
         word.meta.sentence?.series,
       ].filter(t => t !== undefined),
-      audio: {
-        filename: `chinese_word_${word.value}.mp3`,
-        url: word.meta.audioUrl,
-        fields: ['Audio'],
-      },
     },
   },
 })

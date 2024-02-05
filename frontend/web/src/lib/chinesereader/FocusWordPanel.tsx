@@ -3,12 +3,12 @@ import {
   getReadingPairs,
   toneToColor,
   TextAnalyseToken,
-} from '@app/chinesereader/domain'
-import { Button, ButtonLink } from '@app/chinesereader/Components'
+} from 'src/lib/chinesereader/domain'
+import { Button, ButtonLink } from 'src/lib/chinesereader/Components'
 import {
   CedictResultCollection,
   CedictResultEntry,
-} from '@app/anki/components/zh/api'
+} from 'src/lib/anki/components/zh/api'
 
 interface Props {
   word: TextAnalyseToken | undefined

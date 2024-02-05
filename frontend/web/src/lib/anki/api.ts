@@ -1,4 +1,4 @@
-import { Sentence, SentencesResult, Chapter } from '@app/anki/domain'
+import { Sentence, SentencesResult, Chapter } from 'src/lib/anki/domain'
 import getConfig from 'next/config'
 
 const { publicRuntimeConfig } = getConfig()

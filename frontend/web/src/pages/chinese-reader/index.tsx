@@ -1,8 +1,8 @@
 import type { NextPage } from 'next'
 import { useEffect, useState } from 'react'
-import Layout, { PageTitle } from '@app/Layout'
-import { listTexts, ListTextsResponse } from '@app/chinesereader/domain'
-import { ButtonLink } from '@app/anki/components/Button'
+import Layout, { PageTitle } from 'src/lib/Layout'
+import { listTexts, ListTextsResponse } from 'src/lib/chinesereader/domain'
+import { ButtonLink } from 'src/lib/anki/components/Button'
 
 const Index: NextPage<{}> = () => {
   const [texts, setTexts] = useState<ListTextsResponse>()

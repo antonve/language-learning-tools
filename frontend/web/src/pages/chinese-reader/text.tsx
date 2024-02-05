@@ -1,11 +1,11 @@
 import type { NextPage } from 'next'
 import { useEffect, useState } from 'react'
-import Layout, { PageTitle } from '@app/Layout'
-import Button from '@app/anki/components/Button'
-import TextInput from '@app/chinesereader/TextInput'
-import Reader from '@app/chinesereader/TextReader'
+import Layout, { PageTitle } from 'src/lib/Layout'
+import Button from 'src/lib/anki/components/Button'
+import TextInput from 'src/lib/chinesereader/TextInput'
+import Reader from 'src/lib/chinesereader/TextReader'
 import { useRouter } from 'next/router'
-import { createText, getText, Text } from '@app/chinesereader/domain'
+import { createText, getText, Text } from 'src/lib/chinesereader/domain'
 
 const TextReader: NextPage<{}> = () => {
   const [text, setText] = useState<Text | undefined>()

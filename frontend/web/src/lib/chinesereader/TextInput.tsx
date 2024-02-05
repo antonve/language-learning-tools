@@ -1,7 +1,7 @@
 import type { NextPage } from 'next'
 import { Dispatch, SetStateAction, useState } from 'react'
-import { TextArea } from '@app/anki/components/Form'
-import Button from '@app/anki/components/Button'
+import { TextArea } from 'src/lib/anki/components/Form'
+import Button from 'src/lib/anki/components/Button'
 import { Text } from './domain'
 
 interface Props {

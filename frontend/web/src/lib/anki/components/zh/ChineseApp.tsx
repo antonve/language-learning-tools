@@ -1,14 +1,14 @@
 import type { NextPage } from 'next'
 
-import Layout from '@app/Layout'
-import Sidebar from '@app/anki/components/Sidebar'
-import { useWordCollection } from '@app/anki/hooks'
-import AddWordsButton from '@app/anki/components/AddWordsButton'
-import LanguageToggle from '@app/anki/components/LanguageToggle'
-import { availableLanguages, formatDefinitions } from '@app/anki/domain'
-import CardWizard from '@app/anki/components/zh/CardWizard'
+import Layout from 'src/lib/Layout'
+import Sidebar from 'src/lib/anki/components/Sidebar'
+import { useWordCollection } from 'src/lib/anki/hooks'
+import AddWordsButton from 'src/lib/anki/components/AddWordsButton'
+import LanguageToggle from 'src/lib/anki/components/LanguageToggle'
+import { availableLanguages, formatDefinitions } from 'src/lib/anki/domain'
+import CardWizard from 'src/lib/anki/components/zh/CardWizard'
 import Button from '../Button'
-import { getPendingCards } from '@app/anki/api'
+import { getPendingCards } from 'src/lib/anki/api'
 
 const ChineseApp: NextPage = () => {
   const language = availableLanguages['zh']

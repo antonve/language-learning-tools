@@ -1,12 +1,12 @@
 import type { NextPage } from 'next'
-import MangaReader, { PopupEditorProps } from '@app/mangareader/MangaReader'
+import MangaReader, { PopupEditorProps } from 'src/lib/mangareader/MangaReader'
 import {
   usePersistedTargetLanguage,
   LanguageSelect,
-} from '@app/mangareader/LanguageSelect'
-import { createPendingCard } from '@app/chinesereader/domain'
+} from 'src/lib/mangareader/LanguageSelect'
+import { createPendingCard } from 'src/lib/chinesereader/domain'
 import { useState } from 'react'
-import { useTranslation } from '@app/mangareader/domain'
+import { useTranslation } from 'src/lib/mangareader/domain'
 import { useDebounce } from '@uidotdev/usehooks'
 import { ArrowRightEndOnRectangleIcon } from '@heroicons/react/24/solid'
 

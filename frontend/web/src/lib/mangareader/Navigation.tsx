@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Book } from '@app/mangareader/domain'
+import { Book } from 'src/lib/mangareader/domain'
 import {
   XMarkIcon,
   ChevronLeftIcon,
