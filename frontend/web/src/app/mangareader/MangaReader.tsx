@@ -84,6 +84,11 @@ const MangaReader: NextPage<{
     bottom: 0,
   })
 
+  // disable pull to refresh on safari
+  useEffect(() => {
+    document.body.classList.add('overflow-hidden')
+  })
+
   const imageUrl = useMemo(() => {
     if (!book) {
       return undefined
