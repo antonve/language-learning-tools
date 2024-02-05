@@ -8,7 +8,7 @@ interface Props {
 
 const LanguageToggle = ({ languages, selectedLanguageCode }: Props) => (
   <div className="w-full max-w-md ">
-    <div className="flex p-1 space-x-1 bg-purple-400 bg-opacity-10 rounded-xl flex">
+    <div className="flex p-1 space-x-1 bg-purple-400 bg-opacity-10 rounded-xl">
       {languages.map(lang => (
         <Link
           key={lang.code}
